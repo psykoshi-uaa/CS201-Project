@@ -1,13 +1,12 @@
 #include "star.h"
-
 using namespace std;
 
 
 Player::Player(string inp_name) {
 	name = inp_name;
+	flight_class = 1;
 	rep_cap = (flight_class * 5) + flight_class;
 }
-
 void Player::add_rep(short int rep_to_add){	
 	if (rep_to_add + rep > rep_cap){
 		rank_up();
@@ -17,7 +16,6 @@ void Player::add_rep(short int rep_to_add){
 		rep += rep_to_add;
 	}
 }
-
 void Player::rank_up(){
 	flight_class++;
 	rep_cap = (flight_class * 5) + flight_class;
@@ -28,9 +26,9 @@ void Player::rank_up(){
 Weapon::Weapon(string id_type, string id_model) {
 	model = id_model;
 	type = id_type;
-	full_name = type + " " + model;
+	full_name = id_type + " " + id_model;
 	
-	if (type == "low_impact"){
+	if (type == "low impact"){
 		fire_rate = 4.7;
 		base_damage = 0.25;
 		damage_scaling[0] = 1;
@@ -38,7 +36,7 @@ Weapon::Weapon(string id_type, string id_model) {
 		damage_scaling[2] = 0.1;
 	} 
 	
-	else if (type == "high_impact"){
+	else if (type == "high impact"){
 		fire_rate = 1.2; 
 		base_damage = 1.8;
 		damage_scaling[0] = 1;
