@@ -10,12 +10,14 @@ GitHub is one of many tools used in order to use git. Another example of a tool 
 2. Add (files to be changed or added)
 3. Commit (registers changes to be made with a note)
 4. Push (Pushes all committed changes to the main repository)
+There is more to be said on branching but we can get to that in the future when it is necessary. Think of branching as different save states.
 
 ### Header File
 The header file is used to declare functions and classes as well as the functions and variables within the classes. It looks like:
 
 ___
-```#ifndef HEADERNAME_H
+```
+#ifndef HEADERNAME_H
 #define HEADERNAME_H
 
 #include blah
