@@ -1,12 +1,10 @@
 /*
  */
-
-#include "star_caller.h"
+#include <iostream>
+#include "star.h"
 
 
 int main(){
-	bool playing = true;
-	while (playing){
-
-	}
+	std::cout << "\nmain program executed\n";
 }
+
