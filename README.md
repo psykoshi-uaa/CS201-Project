@@ -4,3 +4,13 @@ This project is a creative assignment from Computer Science 201. We will be crea
 
 ## GUI
 We will be using RAYLIB in order to incorporate a Graphical User Interface for our game. This is a minimalist GUI library that will require us to have an understanding of what is going on with the windows and graphics behind the scenes, unlike with QT.
+
+# GAME LOOP
+5 major steps:
+1. Take mission from mission screen.
+2. Equip gear from prep screen (weapons, mining implements, whatever)
+3. Game plays out the mission (DnD style partial chance results)
+4. Score/status presentation (mission results)
+5. Back to the mission screen
+
+   These will be further broken down 
