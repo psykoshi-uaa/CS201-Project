@@ -3,8 +3,6 @@
 #include <iostream>
 #include "star.h"
 #include "raylib.h"
-#include <string>
-using namespace std;
 
 int main(){
   const int screenWidth = 800;
