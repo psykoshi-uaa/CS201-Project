@@ -1,15 +1,22 @@
 #ifndef STAR_H
 #define STAR_H
 
+#include "raylib.h"
+#include <string>
 
-typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY } GameScreen;
 
-#define FPS 60
+typedef enum GameScreen { LOGO = 0, TITLE, MAINMENU, GAMEPLAY } GameScreen;
 
 extern GameScreen currentScreen;
 
-#include <iostream>
-#include <string>
+#define FPS 60
+
+typedef struct GUIbtn {
+	Rectangle position;
+	Vector2 origin;
+	bool	hovered;
+	bool	selected;
+} GUIbtn;
 
 
 class Player {
@@ -77,6 +84,7 @@ class Timer {
 	static double	waitTime;
 
 	public:
+	int	GetCounter();
 	void	Reset();
 	void	Run();
 	bool 	Wait(double);

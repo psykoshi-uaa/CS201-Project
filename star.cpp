@@ -55,6 +55,10 @@ Weapon::Weapon(std::string idType, std::string idModel) {
 
 
 //code utility classes
+int  Timer::GetCounter() {
+	return frameCounter;
+}
+
 void Timer::Reset() {
 	frameCounter = 0;
 }
