@@ -1,47 +1,93 @@
 /*
  */
-#include <iostream>
 #include "star.h"
 #include "raylib.h"
 
 
-void mainMenu();
+GameScreen currentScreen = LOGO;
+Texture2D titleCard 	= { 0 };
+Texture2D logo 		= { 0 };
+Timer timer;
+
+const int screenWidth	= 800;
+const int screenHeight	= 600;
+
+
+void UpdateCurrentScreen();
+void DrawScreen();
 
 
 int main(){
-  const int screenWidth = 800;
-  const int screenHeight = 600;
-
-  InitWindow(screenWidth, screenHeight, "Starcaller");
-
-  Image image = LoadImage("resources/titlecard.png");
-  Texture2D texture = LoadTextureFromImage(image);
-  UnloadImage(image);
-
-  image = LoadImageFromTexture(texture);
-  UnloadTexture(texture);
-
-  texture = LoadTextureFromImage(image);
-  UnloadImage(image);
+	const int screenWidth = 800;
+	const int screenHeight = 600;
+	InitWindow(screenWidth, screenHeight, "Starcaller");
 
 
-  while (!WindowShouldClose()) {
-    BeginDrawing();
-	
-    	ClearBackground(BLACK);
-	
-	DrawTexture(texture, screenWidth/2 - texture.width/2, screenHeight/4, WHITE);
+	currentScreen = LOGO;
 
-    EndDrawing();
-  }
+	Vector2 center = (Vector2){screenWidth/2, screenHeight/2};
 
-  UnloadTexture(texture);
+	titleCard	= LoadTexture("resources/title.png");
+	logo 		= LoadTexture("resources/logo.png");
 
-  CloseWindow();
 
-  return 0;
+	SetTargetFPS(FPS);
+
+	while (!WindowShouldClose()) {
+
+		UpdateCurrentScreen();
+		
+		DrawScreen();
+	}
+
+	UnloadTexture(titleCard);
+	UnloadTexture(logo);
+
+
+	CloseWindow();
+
+	return 0;
 }
 
-void mainMenu() {
 
+void UpdateCurrentScreen(){
+	switch (currentScreen)
+	{
+		case LOGO:
+		{
+			timer.Run();
+
+			if (timer.Wait(3)) {
+				currentScreen = TITLE;
+			}
+		} 
+		break;
+
+		case TITLE:
+		{
+		} 
+		break;
+
+		default:break;
+	}
+}
+
+
+void DrawScreen() {
+	BeginDrawing();
+
+	ClearBackground(BLACK);
+
+	switch (currentScreen) {
+		case LOGO: {
+			DrawTexture(logo, screenWidth/2 - logo.width/2, screenHeight/2 - logo.height/2, WHITE);
+		}
+		break;
+		
+		case TITLE: {
+			DrawTexture(titleCard, screenWidth/2 - titleCard.width/2, screenHeight/4, WHITE);
+		}
+	}
+
+	EndDrawing();
 }

@@ -51,3 +51,21 @@ Weapon::Weapon(std::string idType, std::string idModel) {
 		damageScaling[2] = 0.7; 
 	}
 }
+
+
+
+//code utility classes
+void Timer::Reset() {
+	frameCounter = 0;
+}
+
+void Timer::Run() {
+	frameCounter++;
+}
+
+bool Timer::Wait(double mark){
+	if (frameCounter > FPS * mark) {
+		return true;
+	}
+	return false;
+}

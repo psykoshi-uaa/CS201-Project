@@ -1,12 +1,18 @@
-
 #ifndef STAR_H
 #define STAR_H
 
 
+typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY } GameScreen;
+
+#define FPS 60
+
+extern GameScreen currentScreen;
+
+#include <iostream>
 #include <string>
 
 
-class Player{
+class Player {
 	private:
 	std::string	name;
 	short int 	flightClass,
@@ -22,7 +28,7 @@ class Player{
 };
 
 
-class Weapon{
+class Weapon {
 	private:
 	std::string	fullName,
 			model,
@@ -30,11 +36,6 @@ class Weapon{
 	double		baseDamage,	
 			fireRate,
 			damageScaling[3];
-		//damageScaling refers to damage againts specific armor
-		//damage scaling list:
-			//unarmored:	[0]
-			//reinforved:	[1]
-			//energy:	[2]
 
 	public:
 	std::string 	getModel() {return model;}
@@ -45,7 +46,7 @@ class Weapon{
 };
 
 
-class Drill{
+class Drill {
 	private:
 	short int 	level;	
 	double 		baseDamage;
@@ -59,7 +60,7 @@ class Drill{
 };
 
 
-class CargoBay{
+class CargoBay {
 	private:
 	double		maxWeight;
 
@@ -67,5 +68,18 @@ class CargoBay{
 	double		getWeight();
 };
 
-#endif
 
+
+//code utility classes
+class Timer {
+	private:
+	int	frameCounter = 0;
+	static double	waitTime;
+
+	public:
+	void	Reset();
+	void	Run();
+	bool 	Wait(double);
+};
+
+#endif
