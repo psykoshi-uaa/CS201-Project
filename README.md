@@ -33,8 +33,8 @@ Player should be able to look at their stats here, and current inventory/equipme
 2. Mission:
 	Player takes mission. Mission plays out by giving a text blurb that varies depending on mission type. Last paragraph may vary depending on fail/success. In the background the game compares player stats with mission requirements, and adds the modifier +number depending on weapon/ship bonuses or other stats. (For example, an upgraded laser would provide +3 to the player ‘dice roll’ against an enemy. An upgraded engine would allow the cargo to be transported +2 parsecs faster.) Further interactivity could be brought by making mid-combat choices in a turn based system. (Use different weapons, flee, etc.)
 	
-	2.5: Display results
-To start with just displaying results will be good. Display more earned, damage taken (-money to repair). If money falls below debt threshold, GAME OVER. 
+	2.5: Display results - 
+To start with just displaying results will be good. Display money earned, damage taken (-money to repair). If money falls below debt threshold, GAME OVER. 
 
 	Mission design may take 2 forms: combat and industry/mining/transport. More types can be created for more complexity. Upgrades that give new abilities (cargo hold, anti-gravity, etc.) allow access to these missions. Combat is the high-risk, high reward scenario, whereas the others are lower risk, less reward. Combat carries risk of death, and the increase of your debt. Other options allow you to increase money with very small chance of pirate attack.
 
