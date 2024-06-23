@@ -1,12 +1,12 @@
 # CS201-Project
-    This project is a creative assignment from Computer Science 201. We will be creating a space-faring game of sorts. The goal of our game is to build resources that generate idly, allowing you to build more advanced resoure generation tools for your ship and allow you to take on more dangerous missions. 
+  This project is a creative assignment from Computer Science 201. We will be creating a space-faring game of sorts. The goal of our game is to build resources that generate idly, allowing you to build more advanced resoure generation tools for your ship and allow you to take on more dangerous missions. 
 
 
 ## GUI
-    We will be using RAYLIB in order to incorporate a Graphical User Interface for our game. This is a minimalist GUI library that will require us to have an understanding of what is going on with the windows and graphics behind the scenes, unlike with QT.
+  We will be using RAYLIB in order to incorporate a Graphical User Interface for our game. This is a minimalist GUI library that will require us to have an understanding of what is going on with the windows and graphics behind the scenes, unlike with QT.
 
 ## Player Choice
-    The player should have agency in making the best decision as a space pilot. They will choose which mission they should take in order to maximize their mission rewards based on ship equipment, currency, and other stats that will affect the outcome of the varied missions.
+  The player should have agency in making the best decision as a space pilot. They will choose which mission they should take in order to maximize their mission rewards based on ship equipment, currency, and other stats that will affect the outcome of the varied missions.
 
 # GAME LOOP
 Game Loop
@@ -14,7 +14,7 @@ Intro:
 	Title screen appears. Player presses key to begin. Through text interaction player names character. Welcome message appears, introducing the game (this could also come before title screen). Land on home/hub screen.
 
 1. Home:
-	The display of Home depends on graphical capability. Functionally it represents the main part of the player’s journey. It should say how much money the player has, and present a the beginning of a couple option trees. (GUI or text).
+	The display of Home depends on graphical capability. Functionally it represents the main part of the player’s journey. It should say how much money the player has, and present a of couple option trees. (GUI or text).
 	
 Upgrades, ship and character. 
 Money, debt and income (especially if the player acquires a constant income upgrade). 
@@ -23,7 +23,7 @@ Jobs, Missions/increment grind.
 
 Player should be able to look at their stats here, and current inventory/equipment.
 
-	Player chooses how to proceed. To begin with, player should do 1-3 incremental “jobs” or clicks to just increase money (small chance for big salvage win as well). Player then buys a weapon, tool, whatever to take a mission that has 1 requirement.
+   Player chooses how to proceed. To begin with, player should do 1-3 incremental “jobs” or clicks to just increase money (small chance for big salvage win as well). Player then buys a weapon, tool, whatever to take a mission that has 1 requirement.
 
 ! All equipment could be designed as flat stat increases or new capabilities, eliminating the need for a gear-swapping system. 
 
