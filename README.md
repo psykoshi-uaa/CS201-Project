@@ -1,7 +1,7 @@
 # CS201-Project
   This project is a creative assignment from Computer Science 201. We will be creating a space-faring game of sorts. The goal of our game is to build resources that generate idly, allowing you to build more advanced resoure generation tools for your ship and allow you to take on more dangerous missions. 
 
-[title card](https://github.com/psykoshi-uaa/CS201-Project/blob/main/resources/title.png)
+![title](https://github.com/psykoshi-uaa/CS201-Project/assets/171866242/c8e191d9-e42c-4038-83b7-bff487adaff4)
 
 #### GUI
   We will be using RAYLIB in order to incorporate a Graphical User Interface for our game. This is a minimalist GUI library that will require us to have an understanding of what is going on with the windows and graphics behind the scenes, unlike with QT.
