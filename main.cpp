@@ -4,49 +4,40 @@
 //#include "raylib.h"
 
 
+const int screenWidth = 800;
+const int screenHeight = 600;
+
 GameScreen currentScreen = LOGO;
 Texture2D titleCard 		= { 0 };
 Texture2D logo 			= { 0 };
 Texture2D particle		= { 0 };
+static int btnHovered		= { 0 };
 static GUIbtn newGameBtn	= { 0 };
 static GUIbtn exitBtn		= { 0 };
-Timer screenTimer;
+static Timer screenTimer;
 
-const int screenWidth	= 800;
-const int screenHeight	= 600;
-
-
-void initMainMenu();
-void UpdateCurrentScreen();
-void DrawScreen();
+static void initMainMenu();
+static void UpdateCurrentScreen();
+static void DrawScreen();
+static void CheckBtnCollision();
+static void CheckBtnPressed();
 
 
 int main(){
-	const int screenWidth = 800;
-	const int screenHeight = 600;
-	InitWindow(screenWidth, screenHeight, "Starcaller");
-
-
-	currentScreen = LOGO;
-
-
-	titleCard	= LoadTexture("resources/title.png");
-	logo 		= LoadTexture("resources/logo.png");
 	initMainMenu();
-
-
-	SetTargetFPS(FPS);
 
 	while (!WindowShouldClose()) {
 
 		UpdateCurrentScreen();
 		
 		DrawScreen();
+
+		CheckBtnCollision();
+		CheckBtnPressed();
 	}
 
 	UnloadTexture(titleCard);
 	UnloadTexture(logo);
-
 
 	CloseWindow();
 
@@ -54,26 +45,32 @@ int main(){
 }
 
 
-void initMainMenu() {
+static void initMainMenu() {
+	InitWindow(screenWidth, screenHeight, "Starcaller");
+	titleCard	= LoadTexture("resources/title.png");
+	logo 		= LoadTexture("resources/logo.png");
+	
+	currentScreen = LOGO;
+
+	btnHovered = -1;
+
+	SetTargetFPS(FPS);
+
 	newGameBtn.origin = (Vector2) {screenWidth/5, screenHeight - screenHeight/4};
 	newGameBtn.position = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 90, 25};
-	newGameBtn.hovered = false;
-	newGameBtn.selected = false;
 
 	exitBtn.origin = (Vector2) {screenWidth/5, newGameBtn.origin.y + 25};
 	exitBtn.position = (Rectangle) {exitBtn.origin.x, exitBtn.origin.y, 90, 25};
-	exitBtn.hovered = false;
-	exitBtn.selected = false;
 }
 
 
-void UpdateCurrentScreen(){
+static void UpdateCurrentScreen(){
 	switch (currentScreen)
 	{
 		case LOGO: {
 			screenTimer.Run();
 
-			if (screenTimer.Wait(3)) {
+			if (screenTimer.Wait(3) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				currentScreen = TITLE;
 				screenTimer.Reset();
 			}
@@ -83,7 +80,7 @@ void UpdateCurrentScreen(){
 		case TITLE: {
 			screenTimer.Run();
 
-			if (screenTimer.Wait(4) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				currentScreen = MAINMENU;
 				screenTimer.Reset();
 			}
@@ -98,7 +95,7 @@ void UpdateCurrentScreen(){
 }
 
 
-void DrawScreen() {
+static void DrawScreen() {
 	BeginDrawing();
 
 	ClearBackground(BLACK);
@@ -117,14 +114,13 @@ void DrawScreen() {
 
 		case MAINMENU: {
 			DrawTexture(titleCard, screenWidth/2 - titleCard.width/2, screenHeight/5, WHITE);
-			if (CheckCollisionPointRec(GetMousePosition(), newGameBtn.position)) {
+			if (btnHovered == NEWGAMEBTN) {
 				DrawTextEx(GetFontDefault(), "new game", newGameBtn.origin, 20, 0, BLUE);
 			}
 			else {
 				DrawTextEx(GetFontDefault(), "new game", newGameBtn.origin, 20, 0, WHITE);
 			}
-
-			if (CheckCollisionPointRec(GetMousePosition(), exitBtn.position)) {
+			if (btnHovered == EXITBTN) {
 				DrawTextEx(GetFontDefault(), "exit", exitBtn.origin, 20, 0, BLUE);
 			}
 			else {
@@ -139,3 +135,42 @@ void DrawScreen() {
 	EndDrawing();
 }
 
+static void CheckBtnCollision() {
+	switch (currentScreen) {
+		case MAINMENU: {
+			if (CheckCollisionPointRec(GetMousePosition(), newGameBtn.position)) {
+				btnHovered = NEWGAMEBTN;
+			}
+			else  if (CheckCollisionPointRec(GetMousePosition(), exitBtn.position)) {
+				btnHovered = EXITBTN;
+			}
+			else {
+				btnHovered = -1;
+			}
+		} break;
+
+		default: break;
+	}
+}
+
+static void CheckBtnPressed() {
+	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && btnHovered != -1) {
+		switch (currentScreen) {
+			case MAINMENU: {
+				switch (btnHovered) {
+					case NEWGAMEBTN: {
+						currentScreen = GAMEPLAY;
+					} break;
+
+					case EXITBTN: {
+						CloseWindow();
+					} break;
+
+					default: break;
+				}
+			} break;
+			
+			default: break;
+		}
+	}
+}

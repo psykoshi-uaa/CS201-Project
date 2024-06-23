@@ -6,6 +6,7 @@
 
 
 typedef enum GameScreen { LOGO = 0, TITLE, MAINMENU, GAMEPLAY } GameScreen;
+typedef enum MenuOptions { NEWGAMEBTN = 0, EXITBTN } MenuOptions;
 
 extern GameScreen currentScreen;
 
@@ -14,8 +15,6 @@ extern GameScreen currentScreen;
 typedef struct GUIbtn {
 	Rectangle position;
 	Vector2 origin;
-	bool	hovered;
-	bool	selected;
 } GUIbtn;
 
 
