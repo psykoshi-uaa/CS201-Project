@@ -1,7 +1,6 @@
 /*
  */
 #include "star.h"
-//#include "raylib.h"
 
 
 const int screenWidth = 800;
@@ -11,6 +10,7 @@ GameScreen currentScreen = LOGO;
 Texture2D titleCard 		= { 0 };
 Texture2D logo 			= { 0 };
 Texture2D particle		= { 0 };
+Font sagaFont			= { 0 };
 static int btnHovered		= { 0 };
 static GUIbtn newGameBtn	= { 0 };
 static GUIbtn exitBtn		= { 0 };
@@ -49,6 +49,7 @@ static void initMainMenu() {
 	InitWindow(screenWidth, screenHeight, "Starcaller");
 	titleCard	= LoadTexture("resources/title.png");
 	logo 		= LoadTexture("resources/logo.png");
+	sagaFont	= LoadFont("resources/saga-regular.ttf");
 	
 	currentScreen = LOGO;
 
@@ -115,16 +116,16 @@ static void DrawScreen() {
 		case MAINMENU: {
 			DrawTexture(titleCard, screenWidth/2 - titleCard.width/2, screenHeight/5, WHITE);
 			if (btnHovered == NEWGAMEBTN) {
-				DrawTextEx(GetFontDefault(), "new game", newGameBtn.origin, 20, 0, BLUE);
+				DrawTextEx(sagaFont, "new game", newGameBtn.origin, 20, 0, BLUE);
 			}
 			else {
-				DrawTextEx(GetFontDefault(), "new game", newGameBtn.origin, 20, 0, WHITE);
+				DrawTextEx(sagaFont, "new game", newGameBtn.origin, 20, 0, WHITE);
 			}
 			if (btnHovered == EXITBTN) {
-				DrawTextEx(GetFontDefault(), "exit", exitBtn.origin, 20, 0, BLUE);
+				DrawTextEx(sagaFont, "exit", exitBtn.origin, 20, 0, BLUE);
 			}
 			else {
-				DrawTextEx(GetFontDefault(), "exit", exitBtn.origin, 20, 0, WHITE);
+				DrawTextEx(sagaFont, "exit", exitBtn.origin, 20, 0, WHITE);
 			}
 		}
 		break;
