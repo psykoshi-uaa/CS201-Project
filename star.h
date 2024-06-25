@@ -10,13 +10,13 @@ typedef enum MenuOptions { NEWGAMEBTN = 0, EXITBTN } MenuOptions;
 
 extern GameScreen currentScreen;
 
-#define FPS 60
-
 typedef struct GUIbtn {
 	Rectangle position;
 	Vector2 origin;
 } GUIbtn;
 
+#define FPS 60
+#define MAINMENUFONTSIZE 25
 
 class Player {
 	private:
@@ -79,7 +79,7 @@ class CargoBay {
 //code utility classes
 class Timer {
 	private:
-	int	frameCounter = 0;
+	int		frameCounter;
 	static double	waitTime;
 
 	public:

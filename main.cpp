@@ -116,16 +116,16 @@ static void DrawScreen() {
 		case MAINMENU: {
 			DrawTexture(titleCard, screenWidth/2 - titleCard.width/2, screenHeight/5, WHITE);
 			if (btnHovered == NEWGAMEBTN) {
-				DrawTextEx(sagaFont, "new game", newGameBtn.origin, 20, 0, BLUE);
+				DrawTextEx(sagaFont, "new game", newGameBtn.origin, MAINMENUFONTSIZE, 0, BLUE);
 			}
 			else {
-				DrawTextEx(sagaFont, "new game", newGameBtn.origin, 20, 0, WHITE);
+				DrawTextEx(sagaFont, "new game", newGameBtn.origin, MAINMENUFONTSIZE, 0, WHITE);
 			}
 			if (btnHovered == EXITBTN) {
-				DrawTextEx(sagaFont, "exit", exitBtn.origin, 20, 0, BLUE);
+				DrawTextEx(sagaFont, "exit", exitBtn.origin, MAINMENUFONTSIZE, 0, BLUE);
 			}
 			else {
-				DrawTextEx(sagaFont, "exit", exitBtn.origin, 20, 0, WHITE);
+				DrawTextEx(sagaFont, "exit", exitBtn.origin, MAINMENUFONTSIZE, 0, WHITE);
 			}
 		}
 		break;
