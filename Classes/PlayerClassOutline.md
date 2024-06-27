@@ -2,6 +2,8 @@
 
 ## Attributes
 (All public)
+- **name**: player name from input:
+- **class**: player class from class select
 
 - **money**: Default 0
 - **debt**: Default highly negative value
@@ -10,19 +12,26 @@
 - **hasShield**: Boolean
 - **SP**: Shield health points
 
-- **piloting**: Skill value to add when skill-checking
-- **repair**: Skill value to add when skill-checking
-- **bartering**: Skill value to add when skill-checking
+- **piloting**: Skill value to add when skill-checking, increases yeilds
+- **repair**: Skill value to add when skill-checking, discounts repairs
+- **bartering**: Skill value to add when skill-checking, discounts prices
+
 
 ## Methods
 
 ### Display Attributes Methods
 
-- **getMoney()**: Return money for display
-- **getDebt()**: Return debt for display
-- **getHP()**: Return HP for display
-- **getShieldHP()**: Return shield HP for display
-- **getSkills()**: Return skills for display
+- **getName()**: return name
+- **getMoney()**: Return money
+- **getDebt()**: Return debt
+- **getHP()**: Return HP
+- **getSP()**: Return SP
+- **getSkills()**: Return skills
+
+- **setClass()**: carry out class selection, apply default values to skills and set appropriate class attribute 
+- **getPilot()**: return pilot skill
+- **getRepair()**: return repair skill
+- **getBarter()**: return barter skill
 
 ### Change Attributes Methods
 
