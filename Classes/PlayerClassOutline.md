@@ -28,6 +28,11 @@
 - **getSP()**: Return SP
 - **getSkills()**: Return skills
 
+  Upgrade Methods:
+- `void ApplyUpgrade(Upgrade)` - Apply an upgrade to the starship, adding it to the list of applied upgrades.
+- `void ShowUpgrades() const` - Display the list of applied upgrades.
+
+
 - **setClass()**: carry out class selection, apply default values to skills and set appropriate class attribute 
 - **getPilot()**: return pilot skill
 - **getRepair()**: return repair skill
