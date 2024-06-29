@@ -29,7 +29,7 @@
 - **getSkills()**: Return skills
 
   Upgrade Methods:
-- `void ApplyUpgrade(Upgrade)` - Apply an upgrade to the starship, adding it to the list of applied upgrades.
+- `void ApplyUpgrade(Upgrade)` - Apply an upgrade to player, adding it to the list of applied upgrades.
 - `void ShowUpgrades() const` - Display the list of applied upgrades.
 
 
