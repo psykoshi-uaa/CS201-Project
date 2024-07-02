@@ -1,26 +1,34 @@
 #ifndef STAR_H
 #define STAR_H
 
+//includes
 #include "raylib.h"
+#include "raymath.h"
 #include <string>
 
-//MODULAR VARIABLES, STRUCTS, ENUMS
+//defines
+#define FPS 60
+#define MAINMENUFONTSIZE 25
+
+//enums and structs
 typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, GAMEPLAY } GameScreen;
-typedef enum MenuOptions { NEWGAMEBTN = 0, EXITBTN } MenuOptions;
-typedef enum HubButtons	 { MISSIONBOARD, STATUS, MARKET, GIVEUP } HubButtons;
-typedef enum Missions	 { ODDJOB = 0, GATHER, SALVAGE, BOUNTY, RAID } Missions;
+typedef enum Buttons {	NOBTN, NEWGAMEBTN, EXITBTN,
+			MISSIONBOARD=10, STATUS=11, MARKET=12, GIVEUP=13,
+			ODDJOB=20, GATHER=21, SALVAGE=22, BOUNTY=23, RAID=24
+} Buttons;
 
 typedef struct GUIbtn {
 	Rectangle position;
 	Vector2 origin;
 } GUIbtn;
 
+//global variables
 extern GameScreen currentScreen;
+extern Buttons btnHovered;
+extern Buttons btnPlacement;
 
-#define FPS 60
-#define MAINMENUFONTSIZE 25
-//END OF MODULAR VARIABLES
 
+//-------------------------------------------------------------------------------
 //player, ship, mission classes
 class Player {
 };
