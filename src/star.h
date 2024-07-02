@@ -31,6 +31,27 @@ extern Buttons btnPlacement;
 //-------------------------------------------------------------------------------
 //player, ship, mission classes
 class Player {
+	private: 
+	std::string	name;
+	std::string Class;
+	int money;
+	int debt;
+	int HP;
+	const int maxHP;
+	bool hasShield;
+	int SP;
+	int piloting;
+	int repair;
+	int bartering;
+
+	public:
+	std::string getName();
+	int getMoney();
+	int getDebt();
+	int getHP();
+	int getSP();
+	void getSkills(int&, int&, int&);
+
 };
 
 

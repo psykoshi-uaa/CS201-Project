@@ -4,10 +4,31 @@
 
 
 //player, ship, and mission classes
+std::string Player::getName() {
+	return name;
+}
 
+int Player::getMoney() {
+	return money;
+}
 
+int Player::getDebt() {
+	return debt;
+}
 
+int Player::getHP() {
+	return HP;
+}
 
+int Player::getSP() {
+	return SP;
+}
+
+void Player::getSkills(int& Piloting, int& Repair, int& Bartering) {
+	Piloting = piloting;
+	Repair = repair;
+	Bartering = bartering;
+}
 
 
 
