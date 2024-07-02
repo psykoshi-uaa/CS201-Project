@@ -1,28 +1,58 @@
+#include <ctime>
+#include <cstdlib> 
 #include "star.h"
 
 
-Player::Player(std::string inpName) {
-	name = inpName;
-	flightClass = 1;
-	repCap = (flightClass * 5) + flightClass;
+//player, ship, and mission classes
+
+
+
+
+
+
+
+//code utility classes
+int  Timer::GetCounter() {
+	return frameCounter;
 }
-void Player::addRep(short int repToAdd){	
-	if (repToAdd + rep > repCap){
-		rankUp();
-		rep = 0 + (repToAdd - (repCap - rep));
-	}
-	else{
-		rep += repToAdd;
-	}
+
+void Timer::Reset() {
+	frameCounter = 0;
 }
-void Player::rankUp(){
-	flightClass++;
-	repCap = (flightClass * 5) + flightClass;
-	//Genererate congratulatory message
+
+void Timer::Run() {
+	frameCounter++;
+}
+
+bool Timer::Wait(double mark){
+	if (frameCounter > FPS * mark) {
+		return true;
+	}
+	return false;
 }
 
 
-Weapon::Weapon(std::string idType, std::string idModel) {
+Dice::Dice() {
+	static bool seeded = false;
+	if (!seeded) {
+		std::srand(std::time(nullptr));
+		seeded = true;
+	}
+}
+
+int Dice::rollD6(int numRolls = 0) {
+	int total = 0;
+	for (int i=0; i<numRolls; ++i) {
+		total += std::rand() % 6 + 1;
+	}
+	return total;
+}
+
+
+
+/*backup
+ *
+ * Weapon::Weapon(std::string idType, std::string idModel) {
 	model = idModel;
 	type = idType;
 	fullName = idType + " " + idModel;
@@ -51,25 +81,4 @@ Weapon::Weapon(std::string idType, std::string idModel) {
 		damageScaling[2] = 0.7; 
 	}
 }
-
-
-
-//code utility classes
-int  Timer::GetCounter() {
-	return frameCounter;
-}
-
-void Timer::Reset() {
-	frameCounter = 0;
-}
-
-void Timer::Run() {
-	frameCounter++;
-}
-
-bool Timer::Wait(double mark){
-	if (frameCounter > FPS * mark) {
-		return true;
-	}
-	return false;
-}
+ */

@@ -4,74 +4,25 @@
 #include "raylib.h"
 #include <string>
 
-
-typedef enum GameScreen { LOGO = 0, TITLE, MAINMENU, GAMEPLAY } GameScreen;
+//MODULAR VARIABLES, STRUCTS, ENUMS
+typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, GAMEPLAY } GameScreen;
 typedef enum MenuOptions { NEWGAMEBTN = 0, EXITBTN } MenuOptions;
-
-extern GameScreen currentScreen;
+typedef enum HubButtons	 { MISSIONBOARD, STATUS, MARKET, GIVEUP } HubButtons;
+typedef enum Missions	 { ODDJOB = 0, GATHER, SALVAGE, BOUNTY, RAID } Missions;
 
 typedef struct GUIbtn {
 	Rectangle position;
 	Vector2 origin;
 } GUIbtn;
 
+extern GameScreen currentScreen;
+
 #define FPS 60
 #define MAINMENUFONTSIZE 25
+//END OF MODULAR VARIABLES
 
+//player, ship, mission classes
 class Player {
-	private:
-	std::string	name;
-	short int 	flightClass,
-	      		rep, 
-			repCap;
-
-	public:
-	std::string getName() {return name;}
-	short int getFlightClass() {return flightClass;}
-	void addRep(short int);
-	void rankUp();
-	Player(std::string inpName);
-};
-
-
-class Weapon {
-	private:
-	std::string	fullName,
-			model,
-			type;
-	double		baseDamage,	
-			fireRate,
-			damageScaling[3];
-
-	public:
-	std::string 	getModel() {return model;}
-	std::string	getType() {return type;}
-	std::string	getName() {return fullName;}
-	double 		calculateDamage(short int);
-	Weapon(std::string idType, std::string idModel);
-};
-
-
-class Drill {
-	private:
-	short int 	level;	
-	double 		baseDamage;
-	std::string 	name;
-
-	public:
-	void 		upgradeDrill();
-	short int 	getLevel();
-	double 		getDamage();
-	std::string	getName();
-};
-
-
-class CargoBay {
-	private:
-	double		maxWeight;
-
-	public:
-	double		getWeight();
 };
 
 
@@ -89,4 +40,32 @@ class Timer {
 	bool 	Wait(double);
 };
 
+class Dice {
+	public:
+	Dice();
+	int rollD6(int);
+};
+
+
 #endif
+
+
+
+/* backup
+class Weapon {
+	private:
+	std::string	fullName,
+			model,
+			type;
+	double		baseDamage,	
+			fireRate,
+			damageScaling[3];
+
+	public:
+	std::string 	getModel() {return model;}
+	std::string	getType() {return type;}
+	std::string	getName() {return fullName;}
+	double 		calculateDamage(short int);
+	Weapon(std::string idType, std::string idModel);
+};
+*/
