@@ -66,7 +66,7 @@ static void InitMainMenu() {
 	InitWindow(screenWidth, screenHeight, "Starcaller");
 	titleCard	= LoadTexture("resources/title.png");
 	logo 		= LoadTexture("resources/logo.png");
-	sagaFont	= LoadFontEx("resources/saga-font.ttf", 72, NULL, 0);
+	sagaFont	= LoadFontEx("resources/saga.ttf", 72, NULL, 0);
 	
 	currentScreen = LOGO;
 
