@@ -31,7 +31,6 @@ static void InitBoard();
 static void UpdateCurrentScreen();
 static void DrawScreen();
 static void CheckBtnCollision();
-static void CheckBtnPressed();
 
 //declaring global
 GameScreen currentScreen = LOGO;
@@ -49,7 +48,6 @@ int main(){
 		UpdateCurrentScreen();
 		DrawScreen();
 		CheckBtnCollision();
-		CheckBtnPressed();
 	}
 
 	UnloadTexture(titleCard);
@@ -92,7 +90,7 @@ static void InitHub() {
 		hubBtnGrid[i] = NOBTN;
 	}
 
-	boardBtn.origin = (Vector2) { 50, 100+(MISSIONBOARD - 10) * 50};
+	boardBtn.origin = (Vector2) { 50, 100+((MISSIONBOARD - 10) * 50)};
 	boardBtn.position = (Rectangle) {boardBtn.origin.x, boardBtn.origin.y, 200, 50};
 }
 
@@ -132,6 +130,19 @@ static void UpdateCurrentScreen(){
 			}
 		}
 		break;
+
+		case MAINMENU: {
+			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+				switch (btnHovered) {
+					case NEWGAMEBTN: {
+						currentScreen = HUB;
+					} break;
+	
+					case EXITBTN: {
+						CloseWindow();
+					} break;
+				}
+		}
 
 		default:break;
 	}
@@ -200,29 +211,5 @@ static void CheckBtnCollision() {
 		} break;
 
 		default: break;
-	}
-}
-
-
-//check to see if a button is pressed
-static void CheckBtnPressed() {
-	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && btnHovered != NOBTN) {
-		switch (currentScreen) {
-			case MAINMENU: {
-				switch (btnHovered) {
-					case NEWGAMEBTN: {
-						currentScreen = HUB;
-					} break;
-
-					case EXITBTN: {
-						CloseWindow();
-					} break;
-
-					default: break;
-				}
-			} break;
-			
-			default: break;
-		}
 	}
 }
