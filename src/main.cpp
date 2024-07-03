@@ -21,11 +21,13 @@ static GUIbtn salvageMissionBtn = { 0 };
 static GUIbtn bountyMissionBtn	= { 0 };
 static GUIbtn raidMissionBtn	= { 0 };
 static Timer screenTimer;
-static int btnGrid[8];
+static int hubBtnGrid[MAXBTNS];
+static int boardBtnGrid[MAXBTNS];
 
 //module function prototypes
 static void InitMainMenu();
-static void InitGameLoop();
+static void InitHub();
+static void InitBoard();
 static void UpdateCurrentScreen();
 static void DrawScreen();
 static void CheckBtnCollision();
@@ -37,9 +39,9 @@ Buttons btnHovered = NOBTN;
 
 //main program
 int main(){
-		//need to figure out how to initialize these based on gamescreen, not at once...
 	InitMainMenu();
-	InitGameLoop();
+	InitHub();
+	InitBoard();
 
 	SetTargetFPS(FPS);
 
@@ -64,7 +66,7 @@ static void InitMainMenu() {
 	InitWindow(screenWidth, screenHeight, "Starcaller");
 	titleCard	= LoadTexture("resources/title.png");
 	logo 		= LoadTexture("resources/logo.png");
-	sagaFont	= LoadFont("resources/saga-regular.ttf");
+	sagaFont	= LoadFont("resources/saga-font.ttf");
 	
 	currentScreen = LOGO;
 
@@ -78,20 +80,36 @@ static void InitMainMenu() {
 }
 
 
-//initialize game loop
-static void InitGameLoop() {
-	
-
+//initialize Hub
+static void InitHub() {
 	btnHovered = NOBTN;
 
-	btnGrid[0] = Buttons::MISSIONBOARD;
-	btnGrid[1] = Buttons::STATUS;
-	btnGrid[2] = Buttons::MARKET;
-	btnGrid[3] = Buttons::GIVEUP;
+	hubBtnGrid[0] = Buttons::MISSIONBOARD;
+	hubBtnGrid[1] = Buttons::STATUS;
+	hubBtnGrid[2] = Buttons::MARKET;
+	hubBtnGrid[3] = Buttons::GIVEUP;
+	for (int i=4; i<MAXBTNS; i++) {
+		hubBtnGrid[i] = NOBTN;
+	}
 
-	//boardBtn.origin = (Vector2) {
+	boardBtn.origin = (Vector2) { 50, 100+(MISSIONBOARD - 10) * 50};
+	boardBtn.position = (Rectangle) {boardBtn.origin.x, boardBtn.origin.y, 200, 50};
 }
 
+
+//initiliaze Board
+static void InitBoard() {
+	btnHovered = NOBTN;
+
+	boardBtnGrid[0] = Buttons::ODDJOB;
+	boardBtnGrid[1] = Buttons::GATHER;
+	boardBtnGrid[2] = Buttons::SALVAGE;
+	boardBtnGrid[3] = Buttons::BOUNTY;
+	boardBtnGrid[4] = Buttons::RAID;
+	for (int i=5; i<MAXBTNS; i++) {
+		boardBtnGrid[i] = NOBTN;
+	}
+}
 
 //update screen based on events
 static void UpdateCurrentScreen(){
@@ -108,17 +126,12 @@ static void UpdateCurrentScreen(){
 		break;
 		
 		case TITLE: {
-			screenTimer.Run();
-
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				currentScreen = MAINMENU;
 				screenTimer.Reset();
 			}
 		}
 		break;
-
-		case MAINMENU: {
-		}
 
 		default:break;
 	}
@@ -139,7 +152,7 @@ static void DrawScreen() {
 		
 		case TITLE: {
 			DrawTexture(titleCard, screenWidth/2 - titleCard.width/2, screenHeight/5, WHITE);
-			DrawText("<click anywhere>", screenWidth/2 - 70, 340, 20, WHITE);
+			DrawTextEx(sagaFont, "<click anywhere>", (Vector2){screenWidth/2 - 70, 340}, 30, 0, WHITE);
 		}
 		break;
 
@@ -159,6 +172,10 @@ static void DrawScreen() {
 			}
 		}
 		break;
+		 
+		case HUB: {
+			DrawTextEx(sagaFont, "MISSIONS", boardBtn.origin, 50, 0, WHITE);
+		}
 
 		default:break; 
 	}
@@ -194,7 +211,7 @@ static void CheckBtnPressed() {
 			case MAINMENU: {
 				switch (btnHovered) {
 					case NEWGAMEBTN: {
-						currentScreen = GAMEPLAY;
+						currentScreen = HUB;
 					} break;
 
 					case EXITBTN: {

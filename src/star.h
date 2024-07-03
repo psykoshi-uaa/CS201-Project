@@ -1,17 +1,17 @@
 #ifndef STAR_H
 #define STAR_H
 
-//includes
+//indludes
 #include "raylib.h"
-#include "raymath.h"
 #include <string>
 
 //defines
 #define FPS 60
 #define MAINMENUFONTSIZE 25
+#define MAXBTNS 8
 
 //enums and structs
-typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, GAMEPLAY } GameScreen;
+typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, HUB, BOARD, PLAYERSHEET, GAMEOVER, SUCCESS } GameScreen;
 typedef enum Buttons {	NOBTN, NEWGAMEBTN, EXITBTN,
 			MISSIONBOARD=10, STATUS=11, MARKET=12, GIVEUP=13,
 			ODDJOB=20, GATHER=21, SALVAGE=22, BOUNTY=23, RAID=24
@@ -25,7 +25,6 @@ typedef struct GUIbtn {
 //global variables
 extern GameScreen currentScreen;
 extern Buttons btnHovered;
-extern Buttons btnPlacement;
 
 
 //-------------------------------------------------------------------------------
