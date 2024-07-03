@@ -31,7 +31,6 @@ void Player::getSkills(int& Piloting, int& Repair, int& Bartering) {
 }
 
 
-
 //code utility classes
 int  Timer::GetCounter() {
 	return frameCounter;
@@ -68,38 +67,3 @@ int Dice::rollD6(int numRolls = 0) {
 	}
 	return total;
 }
-
-
-
-/*backup
- *
- * Weapon::Weapon(std::string idType, std::string idModel) {
-	model = idModel;
-	type = idType;
-	fullName = idType + " " + idModel;
-	
-	if (type == "low impact"){
-		fireRate = 4.7;
-		baseDamage = 0.25;
-		damageScaling[0] = 1;
-		damageScaling[1] = 0.7;
-		damageScaling[2] = 0.1;
-	} 
-	
-	else if (type == "high impact"){
-		fireRate = 1.2; 
-		baseDamage = 1.8;
-		damageScaling[0] = 1;
-		damageScaling[1] = 0.9;
-		damageScaling[2] = 0.1;
-	}
-
-	else if (type == "laser"){
-		fireRate = 2.1; 
-		baseDamage = 3.7;
-		damageScaling[0] = 1.4;
-		damageScaling[1] = 0.7;
-		damageScaling[2] = 0.7; 
-	}
-}
- */

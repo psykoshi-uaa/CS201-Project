@@ -1,19 +1,26 @@
 #ifndef STAR_H
 #define STAR_H
 
-//indludes
+//includes
 #include "raylib.h"
+#include "raymath.h"
 #include <string>
 
 //defines
 #define FPS 60
-#define MAINMENUFONTSIZE 25
 #define MAXBTNS 8
+#define MAINMENUFONTSIZE 30
+#define HUBMAINFONTSIZE 72
+#define HUBSUBFONTSIZE 12
+#define HUBBTNWIDTH 300
+#define HUBBTNHEIGHT 180
+#define STATUSBARHEIGHT 14
+#define MARGIN 50
 
 //enums and structs
 typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, HUB, BOARD, PLAYERSHEET, GAMEOVER, SUCCESS } GameScreen;
 typedef enum Buttons {	NOBTN, NEWGAMEBTN, EXITBTN,
-			MISSIONBOARD=10, STATUS=11, MARKET=12, GIVEUP=13,
+			MISSIONBOARD=10, MARKET=11, STATUS=12, GIVEUP=13,
 			ODDJOB=20, GATHER=21, SALVAGE=22, BOUNTY=23, RAID=24
 } Buttons;
 
@@ -28,7 +35,7 @@ extern Buttons btnHovered;
 
 
 //-------------------------------------------------------------------------------
-//player, ship, mission classes
+//player, ship, and mission classes
 class Player {
 	private: 
 	std::string	name;
@@ -76,24 +83,3 @@ class Dice {
 
 
 #endif
-
-
-
-/* backup
-class Weapon {
-	private:
-	std::string	fullName,
-			model,
-			type;
-	double		baseDamage,	
-			fireRate,
-			damageScaling[3];
-
-	public:
-	std::string 	getModel() {return model;}
-	std::string	getType() {return type;}
-	std::string	getName() {return fullName;}
-	double 		calculateDamage(short int);
-	Weapon(std::string idType, std::string idModel);
-};
-*/

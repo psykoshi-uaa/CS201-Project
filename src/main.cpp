@@ -30,6 +30,8 @@ static void InitHub();
 static void InitBoard();
 static void UpdateCurrentScreen();
 static void DrawScreen();
+static void DrawStatusBar();
+static void DrawBtn(Rectangle);
 static void CheckBtnCollision();
 
 //declaring global
@@ -64,17 +66,17 @@ static void InitMainMenu() {
 	InitWindow(screenWidth, screenHeight, "Starcaller");
 	titleCard	= LoadTexture("resources/title.png");
 	logo 		= LoadTexture("resources/logo.png");
-	sagaFont	= LoadFont("resources/saga-font.ttf");
+	sagaFont	= LoadFontEx("resources/saga-font.ttf", 72, NULL, 0);
 	
 	currentScreen = LOGO;
 
 	btnHovered = NOBTN;
 
 	newGameBtn.origin = (Vector2) {screenWidth/5, screenHeight - screenHeight/4};
-	newGameBtn.position = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 90, 25};
+	newGameBtn.position = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 100, 25};
 
 	exitBtn.origin = (Vector2) {screenWidth/5, newGameBtn.origin.y + 25};
-	exitBtn.position = (Rectangle) {exitBtn.origin.x, exitBtn.origin.y, 90, 25};
+	exitBtn.position = (Rectangle) {exitBtn.origin.x, exitBtn.origin.y, 30, 25};
 }
 
 
@@ -90,8 +92,11 @@ static void InitHub() {
 		hubBtnGrid[i] = NOBTN;
 	}
 
-	boardBtn.origin = (Vector2) { 50, 100+((MISSIONBOARD - 10) * 50)};
-	boardBtn.position = (Rectangle) {boardBtn.origin.x, boardBtn.origin.y, 200, 50};
+	boardBtn.origin = (Vector2) { MARGIN+((MISSIONBOARD - 10) * HUBBTNWIDTH), MARGIN };
+	boardBtn.position = (Rectangle) {boardBtn.origin.x, boardBtn.origin.y, HUBBTNWIDTH, HUBBTNHEIGHT};
+
+	marketBtn.origin = (Vector2) { MARGIN*2+((MARKET - 10) * HUBBTNWIDTH), MARGIN };
+	marketBtn.position = (Rectangle) {marketBtn.origin.x, marketBtn.origin.y, HUBBTNWIDTH, HUBBTNHEIGHT};
 }
 
 
@@ -142,6 +147,7 @@ static void UpdateCurrentScreen(){
 						CloseWindow();
 					} break;
 				}
+			}
 		}
 
 		default:break;
@@ -183,15 +189,28 @@ static void DrawScreen() {
 			}
 		}
 		break;
-		 
+
 		case HUB: {
-			DrawTextEx(sagaFont, "MISSIONS", boardBtn.origin, 50, 0, WHITE);
+			DrawBtn(boardBtn.position);
+			DrawTextEx(sagaFont, "MISSIONS", boardBtn.origin, HUBMAINFONTSIZE, 0, WHITE);
+
+			DrawBtn(marketBtn.position);
+			DrawTextEx(sagaFont, "MARKET", marketBtn.origin, HUBMAINFONTSIZE, 0, WHITE);
 		}
 
 		default:break; 
 	}
 
 	EndDrawing();
+}
+
+
+static void DrawBtn(Rectangle rct) {
+	DrawRectangleRoundedLines(rct, 0.1, 1, 5, WHITE);
+}
+
+
+static void DrawStatusBar() {
 }
 
 
@@ -213,3 +232,4 @@ static void CheckBtnCollision() {
 		default: break;
 	}
 }
+
