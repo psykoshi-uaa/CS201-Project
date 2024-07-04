@@ -10,13 +10,17 @@
 #define FPS 60
 #define MAXBTNS 8
 #define MAINMENUFONTSIZE 30
+#define HUBNUMBTNS 4
 #define HUBMAINFONTSIZE 72
 #define HUBSUBFONTSIZE 12
 #define HUBBTNWIDTH 300
 #define HUBBTNHEIGHT 180
-#define STATUSBARHEIGHT 20
-#define STATUSBARFONTSIZE 10
-#define MARGIN 50
+#define SBARHEIGHT 30
+#define SBARFONTSIZE 22
+#define SBARNUMSEGS 2
+
+const float SBARSEG[SBARNUMSEGS] = {180, 400};
+const float MARGIN = 90;
 
 //enums and structs
 typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, HUB, BOARD, PLAYERSHEET, GAMEOVER, SUCCESS } GameScreen;

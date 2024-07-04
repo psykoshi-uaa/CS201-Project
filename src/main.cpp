@@ -11,18 +11,15 @@ Texture2D particle		= { 0 };
 Font sagaFont			= { 0 };
 static GUIbtn newGameBtn	= { 0 };
 static GUIbtn exitBtn		= { 0 };
-static GUIbtn boardBtn		= { 0 };
-static GUIbtn statusBtn		= { 0 };
-static GUIbtn marketBtn		= { 0 };
-static GUIbtn giveupBtn		= { 0 };
+static GUIbtn hubBtn[HUBNUMBTNS];
 static GUIbtn oddjobMissionBtn	= { 0 };
 static GUIbtn gatherMissionBtn	= { 0 };
 static GUIbtn salvageMissionBtn = { 0 };
 static GUIbtn bountyMissionBtn	= { 0 };
 static GUIbtn raidMissionBtn	= { 0 };
 static Timer screenTimer;
-static int hubBtnGrid[MAXBTNS];
 static int boardBtnGrid[MAXBTNS];
+static Vector2 sbar[3];
 
 //module function prototypes
 static void InitMainMenu();
@@ -73,45 +70,33 @@ static void InitMainMenu() {
 	btnHovered = NOBTN;
 
 	newGameBtn.origin = (Vector2) {screenWidth/5, screenHeight - screenHeight/4};
-	newGameBtn.position = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 100, 25};
+	newGameBtn.position = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 95, 25};
 
 	exitBtn.origin = (Vector2) {screenWidth/5, newGameBtn.origin.y + 25};
-	exitBtn.position = (Rectangle) {exitBtn.origin.x, exitBtn.origin.y, 30, 25};
+	exitBtn.position = (Rectangle) {exitBtn.origin.x, exitBtn.origin.y, 35, 25};
 }
 
 
 //initialize Hub
 static void InitHub() {
+	float sbarH = 5;
+
 	btnHovered = NOBTN;
 
-	hubBtnGrid[0] = Buttons::MISSIONBOARD;
-	hubBtnGrid[1] = Buttons::STATUS;
-	hubBtnGrid[2] = Buttons::MARKET;
-	hubBtnGrid[3] = Buttons::GIVEUP;
-	for (int i=4; i<MAXBTNS; i++) {
-		hubBtnGrid[i] = NOBTN;
+	sbar[0] = (Vector2) {15, sbarH};
+	sbar[1] = (Vector2) {SBARSEG[0] + 15, sbarH};
+	sbar[2] = (Vector2) {SBARSEG[1] + 15, sbarH};
+
+	for (int i=0; i<HUBNUMBTNS; i++) {
+		hubBtn[i].origin = (Vector2) { MARGIN, 200 + MARGIN + 100 * i };
+		hubBtn[i].position = (Rectangle) { hubBtn[i].origin.x, hubBtn[i].origin.y, HUBBTNWIDTH, HUBBTNHEIGHT };
 	}
-
-	boardBtn.origin = (Vector2) { MARGIN+((MISSIONBOARD - 10) * HUBBTNWIDTH), MARGIN };
-	boardBtn.position = (Rectangle) {boardBtn.origin.x, boardBtn.origin.y, HUBBTNWIDTH, HUBBTNHEIGHT};
-
-	marketBtn.origin = (Vector2) { MARGIN*2+((MARKET - 10) * HUBBTNWIDTH), MARGIN };
-	marketBtn.position = (Rectangle) {marketBtn.origin.x, marketBtn.origin.y, HUBBTNWIDTH, HUBBTNHEIGHT};
 }
 
 
 //initiliaze Board
 static void InitBoard() {
 	btnHovered = NOBTN;
-
-	boardBtnGrid[0] = Buttons::ODDJOB;
-	boardBtnGrid[1] = Buttons::GATHER;
-	boardBtnGrid[2] = Buttons::SALVAGE;
-	boardBtnGrid[3] = Buttons::BOUNTY;
-	boardBtnGrid[4] = Buttons::RAID;
-	for (int i=5; i<MAXBTNS; i++) {
-		boardBtnGrid[i] = NOBTN;
-	}
 }
 
 //update screen based on events
@@ -169,7 +154,7 @@ static void DrawScreen() {
 		
 		case TITLE: {
 			DrawTexture(titleCard, screenWidth/2 - titleCard.width/2, screenHeight/5, WHITE);
-			DrawTextEx(sagaFont, "<click anywhere>", (Vector2){screenWidth/2 - 70, 340}, 30, 0, WHITE);
+			DrawTextEx(sagaFont, "<click anywhere>", (Vector2){screenWidth/2 - 80, 340}, 30, 0, WHITE);
 		}
 		break;
 
@@ -193,11 +178,13 @@ static void DrawScreen() {
 		case HUB: {
 			DrawStatusBar();
 
-			DrawBtn(boardBtn.position);
-			DrawTextEx(sagaFont, "MISSIONS", boardBtn.origin, HUBMAINFONTSIZE, 0, WHITE);
+			DrawTextEx(sagaFont, "MISSIONS", hubBtn[0].origin, HUBMAINFONTSIZE, 0, WHITE);
 
-			DrawBtn(marketBtn.position);
-			DrawTextEx(sagaFont, "MARKET", marketBtn.origin, HUBMAINFONTSIZE, 0, WHITE);
+			DrawTextEx(sagaFont, "MARKET", hubBtn[1].origin, HUBMAINFONTSIZE, 0, WHITE);
+
+			DrawTextEx(sagaFont, "STATUS", hubBtn[2].origin, HUBMAINFONTSIZE, 0, WHITE);
+
+			DrawTextEx(sagaFont, "GIVE UP", hubBtn[3].origin, HUBMAINFONTSIZE, 0, WHITE);
 		}
 
 		default:break; 
@@ -213,8 +200,15 @@ static void DrawBtn(Rectangle rct) {
 
 
 static void DrawStatusBar() {
-	DrawRectangleLinesEx((Rectangle){0, 0, screenWidth, STATUSBARHEIGHT}, 2, WHITE);
-	DrawLine(300, 0, 300, STATUSBARHEIGHT, WHITE);
+	DrawRectangleLinesEx((Rectangle) {0, 0, screenWidth, SBARHEIGHT}, 3, WHITE);
+
+	for (int i=0; i<SBARNUMSEGS; i++) {
+		DrawLine(SBARSEG[i], 0, SBARSEG[i], SBARHEIGHT, WHITE);
+	}
+
+	DrawTextEx(sagaFont, "PILOT: xyz", sbar[0], SBARFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, "CURRENCY: xyz", sbar[1], SBARFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, "TIME LEFT TIL REPO: xyz", sbar[2], SBARFONTSIZE, 0, WHITE);
 }
 
 
