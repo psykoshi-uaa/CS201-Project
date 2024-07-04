@@ -14,7 +14,8 @@
 #define HUBSUBFONTSIZE 12
 #define HUBBTNWIDTH 300
 #define HUBBTNHEIGHT 180
-#define STATUSBARHEIGHT 14
+#define STATUSBARHEIGHT 20
+#define STATUSBARFONTSIZE 10
 #define MARGIN 50
 
 //enums and structs
@@ -33,9 +34,9 @@ typedef struct GUIbtn {
 extern GameScreen currentScreen;
 extern Buttons btnHovered;
 
-
 //-------------------------------------------------------------------------------
-//player, ship, and mission classes
+//			player, ship, and mission classes
+//-------------------------------------------------------------------------------
 class Player {
 	private: 
 	std::string	name;
@@ -61,8 +62,9 @@ class Player {
 };
 
 
-
-//code utility classes
+//-------------------------------------------------------------------------------
+//			code utility classes
+//-------------------------------------------------------------------------------
 class Timer {
 	private:
 	int		frameCounter;
@@ -83,3 +85,4 @@ class Dice {
 
 
 #endif
+		

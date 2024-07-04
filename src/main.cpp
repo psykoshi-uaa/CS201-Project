@@ -2,7 +2,7 @@
 
 //constants
 const int screenWidth = 800;
-const int screenHeight = 600;
+const int screenHeight = 800;
 
 //declaring structs and other init stuff
 Texture2D titleCard 		= { 0 };
@@ -191,6 +191,8 @@ static void DrawScreen() {
 		break;
 
 		case HUB: {
+			DrawStatusBar();
+
 			DrawBtn(boardBtn.position);
 			DrawTextEx(sagaFont, "MISSIONS", boardBtn.origin, HUBMAINFONTSIZE, 0, WHITE);
 
@@ -211,6 +213,8 @@ static void DrawBtn(Rectangle rct) {
 
 
 static void DrawStatusBar() {
+	DrawRectangleLinesEx((Rectangle){0, 0, screenWidth, STATUSBARHEIGHT}, 2, WHITE);
+	DrawLine(300, 0, 300, STATUSBARHEIGHT, WHITE);
 }
 
 
