@@ -1,5 +1,5 @@
 <p align="center" width="100%">
-    <img width="33%" src="https://github.com/psykoshi-uaa/CS201-Project/assets/171866242/944d6400-0bf5-45e6-b646-483414897c5a">
+    <img width="33%" src="https://github.com/psykoshi-uaa/CS201-Project/blob/main/src/resources/github_title.png">
 </p>
 
 ___
