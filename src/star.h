@@ -8,29 +8,28 @@
 
 //defines
 #define FPS 60
-#define MAXBTNS 8
 #define MAINMENUFONTSIZE 30
 #define HUBNUMBTNS 4
-#define HUBMAINFONTSIZE 72
+#define HUBMAINFONTSIZE 36
 #define HUBSUBFONTSIZE 12
-#define HUBBTNWIDTH 300
-#define HUBBTNHEIGHT 180
+#define HUBBTNWIDTH 250
+#define HUBBTNHEIGHT 40 
 #define SBARHEIGHT 30
 #define SBARFONTSIZE 22
 #define SBARNUMSEGS 2
 
 const float SBARSEG[SBARNUMSEGS] = {180, 400};
-const float MARGIN = 90;
+const float MARGIN = 30;
 
 //enums and structs
 typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, HUB, BOARD, PLAYERSHEET, GAMEOVER, SUCCESS } GameScreen;
 typedef enum Buttons {	NOBTN, NEWGAMEBTN, EXITBTN,
-			MISSIONBOARD=10, MARKET=11, STATUS=12, GIVEUP=13,
-			ODDJOB=20, GATHER=21, SALVAGE=22, BOUNTY=23, RAID=24
+			MISSIONBOARD, MARKET, STATUS, GIVEUP,
+			ODDJOB, GATHER, SALVAGE, BOUNTY, RAID
 } Buttons;
 
 typedef struct GUIbtn {
-	Rectangle position;
+	Rectangle border;
 	Vector2 origin;
 } GUIbtn;
 
@@ -71,11 +70,11 @@ class Player {
 //-------------------------------------------------------------------------------
 class Timer {
 	private:
-	int		frameCounter;
+	float		frameCounter;
 	static double	waitTime;
 
 	public:
-	int	GetCounter();
+	float	GetCounter();
 	void	Reset();
 	void	Run();
 	bool 	Wait(double);

@@ -32,7 +32,7 @@ void Player::getSkills(int& Piloting, int& Repair, int& Bartering) {
 
 
 //code utility classes
-int  Timer::GetCounter() {
+float  Timer::GetCounter() {
 	return frameCounter;
 }
 

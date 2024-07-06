@@ -1,4 +1,5 @@
 #include "star.h"
+#include <cmath>
 
 //constants
 const int screenWidth = 800;
@@ -18,7 +19,7 @@ static GUIbtn salvageMissionBtn = { 0 };
 static GUIbtn bountyMissionBtn	= { 0 };
 static GUIbtn raidMissionBtn	= { 0 };
 static Timer screenTimer;
-static int boardBtnGrid[MAXBTNS];
+static Timer animTimer;
 static Vector2 sbar[3];
 
 //module function prototypes
@@ -28,8 +29,9 @@ static void InitBoard();
 static void UpdateCurrentScreen();
 static void DrawScreen();
 static void DrawStatusBar();
-static void DrawBtn(Rectangle);
+static void DrawBtnSelected(Rectangle, int);
 static void CheckBtnCollision();
+static float WaveAnim(float val, float b, float k);
 
 //declaring global
 GameScreen currentScreen = LOGO;
@@ -70,10 +72,10 @@ static void InitMainMenu() {
 	btnHovered = NOBTN;
 
 	newGameBtn.origin = (Vector2) {screenWidth/5, screenHeight - screenHeight/4};
-	newGameBtn.position = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 95, 25};
+	newGameBtn.border = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 95, 25};
 
 	exitBtn.origin = (Vector2) {screenWidth/5, newGameBtn.origin.y + 25};
-	exitBtn.position = (Rectangle) {exitBtn.origin.x, exitBtn.origin.y, 35, 25};
+	exitBtn.border = (Rectangle) {exitBtn.origin.x, exitBtn.origin.y, 35, 25};
 }
 
 
@@ -88,8 +90,8 @@ static void InitHub() {
 	sbar[2] = (Vector2) {SBARSEG[1] + 15, sbarH};
 
 	for (int i=0; i<HUBNUMBTNS; i++) {
-		hubBtn[i].origin = (Vector2) { MARGIN, 200 + MARGIN + 100 * i };
-		hubBtn[i].position = (Rectangle) { hubBtn[i].origin.x, hubBtn[i].origin.y, HUBBTNWIDTH, HUBBTNHEIGHT };
+		hubBtn[i].origin = (Vector2) { MARGIN, MARGIN + 50 * i };
+		hubBtn[i].border = (Rectangle) { hubBtn[i].origin.x-20, hubBtn[i].origin.y-2, HUBBTNWIDTH-20, HUBBTNHEIGHT-2 };
 	}
 }
 
@@ -178,13 +180,13 @@ static void DrawScreen() {
 		case HUB: {
 			DrawStatusBar();
 
-			DrawTextEx(sagaFont, "MISSIONS", hubBtn[0].origin, HUBMAINFONTSIZE, 0, WHITE);
-
-			DrawTextEx(sagaFont, "MARKET", hubBtn[1].origin, HUBMAINFONTSIZE, 0, WHITE);
-
-			DrawTextEx(sagaFont, "STATUS", hubBtn[2].origin, HUBMAINFONTSIZE, 0, WHITE);
-
-			DrawTextEx(sagaFont, "GIVE UP", hubBtn[3].origin, HUBMAINFONTSIZE, 0, WHITE);
+			for (int i=0; i<sizeof(hubBtn); i++) {
+				DrawBtnSelected(hubBtn[i].border, i + 3);
+			}
+			DrawTextEx(sagaFont, "Mission Board", hubBtn[0].origin, HUBMAINFONTSIZE, 0, WHITE);
+			DrawTextEx(sagaFont, "Market", hubBtn[1].origin, HUBMAINFONTSIZE, 0, WHITE);
+			DrawTextEx(sagaFont, "Status", hubBtn[2].origin, HUBMAINFONTSIZE, 0, WHITE);
+			DrawTextEx(sagaFont, "Give Up", hubBtn[3].origin, HUBMAINFONTSIZE, 0, WHITE);
 		}
 
 		default:break; 
@@ -194,8 +196,20 @@ static void DrawScreen() {
 }
 
 
-static void DrawBtn(Rectangle rct) {
-	DrawRectangleRoundedLines(rct, 0.1, 1, 5, WHITE);
+static void DrawBtnSelected(Rectangle rct, int btn) {
+	float dur = 15;
+
+	if (btnHovered == btn) {
+		if (animTimer.GetCounter() < dur*FPS) {
+			animTimer.Run();
+		}
+		else
+		{
+			animTimer.Reset();
+		}
+
+		DrawRectangleLinesEx(rct, WaveAnim(animTimer.GetCounter(), dur, 1.7), WHITE);
+	}
 }
 
 
@@ -216,11 +230,29 @@ static void DrawStatusBar() {
 static void CheckBtnCollision() {
 	switch (currentScreen) {
 		case MAINMENU: {
-			if (CheckCollisionPointRec(GetMousePosition(), newGameBtn.position)) {
+			if (CheckCollisionPointRec(GetMousePosition(), newGameBtn.border)) {
 				btnHovered = NEWGAMEBTN;
 			}
-			else  if (CheckCollisionPointRec(GetMousePosition(), exitBtn.position)) {
+			else  if (CheckCollisionPointRec(GetMousePosition(), exitBtn.border)) {
 				btnHovered = EXITBTN;
+			}
+			else {
+				btnHovered = NOBTN;
+			}
+		} break;
+
+		case HUB: {
+			if (CheckCollisionPointRec(GetMousePosition(), hubBtn[0].border)) {
+				btnHovered = MISSIONBOARD;
+			}
+			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[1].border)) {
+				btnHovered = MARKET;
+			}
+			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[2].border)) {
+				btnHovered = STATUS;
+			}
+			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[3].border)) {
+				btnHovered = GIVEUP;
 			}
 			else {
 				btnHovered = NOBTN;
@@ -231,3 +263,7 @@ static void CheckBtnCollision() {
 	}
 }
 
+static float WaveAnim(float val, float dur, float k) {
+	float b = dur*3.14159;
+	return (k * pow(sin(val/b), 2) + 1.2);
+}
