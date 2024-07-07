@@ -17,14 +17,17 @@
 #define SBARHEIGHT 30
 #define SBARFONTSIZE 22
 #define SBARNUMSEGS 2
-
+	  
+const int screenWidth = 800,
+              screenHeight = 800;
+			  
 const float SBARSEG[SBARNUMSEGS] = {180, 400},
       MARGIN = 30,
-      BTNPADDING = 10;
+      BTNPADDING = 2;
 
 //enums and structs
 typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, HUB, BOARD, PLAYERSHEET, GAMEOVER, SUCCESS } GameScreen;
-typedef enum Buttons {	NOBTN, NEWGAMEBTN, EXITBTN,
+typedef enum Buttons { NOBTN, NEWGAMEBTN, EXITBTN,
 			BOARDBTN, MARKETBTN, STATUSBTN, GIVEUPBTN,
 			ODDJOBBTN, GATHERBTN, SALVAGEBTN, BOUNTYBTN, RAIDBTN,
 			BACKBTN
@@ -72,7 +75,7 @@ class Player {
 //-------------------------------------------------------------------------------
 class Timer {
 	private:
-	float		frameCounter;
+	float	frameCounter;
 	static double	waitTime;
 
 	public:
@@ -87,6 +90,7 @@ class Dice {
 	Dice();
 	int rollD6(int);
 };
+
 
 
 #endif

@@ -1,5 +1,5 @@
 /* This class defines a D6, more options can be added
-if balancing would be better with a D20 or something*/
+if balancing would be better with a D20 or something
 
 #include <cstdlib>
 #include <ctime>
@@ -32,7 +32,7 @@ public:
 };
 
 // example usage
-/* 
+
 int main()
 {
     Dice dice;

@@ -1,9 +1,11 @@
 #include <ctime>
 #include <cstdlib> 
-#include "star.h"
+#include "../lib/includes/star.h"
 
 
-//player, ship, and mission classes
+//-------------------------------------------------------------------------------
+//			player, ship, and mission classes
+//-------------------------------------------------------------------------------
 std::string Player::getName() {
 	return name;
 }
@@ -31,7 +33,9 @@ void Player::getSkills(int& Piloting, int& Repair, int& Bartering) {
 }
 
 
-//code utility classes
+//-------------------------------------------------------------------------------
+//			code utility classes
+//-------------------------------------------------------------------------------
 float  Timer::GetCounter() {
 	return frameCounter;
 }
@@ -66,4 +70,13 @@ int Dice::rollD6(int numRolls = 0) {
 		total += std::rand() % 6 + 1;
 	}
 	return total;
+}
+
+
+//-------------------------------------------------------------------------------
+//			animation scalers
+//-------------------------------------------------------------------------------
+float WaveAnim(float val, float dur, float scale) {
+	float b = dur*3.14159;
+	return (scale * pow(sin(val/b), 2) + 1.2);
 }

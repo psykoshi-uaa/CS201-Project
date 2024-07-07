@@ -1,30 +1,27 @@
-#include "star.h"
+#include "lib/includes/star.h"
 #include <cmath>
 
-//constants
-const int screenWidth = 800;
-const int screenHeight = 800;
-
 //declaring structs and other init stuff
-Texture2D titleCard 		= { 0 };
-Texture2D titleGlow		= { 0 };
-Texture2D titleUnderline	= { 0 };
-Texture2D logo 			= { 0 };
-Texture2D particle		= { 0 };
-Font sagaFont			= { 0 };
-static GUIbtn newGameBtn	= { 0 };
-static GUIbtn exitBtn		= { 0 };
+Texture2D titleCard 					= { 0 };
+Texture2D titleGlow						= { 0 };
+Texture2D titleUnderline				= { 0 };
+Texture2D logo 							= { 0 };
+Texture2D particle						= { 0 };
+Font sagaFont							= { 0 };
+static GUIbtn newGameBtn			= { 0 };
+static GUIbtn exitBtn					= { 0 };
 static GUIbtn hubBtn[HUBNUMBTNS];
 static GUIbtn oddjobMissionBtn	= { 0 };
 static GUIbtn gatherMissionBtn	= { 0 };
-static GUIbtn salvageMissionBtn = { 0 };
+static GUIbtn salvageMissionBtn	= { 0 };
 static GUIbtn bountyMissionBtn	= { 0 };
-static GUIbtn raidMissionBtn	= { 0 };
-static GUIbtn backBtn		= { 0 };
+static GUIbtn raidMissionBtn		= { 0 };
+static GUIbtn backBtn					= { 0 };
 static Timer screenTimer;
 static Timer animTimer;
 static float alpha, alpha2;
 static Vector2 sbar[3];
+static bool increasing = true;
 
 //module function prototypes
 static void InitMainMenu();
@@ -35,13 +32,15 @@ static void DrawScreen();
 static void DrawStatusBar();
 static void DrawBtnSelected(Rectangle, int);
 static void CheckBtnCollision();
-static float WaveAnim(float val, float b, float k);
+float WaveAnim(float, float, float);
 
 //declaring global
 GameScreen currentScreen = LOGO;
 Buttons btnHovered = NOBTN;
 
-//main program
+//-------------------------------------------------------------------------------
+//			main program
+//-------------------------------------------------------------------------------
 int main(){
 	InitMainMenu();
 	InitHub();
@@ -66,7 +65,9 @@ int main(){
 }
 
 
-//initiliaze main menu
+//-------------------------------------------------------------------------------
+//			initializations
+//-------------------------------------------------------------------------------
 static void InitMainMenu() {
 	InitWindow(screenWidth, screenHeight, "Starcaller");
 	titleCard	= LoadTexture("resources/title.png");
@@ -78,8 +79,8 @@ static void InitMainMenu() {
 	currentScreen = LOGO;
 	btnHovered = NOBTN;
 	screenTimer.Reset();
-	alpha = 0.00f;
-	alpha2 = -0.50f;
+	alpha = 0.0f;
+	alpha2 = -0.5f;
 
 	newGameBtn.origin = (Vector2) {screenWidth/5, screenHeight - screenHeight/4};
 	newGameBtn.border = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 100, 25};
@@ -88,11 +89,9 @@ static void InitMainMenu() {
 	exitBtn.border = (Rectangle) {exitBtn.origin.x, exitBtn.origin.y, 40, 25};
 
 	backBtn.origin = (Vector2) {(Vector2){screenWidth - MARGIN * 3, screenHeight - MARGIN * 3}};
-	backBtn.border = (Rectangle) {backBtn.origin.x - BTNPADDING, backBtn.origin.y - BTNPADDING, MARGIN * 3 - BTNPADDING, 40 + BTNPADDING * 2};
+	backBtn.border = (Rectangle) {backBtn.origin.x - 20, backBtn.origin.y - BTNPADDING, 100, 40 + BTNPADDING * 2};
 }
 
-
-//initialize Hub
 static void InitHub() {
 	float sbarH = 5;
 
@@ -103,22 +102,23 @@ static void InitHub() {
 	for (int i=0; i<HUBNUMBTNS; i++) {
 		if (i == HUBNUMBTNS - 1) {
 			hubBtn[i].origin = (Vector2) { MARGIN, screenHeight - MARGIN * 2};
-			hubBtn[i].border = (Rectangle) { hubBtn[i].origin.x-20, hubBtn[i].origin.y-2, HUBBTNWIDTH-20, HUBBTNHEIGHT-2 };
+			hubBtn[i].border = (Rectangle) { hubBtn[i].origin.x - 20, hubBtn[i].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
 		}
 		else {
-			hubBtn[i].origin = (Vector2) { MARGIN, MARGIN + SBARHEIGHT + HUBMAINFONTSIZE * i };
-			hubBtn[i].border = (Rectangle) { hubBtn[i].origin.x-20, hubBtn[i].origin.y-2, HUBBTNWIDTH-20, HUBBTNHEIGHT-2 };
+			hubBtn[i].origin = (Vector2) { MARGIN, MARGIN + SBARHEIGHT + 60 * i };
+			hubBtn[i].border = (Rectangle) { hubBtn[i].origin.x - 20, hubBtn[i].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
 		}
 	}
 }
 
-
-//initiliaze Board
 static void InitBoard() {
 	btnHovered = NOBTN;
 }
 
-//update screen based on events
+
+//-------------------------------------------------------------------------------
+//			update screen
+//-------------------------------------------------------------------------------
 static void UpdateCurrentScreen(){
 	switch (currentScreen)
 	{
@@ -127,13 +127,35 @@ static void UpdateCurrentScreen(){
 
 			if (screenTimer.Wait(3) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				screenTimer.Reset();
+				animTimer.Reset();
 				currentScreen = TITLE;
 			}
 		} break;
 		
 		case TITLE: {
+			if (alpha2 < 1.0f) {
+				alpha += 0.005f;
+				alpha2 += 0.005f;
+			}
+			else {
+				if (alpha < 1.0f && increasing == true) {
+					alpha += 0.01f;
+				}
+				else {
+					increasing = false;
+				}
+				
+				if (alpha > 0.5f && increasing == false) {
+					alpha -= 0.01f;
+				}
+				else {
+					increasing = true;
+				}
+			}
+			
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				screenTimer.Reset();
+				animTimer.Reset();
 				currentScreen = MAINMENU;
 			}
 		} break;
@@ -183,7 +205,9 @@ static void UpdateCurrentScreen(){
 }
 
 
-//draw screen elements
+//-------------------------------------------------------------------------------
+//			draw screen
+//-------------------------------------------------------------------------------
 static void DrawScreen() {
 	BeginDrawing();
 
@@ -195,37 +219,21 @@ static void DrawScreen() {
 		} break;
 		
 		case TITLE: {
-			if (alpha2 < 1.00f) {
-				alpha += 0.01f;
-				alpha2 += 0.01f;
-
-				DrawTexture(titleGlow, 
-						screenWidth/2 - titleCard.width/2,
-						screenHeight/5, 
-						ColorAlpha(WHITE, alpha) );
-				DrawTexture(titleCard, 
-						screenWidth/2 - titleCard.width/2, 
-						screenHeight/5,
-						ColorAlpha(WHITE, alpha2) );
+			if (alpha2 < 1.0f) {
+				DrawTexture(titleGlow, screenWidth/2 - titleCard.width/2, screenHeight/5, ColorAlpha(WHITE, alpha) );
+				DrawTexture(titleCard, screenWidth/2 - titleCard.width/2, screenHeight/5, ColorAlpha(WHITE, alpha2) );
 			}
-			else {
-				DrawTexture(titleGlow, 
-						screenWidth/2 - titleCard.width/2,
-						screenHeight/5, WHITE);
-				DrawTexture(titleCard, 
-						screenWidth/2 - titleCard.width/2, 
-						screenHeight/5, WHITE);
-				DrawTextEx(sagaFont, "<click anywhere>", (Vector2){screenWidth/2 - 80, screenHeight/2}, 30, 0, WHITE);
+			else {	
+				DrawTexture(titleGlow, screenWidth/2 - titleCard.width/2, screenHeight/5, WHITE);
+				DrawTexture(titleCard, screenWidth/2 - titleCard.width/2, screenHeight/5, WHITE);
+				DrawTextEx(sagaFont, "<click anywhere>", (Vector2){screenWidth/2 - 80, screenHeight/2}, 30, 0, ColorAlpha(WHITE, alpha));
 			}
 		} break;
 
 		case MAINMENU: {
-			DrawTexture(titleGlow, 
-					screenWidth/2 - titleCard.width/2,
-					screenHeight/5, WHITE);
-			DrawTexture(titleCard,
-					screenWidth/2 - titleCard.width/2,
-					screenHeight/5, WHITE);
+			DrawTexture(titleGlow, screenWidth/2 - titleCard.width/2, screenHeight/5, WHITE);
+			DrawTexture(titleCard, screenWidth/2 - titleCard.width/2, screenHeight/5, WHITE);
+					
 			if (btnHovered == NEWGAMEBTN) {
 				DrawTextEx(sagaFont, "new game", newGameBtn.origin, MAINMENUFONTSIZE, 0, BLUE);
 			}
@@ -259,12 +267,10 @@ static void DrawScreen() {
 			DrawRectangle(MARGIN, SBARHEIGHT + MARGIN, screenWidth - MARGIN * 5, screenHeight - MARGIN * 3, (Color){3, 3, 3, 255} );
 			DrawRectangleLines(MARGIN, SBARHEIGHT + MARGIN, screenWidth - MARGIN * 5, screenHeight - MARGIN * 3, WHITE);
 
-			DrawTextEx(sagaFont, "missions available...",
-					(Vector2){MARGIN * 3, SBARHEIGHT + MARGIN}, HUBSUBFONTSIZE, 0, WHITE);
+			DrawTextEx(sagaFont, "missions available...", (Vector2){MARGIN * 3, SBARHEIGHT + MARGIN}, HUBSUBFONTSIZE, 0, WHITE);
 
 			DrawBtnSelected(backBtn.border, 12);
-			DrawTextEx(sagaFont, "Back", 
-					backBtn.origin, HUBMAINFONTSIZE, 0, WHITE);
+			DrawTextEx(sagaFont, "Back", backBtn.origin, HUBMAINFONTSIZE, 0, WHITE);
 			DrawRectangleLinesEx(backBtn.border, 2, WHITE);
 		} break;
 
@@ -275,12 +281,14 @@ static void DrawScreen() {
 }
 
 
+//-------------------------------------------------------------------------------
+//			draw functions
+//-------------------------------------------------------------------------------
 static void DrawBtnSelected(Rectangle rct, int btn) {
 	if (btnHovered == btn) {
 		DrawRectangleRec(rct, DARKBLUE);
 	}
 }
-
 
 static void DrawStatusBar() {
 	DrawRectangleLinesEx((Rectangle) {0, 0, screenWidth, SBARHEIGHT}, 3, WHITE);
@@ -295,7 +303,9 @@ static void DrawStatusBar() {
 }
 
 
-//check to see if cursor is colliding with any buttons
+//-------------------------------------------------------------------------------
+//			button collision
+//-------------------------------------------------------------------------------
 static void CheckBtnCollision() {
 	switch (currentScreen) {
 		case MAINMENU: {
@@ -341,7 +351,3 @@ static void CheckBtnCollision() {
 	}
 }
 
-static float WaveAnim(float val, float dur, float k) {
-	float b = dur*3.14159;
-	return (k * pow(sin(val/b), 2) + 1.2);
-}
