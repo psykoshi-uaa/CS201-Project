@@ -7,6 +7,8 @@ const int screenHeight = 800;
 
 //declaring structs and other init stuff
 Texture2D titleCard 		= { 0 };
+Texture2D titleGlow		= { 0 };
+Texture2D titleUnderline	= { 0 };
 Texture2D logo 			= { 0 };
 Texture2D particle		= { 0 };
 Font sagaFont			= { 0 };
@@ -18,8 +20,10 @@ static GUIbtn gatherMissionBtn	= { 0 };
 static GUIbtn salvageMissionBtn = { 0 };
 static GUIbtn bountyMissionBtn	= { 0 };
 static GUIbtn raidMissionBtn	= { 0 };
+static GUIbtn backBtn		= { 0 };
 static Timer screenTimer;
 static Timer animTimer;
+static float alpha, alpha2;
 static Vector2 sbar[3];
 
 //module function prototypes
@@ -52,6 +56,8 @@ int main(){
 	}
 
 	UnloadTexture(titleCard);
+	UnloadTexture(titleGlow);
+	UnloadTexture(titleUnderline);
 	UnloadTexture(logo);
 
 	CloseWindow();
@@ -64,18 +70,25 @@ int main(){
 static void InitMainMenu() {
 	InitWindow(screenWidth, screenHeight, "Starcaller");
 	titleCard	= LoadTexture("resources/title.png");
+	titleGlow	= LoadTexture("resources/title_glow.png");
+	titleUnderline	= LoadTexture("resources/title_ship.png");
 	logo 		= LoadTexture("resources/logo.png");
 	sagaFont	= LoadFontEx("resources/saga.ttf", 72, NULL, 0);
 	
 	currentScreen = LOGO;
-
 	btnHovered = NOBTN;
+	screenTimer.Reset();
+	alpha = 0.00f;
+	alpha2 = -0.50f;
 
 	newGameBtn.origin = (Vector2) {screenWidth/5, screenHeight - screenHeight/4};
-	newGameBtn.border = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 95, 25};
+	newGameBtn.border = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 100, 25};
 
 	exitBtn.origin = (Vector2) {screenWidth/5, newGameBtn.origin.y + 25};
-	exitBtn.border = (Rectangle) {exitBtn.origin.x, exitBtn.origin.y, 35, 25};
+	exitBtn.border = (Rectangle) {exitBtn.origin.x, exitBtn.origin.y, 40, 25};
+
+	backBtn.origin = (Vector2) {(Vector2){screenWidth - MARGIN * 3, screenHeight - MARGIN * 3}};
+	backBtn.border = (Rectangle) {backBtn.origin.x - BTNPADDING, backBtn.origin.y - BTNPADDING, MARGIN * 3 - BTNPADDING, 40 + BTNPADDING * 2};
 }
 
 
@@ -83,15 +96,19 @@ static void InitMainMenu() {
 static void InitHub() {
 	float sbarH = 5;
 
-	btnHovered = NOBTN;
-
 	sbar[0] = (Vector2) {15, sbarH};
 	sbar[1] = (Vector2) {SBARSEG[0] + 15, sbarH};
 	sbar[2] = (Vector2) {SBARSEG[1] + 15, sbarH};
 
 	for (int i=0; i<HUBNUMBTNS; i++) {
-		hubBtn[i].origin = (Vector2) { MARGIN, MARGIN + 50 * i };
-		hubBtn[i].border = (Rectangle) { hubBtn[i].origin.x-20, hubBtn[i].origin.y-2, HUBBTNWIDTH-20, HUBBTNHEIGHT-2 };
+		if (i == HUBNUMBTNS - 1) {
+			hubBtn[i].origin = (Vector2) { MARGIN, screenHeight - MARGIN * 2};
+			hubBtn[i].border = (Rectangle) { hubBtn[i].origin.x-20, hubBtn[i].origin.y-2, HUBBTNWIDTH-20, HUBBTNHEIGHT-2 };
+		}
+		else {
+			hubBtn[i].origin = (Vector2) { MARGIN, MARGIN + SBARHEIGHT + HUBMAINFONTSIZE * i };
+			hubBtn[i].border = (Rectangle) { hubBtn[i].origin.x-20, hubBtn[i].origin.y-2, HUBBTNWIDTH-20, HUBBTNHEIGHT-2 };
+		}
 	}
 }
 
@@ -109,19 +126,17 @@ static void UpdateCurrentScreen(){
 			screenTimer.Run();
 
 			if (screenTimer.Wait(3) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-				currentScreen = TITLE;
 				screenTimer.Reset();
+				currentScreen = TITLE;
 			}
-		}
-		break;
+		} break;
 		
 		case TITLE: {
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-				currentScreen = MAINMENU;
 				screenTimer.Reset();
+				currentScreen = MAINMENU;
 			}
-		}
-		break;
+		} break;
 
 		case MAINMENU: {
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -135,7 +150,33 @@ static void UpdateCurrentScreen(){
 					} break;
 				}
 			}
-		}
+		} break;
+
+		case HUB: {
+			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+				switch (btnHovered) {
+					case BOARDBTN: {
+						currentScreen = BOARD;
+					} break;
+
+
+
+					case GIVEUPBTN: {
+						CloseWindow();
+					} break;
+				}
+			}
+		} break;
+
+		case BOARD: {
+			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+				switch (btnHovered) {
+					case BACKBTN: {
+						currentScreen = HUB;
+					}
+				}
+			}
+		} break;
 
 		default:break;
 	}
@@ -151,17 +192,40 @@ static void DrawScreen() {
 	switch (currentScreen) {
 		case LOGO: {
 			DrawTexture(logo, screenWidth/2 - logo.width/2, screenHeight/2 - logo.height/2, WHITE);
-		}
-		break;
+		} break;
 		
 		case TITLE: {
-			DrawTexture(titleCard, screenWidth/2 - titleCard.width/2, screenHeight/5, WHITE);
-			DrawTextEx(sagaFont, "<click anywhere>", (Vector2){screenWidth/2 - 80, 340}, 30, 0, WHITE);
-		}
-		break;
+			if (alpha2 < 1.00f) {
+				alpha += 0.01f;
+				alpha2 += 0.01f;
+
+				DrawTexture(titleGlow, 
+						screenWidth/2 - titleCard.width/2,
+						screenHeight/5, 
+						ColorAlpha(WHITE, alpha) );
+				DrawTexture(titleCard, 
+						screenWidth/2 - titleCard.width/2, 
+						screenHeight/5,
+						ColorAlpha(WHITE, alpha2) );
+			}
+			else {
+				DrawTexture(titleGlow, 
+						screenWidth/2 - titleCard.width/2,
+						screenHeight/5, WHITE);
+				DrawTexture(titleCard, 
+						screenWidth/2 - titleCard.width/2, 
+						screenHeight/5, WHITE);
+				DrawTextEx(sagaFont, "<click anywhere>", (Vector2){screenWidth/2 - 80, screenHeight/2}, 30, 0, WHITE);
+			}
+		} break;
 
 		case MAINMENU: {
-			DrawTexture(titleCard, screenWidth/2 - titleCard.width/2, screenHeight/5, WHITE);
+			DrawTexture(titleGlow, 
+					screenWidth/2 - titleCard.width/2,
+					screenHeight/5, WHITE);
+			DrawTexture(titleCard,
+					screenWidth/2 - titleCard.width/2,
+					screenHeight/5, WHITE);
 			if (btnHovered == NEWGAMEBTN) {
 				DrawTextEx(sagaFont, "new game", newGameBtn.origin, MAINMENUFONTSIZE, 0, BLUE);
 			}
@@ -174,20 +238,35 @@ static void DrawScreen() {
 			else {
 				DrawTextEx(sagaFont, "exit", exitBtn.origin, MAINMENUFONTSIZE, 0, WHITE);
 			}
-		}
-		break;
+		} break;
 
 		case HUB: {
 			DrawStatusBar();
 
-			for (int i=0; i<sizeof(hubBtn); i++) {
+			for (int i=0; i<HUBNUMBTNS; i++) {
 				DrawBtnSelected(hubBtn[i].border, i + 3);
+				DrawRectangleLinesEx(hubBtn[i].border, 2, WHITE);
 			}
 			DrawTextEx(sagaFont, "Mission Board", hubBtn[0].origin, HUBMAINFONTSIZE, 0, WHITE);
 			DrawTextEx(sagaFont, "Market", hubBtn[1].origin, HUBMAINFONTSIZE, 0, WHITE);
 			DrawTextEx(sagaFont, "Status", hubBtn[2].origin, HUBMAINFONTSIZE, 0, WHITE);
 			DrawTextEx(sagaFont, "Give Up", hubBtn[3].origin, HUBMAINFONTSIZE, 0, WHITE);
-		}
+		} break;
+
+		case BOARD: {
+			DrawStatusBar();
+
+			DrawRectangle(MARGIN, SBARHEIGHT + MARGIN, screenWidth - MARGIN * 5, screenHeight - MARGIN * 3, (Color){3, 3, 3, 255} );
+			DrawRectangleLines(MARGIN, SBARHEIGHT + MARGIN, screenWidth - MARGIN * 5, screenHeight - MARGIN * 3, WHITE);
+
+			DrawTextEx(sagaFont, "missions available...",
+					(Vector2){MARGIN * 3, SBARHEIGHT + MARGIN}, HUBSUBFONTSIZE, 0, WHITE);
+
+			DrawBtnSelected(backBtn.border, 12);
+			DrawTextEx(sagaFont, "Back", 
+					backBtn.origin, HUBMAINFONTSIZE, 0, WHITE);
+			DrawRectangleLinesEx(backBtn.border, 2, WHITE);
+		} break;
 
 		default:break; 
 	}
@@ -197,18 +276,8 @@ static void DrawScreen() {
 
 
 static void DrawBtnSelected(Rectangle rct, int btn) {
-	float dur = 15;
-
 	if (btnHovered == btn) {
-		if (animTimer.GetCounter() < dur*FPS) {
-			animTimer.Run();
-		}
-		else
-		{
-			animTimer.Reset();
-		}
-
-		DrawRectangleLinesEx(rct, WaveAnim(animTimer.GetCounter(), dur, 1.7), WHITE);
+		DrawRectangleRec(rct, DARKBLUE);
 	}
 }
 
@@ -243,21 +312,30 @@ static void CheckBtnCollision() {
 
 		case HUB: {
 			if (CheckCollisionPointRec(GetMousePosition(), hubBtn[0].border)) {
-				btnHovered = MISSIONBOARD;
+				btnHovered = BOARDBTN;
 			}
 			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[1].border)) {
-				btnHovered = MARKET;
+				btnHovered = MARKETBTN;
 			}
 			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[2].border)) {
-				btnHovered = STATUS;
+				btnHovered = STATUSBTN;
 			}
 			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[3].border)) {
-				btnHovered = GIVEUP;
+				btnHovered = GIVEUPBTN;
 			}
 			else {
 				btnHovered = NOBTN;
 			}
 		} break;
+
+		case BOARD: {
+			if (CheckCollisionPointRec(GetMousePosition(), backBtn.border)) {
+				btnHovered = BACKBTN;
+			}
+			else {
+				btnHovered = NOBTN;
+			}
+		}
 
 		default: break;
 	}
