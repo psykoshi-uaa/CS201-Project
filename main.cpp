@@ -9,10 +9,7 @@ Texture2D logo = { 0 };
 Texture2D particle = { 0 };
 Font sagaFont = { 0 };
 Vector2 sbar[SBARNUMSEGS+1];
-
-Vector2 starPtxPos[MAXSTARPTX]; //TODO: Turn this into array of structs instead of this mess
-Color starPtxColor[MAXSTARPTX];
-int starPtx[MAXSTARPTX];
+PTX ptxStar[MAXSTARPTX];
 
 static GUIbtn newGameBtn = { 0 };
 static GUIbtn exitBtn = { 0 };
@@ -34,7 +31,7 @@ void DrawStatusBar(Vector2*);
 void DrawBtnSelected(Rectangle, int);
 void AlphaWaveAnim(float&, float, float, float, bool&);
 void AlphaLinearAnim(float&, float, float, bool);
-void PTXStars(int*, Vector2*, Color*, float);
+void PTXStarAnim(PTX*, float);
 
 static void InitGame();
 static void UpdateCurrentScreen();
@@ -86,7 +83,7 @@ static void InitGame() {
 	screenTimer.Reset();
 	alphaChannel[0] = 0.0f;
 	alphaChannel[1] = -0.5f;
-	
+
 	float sbarH = 5;
 	sbar[0] = (Vector2) {15, sbarH};
 	sbar[1] = (Vector2) {195, sbarH};
@@ -236,7 +233,7 @@ static void DrawScreen() {
 		} break;
 
 		case MAINMENU: {
-			PTXStars(starPtx, starPtxPos, starPtxColor, ptxTimer.GetCounter());
+			PTXStarAnim(ptxStar, ptxTimer.GetCounter());
 
 			DrawTexture(titleGlow, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[0]) );
 			DrawTexture(titleCard, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, WHITE);

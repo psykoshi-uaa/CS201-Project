@@ -133,46 +133,50 @@ void DrawStatusBar(Vector2* sbar) {
 //-------------------------------------------------------------------------------
 //			particle animations (PTX = particles)
 //-------------------------------------------------------------------------------
-void PTXStars(int * starPtx, Vector2 * starPtxPos, Color * starPtxColor, float counter){
+void PTXStarAnim(PTX *ptx, float counter){
 	for (int i=0; i<MAXSTARPTX; i++) {
-		if (starPtx[i] == 0 ) {
+		if (ptx[i].halflife == 0 ) {
 			int chance = std::rand() % (FPS*FPS);
 			
 			if (chance == 1) {
+				ptx[i].dist += (std::rand() % 101) * 0.01f;
+
 				int colorChance = std::rand() % 3;
+
 				switch (colorChance) {
-					case 0: starPtxColor[i] = {106, 70, 160, 255};
+					case 0: ptx[i].color = ColorAlpha( (Color) {106, 70, 160, 255}, ptx[i].dist);
 							break;
 					
-					case 1: starPtxColor[i] = {160, 100, 72, 255};
+					case 1: ptx[i].color = ColorAlpha( (Color) {160, 100, 72, 255}, ptx[i].dist);
 							break;
 							
-					case 2: starPtxColor[i] = {54, 67, 85, 255};
+					case 2: ptx[i].color = ColorAlpha( (Color) {54, 67, 85, 255}, ptx[i].dist);
 							break;
 					
 					default: break;
 				}
-				starPtx[i] = 1;
-				starPtxPos[i] = {float(std::rand()%SCREENWIDTH), float(std::rand()%SCREENHEIGHT)};
+
+				ptx[i].halflife = 1;
+				ptx[i].pos = {float(std::rand()%SCREENWIDTH), float(std::rand()%SCREENHEIGHT)};
 			}
 		}
-		else if (starPtx[i] > 0 && starPtx[i] < FPS) {
-			if (starPtx[i] % 3 == 0) {
-				DrawTextEx(GetFontDefault(), "+", starPtxPos[i], 10, 0, starPtxColor[i]);
+		else if (ptx[i].halflife > 0 && ptx[i].halflife < FPS) {
+			if (ptx[i].halflife % 3 == 0) {
+				DrawTextEx(GetFontDefault(), "+", ptx[i].pos, 10, 0, ptx[i].color);
 			}
-			else if (starPtx[i] % 3 == 1) {
-				DrawTextEx(GetFontDefault(), "*", starPtxPos[i], 10, 0, starPtxColor[i]);
+			else if (ptx[i].halflife % 3 == 1) {
+				DrawTextEx(GetFontDefault(), "*", ptx[i].pos, 10, 0, ptx[i].color);
 			}
 			else {
-				DrawTextEx(GetFontDefault(), "x", starPtxPos[i], 10, 0, starPtxColor[i]);
+				DrawTextEx(GetFontDefault(), "x", ptx[i].pos, 10, 0, ptx[i].color);
 			}
 			
 			if (int(counter) % FPS == 0) {
-				starPtx[i]++;
+				ptx[i].halflife++;
 			}
 		}
 		else {
-			starPtx[i] = 0;
+			ptx[i].halflife = 0;
 		}
 	}
 }

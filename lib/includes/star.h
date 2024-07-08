@@ -39,6 +39,13 @@ typedef struct GUIbtn {
 	Vector2 origin;
 } GUIbtn;
 
+typedef struct PTX{
+	int halflife;	
+	Vector2 pos;
+	Color color;
+	float dist;
+} PTX;
+
 //global variables
 extern GameScreen currentScreen;
 extern Buttons btnHovered;
