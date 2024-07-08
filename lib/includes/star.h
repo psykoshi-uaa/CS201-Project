@@ -17,10 +17,10 @@
 #define SBARHEIGHT 30
 #define SBARFONTSIZE 22
 #define SBARNUMSEGS 2
-#define MAXSTARPTX 100
+#define MAXSTARPTX 500
 	  
-const int SCREENWIDTH = 800,
-          SCREENHEIGHT = 800;
+const int SCREENWIDTH = 1920,
+          SCREENHEIGHT = 1080;
 			  
 const float SBARSEG[SBARNUMSEGS] = {180, 400},
 			MARGIN = 30,

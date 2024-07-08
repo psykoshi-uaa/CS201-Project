@@ -49,6 +49,7 @@ int main(){
 	InitGame();
 
 	SetTargetFPS(FPS);
+	ToggleFullscreen();
 
 	while (!WindowShouldClose()) {
 		UpdateCurrentScreen();
@@ -115,6 +116,13 @@ static void InitGame() {
 //			update screen
 //-------------------------------------------------------------------------------
 static void UpdateCurrentScreen(){
+	if (ptxTimer.GetCounter() <= FPS*10) {
+		ptxTimer.Run();
+	}
+	else {
+		ptxTimer.Reset();
+	}
+			
 	switch (currentScreen)
 	{
 		case LOGO: {
@@ -144,13 +152,6 @@ static void UpdateCurrentScreen(){
 
 		case MAINMENU: {
 			AlphaWaveAnim(alphaChannel[0], 1.0f, 0.5f, 0.006f, increasing);
-			
-			if (ptxTimer.GetCounter() <= FPS*10) {
-				ptxTimer.Run();
-			}
-			else {
-				ptxTimer.Reset();
-			}
 			
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				switch (btnHovered) {
@@ -215,6 +216,8 @@ static void DrawScreen() {
 
 	ClearBackground(BLACK);
 
+	PTXStarAnim(ptxStar, ptxTimer.GetCounter());
+
 	switch (currentScreen) {
 		case LOGO: {
 			DrawTexture(logo, SCREENWIDTH/2 - logo.width/2, SCREENHEIGHT/2 - logo.height/2, WHITE);
@@ -233,8 +236,6 @@ static void DrawScreen() {
 		} break;
 
 		case MAINMENU: {
-			PTXStarAnim(ptxStar, ptxTimer.GetCounter());
-
 			DrawTexture(titleGlow, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[0]) );
 			DrawTexture(titleCard, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, WHITE);
 					

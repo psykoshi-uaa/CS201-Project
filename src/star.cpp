@@ -135,22 +135,23 @@ void DrawStatusBar(Vector2* sbar) {
 //-------------------------------------------------------------------------------
 void PTXStarAnim(PTX *ptx, float counter){
 	for (int i=0; i<MAXSTARPTX; i++) {
+		//initiialize the particles
 		if (ptx[i].halflife == 0 ) {
 			int chance = std::rand() % (FPS*FPS);
 			
 			if (chance == 1) {
-				ptx[i].dist += (std::rand() % 101) * 0.01f;
+				ptx[i].dist += (std::rand() % 35) * 0.01f;
 
 				int colorChance = std::rand() % 3;
 
 				switch (colorChance) {
-					case 0: ptx[i].color = {106, 70, 160, 255};
+					case 0: ptx[i].color = {220, 233, 255, 255};
 							break;
 					
-					case 1: ptx[i].color = {160, 100, 72, 255};
+					case 1: ptx[i].color = {125, 112, 180, 255};
 							break;
 							
-					case 2: ptx[i].color = {54, 67, 85, 255};
+					case 2: ptx[i].color = {22, 90, 153, 255};
 							break;
 					
 					default: break;
@@ -160,11 +161,27 @@ void PTXStarAnim(PTX *ptx, float counter){
 				ptx[i].pos = {float(std::rand()%SCREENWIDTH), float(std::rand()%SCREENHEIGHT)};
 			}
 		}
+		//update the particles
 		else if (ptx[i].halflife > 0 && ptx[i].halflife < FPS) {
-			if (ptx[i].alpha < ptx[i].dist) {
-				ptx[i].alpha += 0.01f;
+			if (int(counter) % FPS == 0) {
+				ptx[i].halflife++;
 			}
 
+			if (ptx[i].alpha < ptx[i].dist) {
+				ptx[i].alpha += 0.001f;
+			}
+
+		}
+		//kill the particles
+		else if (ptx[i].alpha > 0) {
+			ptx[i].alpha -= 0.001f;
+		}
+		else {
+			ptx[i].halflife = 0;
+		}
+		
+		//draw the particles
+		if (ptx[i].halflife != 0) {
 			if (ptx[i].halflife % 3 == 0) {
 				DrawTextEx(GetFontDefault(), "+", ptx[i].pos, 10, 0, ColorAlpha(ptx[i].color, ptx[i].alpha) );
 			}
@@ -174,14 +191,6 @@ void PTXStarAnim(PTX *ptx, float counter){
 			else {
 				DrawTextEx(GetFontDefault(), "x", ptx[i].pos, 10, 0, ColorAlpha(ptx[i].color, ptx[i].alpha) );
 			}
-			
-			if (int(counter) % FPS == 0) {
-				ptx[i].halflife++;
-			}
-
-		}
-		else {
-			ptx[i].halflife = 0;
 		}
 	}
 }
