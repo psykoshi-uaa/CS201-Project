@@ -17,16 +17,17 @@
 #define SBARHEIGHT 30
 #define SBARFONTSIZE 22
 #define SBARNUMSEGS 2
+#define MAXSTARPTX 100
 	  
-const int screenWidth = 800,
-              screenHeight = 800;
+const int SCREENWIDTH = 800,
+          SCREENHEIGHT = 800;
 			  
 const float SBARSEG[SBARNUMSEGS] = {180, 400},
-      MARGIN = 30,
-      BTNPADDING = 2;
+			MARGIN = 30,
+			BTNPADDING = 2;
 
 //enums and structs
-typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, HUB, BOARD, PLAYERSHEET, GAMEOVER, SUCCESS } GameScreen;
+typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, INTRO, HUB, BOARD, PLAYERSHEET, GAMEOVER, SUCCESS } GameScreen;
 typedef enum Buttons { NOBTN, NEWGAMEBTN, EXITBTN,
 			BOARDBTN, MARKETBTN, STATUSBTN, GIVEUPBTN,
 			ODDJOBBTN, GATHERBTN, SALVAGEBTN, BOUNTYBTN, RAIDBTN,
@@ -41,6 +42,7 @@ typedef struct GUIbtn {
 //global variables
 extern GameScreen currentScreen;
 extern Buttons btnHovered;
+extern Font sagaFont;
 
 //-------------------------------------------------------------------------------
 //			player, ship, and mission classes
@@ -95,7 +97,6 @@ class Dice {
 	Dice();
 	int rollD6(int);
 };
-
 
 
 #endif
