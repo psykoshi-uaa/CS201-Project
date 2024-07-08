@@ -65,8 +65,13 @@ class Player {
 	int getDebt();
 	int getHP();
 	int getSP();
-	void getSkills(int&, int&, int&);
+	int getPilot();
+	int getRepair();
+	int getBarter();
 
+	Player() 
+	: name("Unknown"), Class("Unknown"), money(0), debt(1000000), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
+    }
 };
 
 

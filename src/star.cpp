@@ -26,10 +26,16 @@ int Player::getSP() {
 	return SP;
 }
 
-void Player::getSkills(int& Piloting, int& Repair, int& Bartering) {
-	Piloting = piloting;
-	Repair = repair;
-	Bartering = bartering;
+int Player::getPilot(){
+	return piloting;
+}
+
+int Player::getRepair(){
+	return repair;
+}
+
+int Player::getBarter(){
+	return bartering;
 }
 
 
