@@ -43,6 +43,7 @@ typedef struct PTX{
 	int halflife;	
 	Vector2 pos;
 	Color color;
+	float alpha;
 	float dist;
 } PTX;
 

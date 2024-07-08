@@ -144,13 +144,13 @@ void PTXStarAnim(PTX *ptx, float counter){
 				int colorChance = std::rand() % 3;
 
 				switch (colorChance) {
-					case 0: ptx[i].color = ColorAlpha( (Color) {106, 70, 160, 255}, ptx[i].dist);
+					case 0: ptx[i].color = {106, 70, 160, 255};
 							break;
 					
-					case 1: ptx[i].color = ColorAlpha( (Color) {160, 100, 72, 255}, ptx[i].dist);
+					case 1: ptx[i].color = {160, 100, 72, 255};
 							break;
 							
-					case 2: ptx[i].color = ColorAlpha( (Color) {54, 67, 85, 255}, ptx[i].dist);
+					case 2: ptx[i].color = {54, 67, 85, 255};
 							break;
 					
 					default: break;
@@ -161,19 +161,24 @@ void PTXStarAnim(PTX *ptx, float counter){
 			}
 		}
 		else if (ptx[i].halflife > 0 && ptx[i].halflife < FPS) {
+			if (ptx[i].alpha < ptx[i].dist) {
+				ptx[i].alpha += 0.01f;
+			}
+
 			if (ptx[i].halflife % 3 == 0) {
-				DrawTextEx(GetFontDefault(), "+", ptx[i].pos, 10, 0, ptx[i].color);
+				DrawTextEx(GetFontDefault(), "+", ptx[i].pos, 10, 0, ColorAlpha(ptx[i].color, ptx[i].alpha) );
 			}
 			else if (ptx[i].halflife % 3 == 1) {
-				DrawTextEx(GetFontDefault(), "*", ptx[i].pos, 10, 0, ptx[i].color);
+				DrawTextEx(GetFontDefault(), "*", ptx[i].pos, 10, 0, ColorAlpha(ptx[i].color, ptx[i].alpha) );
 			}
 			else {
-				DrawTextEx(GetFontDefault(), "x", ptx[i].pos, 10, 0, ptx[i].color);
+				DrawTextEx(GetFontDefault(), "x", ptx[i].pos, 10, 0, ColorAlpha(ptx[i].color, ptx[i].alpha) );
 			}
 			
 			if (int(counter) % FPS == 0) {
 				ptx[i].halflife++;
 			}
+
 		}
 		else {
 			ptx[i].halflife = 0;
