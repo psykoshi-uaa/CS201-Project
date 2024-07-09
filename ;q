@@ -42,57 +42,17 @@ int Player::getBarter(){
 //-------------------------------------------------------------------------------
 //			planets
 //-------------------------------------------------------------------------------
-void DrawSolarSystem(Planet *planet, Vector2 sunPos, bool doDrawOrbital) {
-	DrawCircle(sunPos.x, sunPos.y, 30, (Color) {245, 255, 245, 255});
-
-	for (int i=0; i<NUMPLANETS; i++) {
-		if (planet[i].orbitAngle < 360) {
-			planet[i].orbitAngle += .05 / planet[i].orbitRadius.x;
-		}
-		else {
-			planet[i].orbitAngle = 0;
-		}
-
-		DrawPlanet(planet[i], (Vector2) {sunPos.x, sunPos.y}, doDrawOrbital);
-	}
-}
-
-void DrawPlanet(Planet planet, Vector2 sunPos, bool doDrawOrbital) {
-	planet.angle = (Vector2) {
-		sunPos.x + cos(planet.orbitAngle) * planet.orbitRadius.x,
-		sunPos.y + sin(planet.orbitAngle) * planet.orbitRadius.y };
-
-	if (CheckCollisionPointCircle(GetMousePosition(), planet.angle, PLANETBOUNDS) && doDrawOrbital == true) 
-	{
-		float pointPerDist = 1 - (GetDist(planet.angle, GetMousePosition()) / PLANETBOUNDS);
-
-		for(int p=0; p<ORBITALPOINTS; p++) {
-			float scaleSpline = 0.1 * pointPerDist;
-
-			planet.orbitPointsAhead[p] = (Vector2) {
-				(float)(sunPos.x + cos((planet.orbitAngle - p * scaleSpline)) * planet.orbitRadius.x),
-				(float)(sunPos.y + sin((planet.orbitAngle - p * scaleSpline)) * planet.orbitRadius.y) };
-			planet.orbitPointsBehind[p] = (Vector2) {
-				(float)(sunPos.x + cos((planet.orbitAngle + p * scaleSpline)) * planet.orbitRadius.x),
-				(float)(sunPos.y + sin((planet.orbitAngle + p * scaleSpline)) * planet.orbitRadius.y) };
-		}
-
-		DrawSplineLinear(planet.orbitPointsAhead, ORBITALPOINTS, 2, (Color) {255, 255, 255, 75} );
-		DrawSplineLinear(planet.orbitPointsBehind, ORBITALPOINTS, 2, (Color) {255, 255, 255, 75} );
-	}
-
-	if ((CheckCollisionPointCircle(GetMousePosition(), planet.angle, planet.radius)
-	|| (CheckCollisionPointCircle(GetMousePosition(), sunPos, 30) ) )
-	&& doDrawOrbital == true) {
-		DrawEllipseLines(sunPos.x, sunPos.y, planet.orbitRadius.x, planet.orbitRadius.y, (Color) {255, 255, 255, 20} );
-	}
-
-	DrawCircle(planet.angle.x, planet.angle.y, planet.radius, planet.color);
+void DrawSolarSystem(float angle) {
+	float X = SCREENWIDTH/2 + cos(angle)*125;
+	float Y = SCREENHEIGHT/2 + sin(angle)*100;
+	DrawCircle(SCREENWIDTH/2, SCREENHEIGHT/2, 30, (Color) {245, 255, 245, 255});
+	DrawEllipseLines(SCREENWIDTH/2, SCREENHEIGHT/2, 125, 100, WHITE);
+	DrawCircle(X, Y, 10, DARKBLUE);
 }
 
 
 //-------------------------------------------------------------------------------
-//			code utility
+//			code utility classes
 //-------------------------------------------------------------------------------
 float  Timer::GetCounter() {
 	return frameCounter;
@@ -130,10 +90,6 @@ int Dice::rollD6(int numRolls = 0) {
 	return total;
 }
 
-
-float GetDist(Vector2 x1y1, Vector2 x2y2) {
-	return sqrt(pow(abs(x1y1.x - x2y2.x), 2) + pow(abs(x2y2.y - x2y2.y), 2) );
-}
 
 //-------------------------------------------------------------------------------
 //			animation scalers

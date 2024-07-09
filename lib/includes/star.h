@@ -14,10 +14,18 @@
 #define HUBSUBFONTSIZE 24
 #define HUBBTNWIDTH 250
 #define HUBBTNHEIGHT 40 
+#define BOARDNUMBTNS 5
+#define BOARDMAINFONTSIZE 50
+#define BOARDSUBFONTSIZE 24
+#define BOARDBTNWIDTH 300
+#define BOARDBTNHEIGHT 60
 #define SBARHEIGHT 30
 #define SBARFONTSIZE 22
 #define SBARNUMSEGS 2
 #define MAXSTARPTX 500
+#define NUMPLANETS 7
+#define ORBITALPOINTS 10
+#define PLANETBOUNDS 100
 	  
 const int SCREENWIDTH = 1920,
           SCREENHEIGHT = 1080;
@@ -39,18 +47,38 @@ typedef struct GUIbtn {
 	Vector2 origin;
 } GUIbtn;
 
-typedef struct PTX{
+typedef struct PTX {
 	int halflife;	
 	Vector2 pos;
 	Color color;
-	float alpha;
-	float dist;
+	float alpha,
+	      dist;
 } PTX;
+
+typedef struct Planet {
+	float mass,
+	      radius,
+	      orbitAngle,
+	      alpha;
+	Vector2 pos,
+		orbitRadius,
+		orbitPointsAhead[ORBITALPOINTS],
+		orbitPointsBehind[ORBITALPOINTS],
+		angle;
+	Color color,
+	      elipse;
+} Planet;
 
 //global variables
 extern GameScreen currentScreen;
 extern Buttons btnHovered;
 extern Font sagaFont;
+
+//functions
+void DrawPlanet(Planet, Vector2, bool);
+void UpdatePlanet(Planet&);
+
+float GetDist(Vector2, Vector2);
 
 //-------------------------------------------------------------------------------
 //			player, ship, and mission classes

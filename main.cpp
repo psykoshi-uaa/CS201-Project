@@ -1,5 +1,7 @@
-#include "lib/includes/star.h"
+#include <ctime>
+#include <cstdlib> 
 #include <cmath>
+#include "lib/includes/star.h"
 
 //declaring structs and other init stuff
 Texture2D titleCard = { 0 };
@@ -10,10 +12,12 @@ Texture2D particle = { 0 };
 Font sagaFont = { 0 };
 Vector2 sbar[SBARNUMSEGS+1];
 PTX ptxStar[MAXSTARPTX];
+Planet planet[NUMPLANETS];
 
+static GUIbtn hubBtn[HUBNUMBTNS];
+static GUIbtn boardBtn[BOARDNUMBTNS];
 static GUIbtn newGameBtn = { 0 };
 static GUIbtn exitBtn = { 0 };
-static GUIbtn hubBtn[HUBNUMBTNS];
 static GUIbtn oddjobMissionBtn = { 0 };
 static GUIbtn gatherMissionBtn = { 0 };
 static GUIbtn salvageMissionBtn	= { 0 };
@@ -24,11 +28,13 @@ static Timer screenTimer;
 static Timer animTimer;
 static Timer ptxTimer;
 static float alphaChannel[5];
+static float orbitAngle = 0;
 static bool increasing = true;
 
 //function prototypes
 void DrawStatusBar(Vector2*);
 void DrawBtnSelected(Rectangle, int);
+void DrawSolarSystem(Planet*, Vector2, bool);
 void AlphaWaveAnim(float&, float, float, float, bool&);
 void AlphaLinearAnim(float&, float, float, bool);
 void PTXStarAnim(PTX*, float);
@@ -37,6 +43,7 @@ static void InitGame();
 static void UpdateCurrentScreen();
 static void DrawScreen();
 static void CheckBtnCollision();
+static void RegisterBtn();
 
 //declaring global
 GameScreen currentScreen = LOGO;
@@ -55,6 +62,10 @@ int main(){
 		UpdateCurrentScreen();
 		DrawScreen();
 		CheckBtnCollision();
+
+		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+			RegisterBtn();
+		}
 	}
 
 	UnloadTexture(titleCard);
@@ -72,13 +83,15 @@ int main(){
 //			initializations
 //-------------------------------------------------------------------------------
 static void InitGame() {
+	std::srand(std::time(nullptr));
+
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "Starcaller");
 	titleCard	= LoadTexture("resources/title.png");
 	titleGlow	= LoadTexture("resources/title_glow.png");
 	titleUnderline	= LoadTexture("resources/title_ship.png");
 	logo 		= LoadTexture("resources/logo.png");
 	sagaFont	= LoadFontEx("resources/saga.ttf", 72, NULL, 0);
-	
+
 	currentScreen = LOGO;
 	btnHovered = NOBTN;
 	screenTimer.Reset();
@@ -89,6 +102,23 @@ static void InitGame() {
 	sbar[0] = (Vector2) {15, sbarH};
 	sbar[1] = (Vector2) {195, sbarH};
 	sbar[2] = (Vector2) {SBARSEG[1] + 15, sbarH};
+
+	for (int i=0; i<NUMPLANETS; i++) {
+		float yOrbitRadius = (std::rand() % 400) + 60;
+		float xOrbitRadius = yOrbitRadius * 1.8; 
+		unsigned char colors[3] = {
+			(unsigned char)((std::rand() % 155) + 100),
+			(unsigned char)((std::rand() % 155) + 100),
+			(unsigned char)((std::rand() % 155) + 100),
+		};
+
+		planet[i].radius = (std::rand() % 10) + 5;
+		planet[i].mass = (std::rand() % 100 + planet[i].radius);
+		planet[i].orbitRadius = (Vector2) {xOrbitRadius, yOrbitRadius};
+		planet[i].orbitAngle = (std::rand() % 360) + 1;
+		planet[i].color = (Color) {colors[0], colors[1], colors[2], 255};
+		planet[i].alpha = 0.0f;
+	}
 
 	newGameBtn.origin = (Vector2) {SCREENWIDTH/5, SCREENHEIGHT - SCREENHEIGHT/4};
 	newGameBtn.border = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 100, 25};
@@ -109,6 +139,10 @@ static void InitGame() {
 			hubBtn[i].border = (Rectangle) { hubBtn[i].origin.x - 20, hubBtn[i].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
 		}
 	}
+
+	for (int i=0; i<BOARDNUMBTNS; i++) {
+		boardBtn[i].origin = (Vector2) { MARGIN, };
+	}
 }
 
 
@@ -122,7 +156,7 @@ static void UpdateCurrentScreen(){
 	else {
 		ptxTimer.Reset();
 	}
-			
+
 	switch (currentScreen)
 	{
 		case LOGO: {
@@ -152,21 +186,6 @@ static void UpdateCurrentScreen(){
 
 		case MAINMENU: {
 			AlphaWaveAnim(alphaChannel[0], 1.0f, 0.5f, 0.006f, increasing);
-			
-			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-				switch (btnHovered) {
-					case NEWGAMEBTN: {
-						for (int i=0; i<sizeof(alphaChannel); i++) {
-							alphaChannel[i] = 0.0f;
-						}
-						currentScreen = INTRO;
-					} break;
-	
-					case EXITBTN: {
-						CloseWindow();
-					} break;
-				}
-			}
 		} break;
 
 		case INTRO: {
@@ -180,27 +199,9 @@ static void UpdateCurrentScreen(){
 		} break;
 
 		case HUB: {
-			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-				switch (btnHovered) {
-					case BOARDBTN: {
-						currentScreen = BOARD;
-					} break;
-
-					case GIVEUPBTN: {
-						CloseWindow();
-					} break;
-				}
-			}
 		} break;
 
 		case BOARD: {
-			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-				switch (btnHovered) {
-					case BACKBTN: {
-						currentScreen = HUB;
-					}
-				}
-			}
 		} break;
 
 		default:break;
@@ -261,6 +262,8 @@ static void DrawScreen() {
 		case HUB: {
 			DrawStatusBar(sbar);
 			
+			DrawSolarSystem(planet, (Vector2){SCREENWIDTH/2, SCREENHEIGHT/2}, true);
+
 			for (int i=0; i<HUBNUMBTNS; i++) {
 				DrawBtnSelected(hubBtn[i].border, i + 3);
 				DrawRectangleLinesEx(hubBtn[i].border, 2, WHITE);
@@ -274,10 +277,7 @@ static void DrawScreen() {
 		case BOARD: {
 			DrawStatusBar(sbar);
 
-			DrawRectangle(MARGIN, SBARHEIGHT + MARGIN, SCREENWIDTH - MARGIN * 5, SCREENHEIGHT - MARGIN * 3, (Color){3, 3, 3, 255} );
-			DrawRectangleLines(MARGIN, SBARHEIGHT + MARGIN, SCREENWIDTH - MARGIN * 5, SCREENHEIGHT - MARGIN * 3, WHITE);
-
-			DrawTextEx(sagaFont, "missions available...", (Vector2){MARGIN * 3, SBARHEIGHT + MARGIN}, HUBSUBFONTSIZE, 0, WHITE);
+			DrawSolarSystem(planet, (Vector2){SCREENWIDTH/2, SCREENHEIGHT/2}, false);
 
 			DrawBtnSelected(backBtn.border, 12);
 			DrawTextEx(sagaFont, "Back", backBtn.origin, HUBMAINFONTSIZE, 0, WHITE);
@@ -292,7 +292,7 @@ static void DrawScreen() {
 
 
 //-------------------------------------------------------------------------------
-//			button collision
+//			button handling
 //-------------------------------------------------------------------------------
 static void CheckBtnCollision() {
 	switch (currentScreen) {
@@ -339,3 +339,41 @@ static void CheckBtnCollision() {
 	}
 }
 
+static void RegisterBtn() {
+	switch (btnHovered) {
+		case NEWGAMEBTN: {
+			for (int i=0; i<sizeof(alphaChannel); i++) {
+				alphaChannel[i] = 0.0f;
+			}
+			currentScreen = INTRO;
+		} break;
+
+		case EXITBTN: {
+			CloseWindow();
+		} break;
+					
+		case BOARDBTN: {
+			currentScreen = BOARD;
+		} break;
+
+		case GIVEUPBTN: {
+			CloseWindow();
+		} break;
+		
+		case BACKBTN: {
+			if (currentScreen == BOARD) {
+				currentScreen = HUB;
+			}
+		} break;
+		
+		default: break;
+	}
+}
+			
+
+/* garbage
+DrawRectangle(MARGIN, SBARHEIGHT + MARGIN, SCREENWIDTH - MARGIN * 5, SCREENHEIGHT - MARGIN * 3, (Color){3, 3, 3, 255} );
+DrawRectangleLines(MARGIN, SBARHEIGHT + MARGIN, SCREENWIDTH - MARGIN * 5, SCREENHEIGHT - MARGIN * 3, WHITE);
+
+DrawTextEx(sagaFont, "missions available...", (Vector2){MARGIN * 3, SBARHEIGHT + MARGIN}, HUBSUBFONTSIZE, 0, WHITE);
+*/
