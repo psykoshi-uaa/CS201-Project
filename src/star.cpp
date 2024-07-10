@@ -40,54 +40,102 @@ int Player::getBarter(){
 
 
 //-------------------------------------------------------------------------------
-//			planets
+//			Planets
 //-------------------------------------------------------------------------------
-void DrawSolarSystem(Planet *planet, Vector2 sunPos, bool doDrawOrbital) {
-	DrawCircle(sunPos.x, sunPos.y, 30, (Color) {245, 255, 245, 255});
+Planet::Planet() {
+	orbitAngle = (std::rand() % 360) + 1;
+	alpha = 0.0f;
+	radius = (std::rand() % 10) + 3;
+	mass = (radius * 1000);
+	orbitDistance = (std::rand() % 350) + 100;
+	conicScale = orbitDistance/mass;
 
-	for (int i=0; i<NUMPLANETS; i++) {
-		if (planet[i].orbitAngle < 360) {
-			planet[i].orbitAngle += .05 / planet[i].orbitRadius.x;
-		}
-		else {
-			planet[i].orbitAngle = 0;
+	unsigned char colors[3] = {
+		(unsigned char)((std::rand() % 155) + 100),
+		(unsigned char)((std::rand() % 155) + 100),
+		(unsigned char)((std::rand() % 155) + 100),
+	};
+	color = (Color) {colors[0], colors[1], colors[2], 255};
+}
+
+void Planet::UpdatePlanet(Vector2 sunPos) {
+	if (orbitAngle < 360) {
+		orbitAngle -= 0.00001 * distFromSun;
+	}
+	else {
+		orbitAngle = 0;
+	}
+
+	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - 0));
+
+	pos = (Vector2) {
+		sunPos.x + cos(orbitAngle) * orbitRadius,
+		sunPos.y + sin(orbitAngle) * orbitRadius 
+	};
+	
+	distFromMouse = GetDist(pos, GetMousePosition() );
+	distFromSun = GetDist(pos, sunPos);
+}
+
+void Planet::DrawPlanet(Vector2 sunPos, bool doDrawOrbital) {
+	if (CheckCollisionPointCircle(GetMousePosition(), pos, PLANETBOUNDS) && doDrawOrbital == true) {
+		for(int p=0; p<ORBITALPOINTS; p++) {
+			float scaleSpline = 0.1 * (1 - (distFromMouse/PLANETBOUNDS));
+
+			orbitPointsAhead[p] = {
+				sunPos.x + cos(orbitAngle - p * scaleSpline) * orbitRadius,
+				sunPos.y + sin(orbitAngle - p * scaleSpline) * orbitRadius
+			};
+
+			orbitPointsBehind[p] = {
+				sunPos.x + cos(orbitAngle + p * scaleSpline) * orbitRadius,
+				sunPos.y + sin(orbitAngle + p * scaleSpline) * orbitRadius
+			};
 		}
 
-		DrawPlanet(planet[i], (Vector2) {sunPos.x, sunPos.y}, doDrawOrbital);
+		DrawSplineLinear(orbitPointsAhead, ORBITALPOINTS, 2, (Color) {255, 255, 255, 75} );
+		DrawSplineLinear(orbitPointsBehind, ORBITALPOINTS, 2, (Color) {255, 255, 255, 75} );
+	}
+
+	
+	if ((CheckCollisionPointCircle(GetMousePosition(), pos, radius)
+	|| (CheckCollisionPointCircle(GetMousePosition(), sunPos, 30) ) )
+	&& doDrawOrbital == true) {
+		DrawEllipseLines(sunPos.x, sunPos.y, orbitRadius, orbitRadius, WHITE);
+	}
+	
+
+	DrawCircleV(pos, radius, color);
+}
+
+
+//-------------------------------------------------------------------------------
+//			draw functions
+//-------------------------------------------------------------------------------
+void DrawBtnSelected(Rectangle rct, int btn) {
+	if (btnHovered == btn) {
+		DrawRectangleRec(rct, DARKBLUE);
 	}
 }
 
-void DrawPlanet(Planet planet, Vector2 sunPos, bool doDrawOrbital) {
-	planet.angle = (Vector2) {
-		sunPos.x + cos(planet.orbitAngle) * planet.orbitRadius.x,
-		sunPos.y + sin(planet.orbitAngle) * planet.orbitRadius.y };
+void DrawStatusBar(Vector2* sbar) {
+	DrawRectangleLinesEx((Rectangle) {0, 0, SCREENWIDTH, SBARHEIGHT}, 3, WHITE);
 
-	if (CheckCollisionPointCircle(GetMousePosition(), planet.angle, PLANETBOUNDS) && doDrawOrbital == true) 
-	{
-		float pointPerDist = 1 - (GetDist(planet.angle, GetMousePosition()) / PLANETBOUNDS);
-
-		for(int p=0; p<ORBITALPOINTS; p++) {
-			float scaleSpline = 0.1 * pointPerDist;
-
-			planet.orbitPointsAhead[p] = (Vector2) {
-				(float)(sunPos.x + cos((planet.orbitAngle - p * scaleSpline)) * planet.orbitRadius.x),
-				(float)(sunPos.y + sin((planet.orbitAngle - p * scaleSpline)) * planet.orbitRadius.y) };
-			planet.orbitPointsBehind[p] = (Vector2) {
-				(float)(sunPos.x + cos((planet.orbitAngle + p * scaleSpline)) * planet.orbitRadius.x),
-				(float)(sunPos.y + sin((planet.orbitAngle + p * scaleSpline)) * planet.orbitRadius.y) };
-		}
-
-		DrawSplineLinear(planet.orbitPointsAhead, ORBITALPOINTS, 2, (Color) {255, 255, 255, 75} );
-		DrawSplineLinear(planet.orbitPointsBehind, ORBITALPOINTS, 2, (Color) {255, 255, 255, 75} );
+	for (int i=0; i<SBARNUMSEGS; i++) {
+		DrawLine(SBARSEG[i], 0, SBARSEG[i], SBARHEIGHT, WHITE);
 	}
 
-	if ((CheckCollisionPointCircle(GetMousePosition(), planet.angle, planet.radius)
-	|| (CheckCollisionPointCircle(GetMousePosition(), sunPos, 30) ) )
-	&& doDrawOrbital == true) {
-		DrawEllipseLines(sunPos.x, sunPos.y, planet.orbitRadius.x, planet.orbitRadius.y, (Color) {255, 255, 255, 20} );
-	}
+	DrawTextEx(sagaFont, "PILOT: xyz", sbar[0], SBARFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, "CURRENCY: xyz", sbar[1], SBARFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, "TIME LEFT TIL REPO: xyz", sbar[2], SBARFONTSIZE, 0, WHITE);
+}
 
-	DrawCircle(planet.angle.x, planet.angle.y, planet.radius, planet.color);
+void DrawSolarSystem(Planet *planet, Vector2 sunPos, bool doDrawOrbital) {
+	DrawCircleV(sunPos, 30, (Color) {245, 255, 245, 255});
+	for (int i=0; i<NUMPLANETS; i++) {
+		planet[i].UpdatePlanet(sunPos);
+		planet[i].DrawPlanet(sunPos, doDrawOrbital);
+	}
 }
 
 
@@ -132,8 +180,9 @@ int Dice::rollD6(int numRolls = 0) {
 
 
 float GetDist(Vector2 x1y1, Vector2 x2y2) {
-	return sqrt(pow(abs(x1y1.x - x2y2.x), 2) + pow(abs(x2y2.y - x2y2.y), 2) );
+	return sqrt(pow(x2y2.x - x1y1.x, 2) + pow(x2y2.y - x1y1.y, 2) );
 }
+
 
 //-------------------------------------------------------------------------------
 //			animation scalers
@@ -165,38 +214,16 @@ void AlphaLinearAnim(float& counter, float goal, float increment, bool increase)
 
 
 //-------------------------------------------------------------------------------
-//			draw functions
-//-------------------------------------------------------------------------------
-void DrawBtnSelected(Rectangle rct, int btn) {
-	if (btnHovered == btn) {
-		DrawRectangleRec(rct, DARKBLUE);
-	}
-}
-
-void DrawStatusBar(Vector2* sbar) {
-	DrawRectangleLinesEx((Rectangle) {0, 0, SCREENWIDTH, SBARHEIGHT}, 3, WHITE);
-
-	for (int i=0; i<SBARNUMSEGS; i++) {
-		DrawLine(SBARSEG[i], 0, SBARSEG[i], SBARHEIGHT, WHITE);
-	}
-
-	DrawTextEx(sagaFont, "PILOT: xyz", sbar[0], SBARFONTSIZE, 0, WHITE);
-	DrawTextEx(sagaFont, "CURRENCY: xyz", sbar[1], SBARFONTSIZE, 0, WHITE);
-	DrawTextEx(sagaFont, "TIME LEFT TIL REPO: xyz", sbar[2], SBARFONTSIZE, 0, WHITE);
-}
-
-
-//-------------------------------------------------------------------------------
 //			particle animations (PTX = particles)
 //-------------------------------------------------------------------------------
 void PTXStarAnim(PTX *ptx, float counter){
 	for (int i=0; i<MAXSTARPTX; i++) {
 		//initiialize the particles
 		if (ptx[i].halflife == 0 ) {
-			int chance = std::rand() % (FPS*FPS);
+			int chance = std::rand() % (350);
 			
 			if (chance == 1) {
-				ptx[i].dist += (std::rand() % 35) * 0.01f;
+				ptx[i].dist += (std::rand() % 25) * 0.01f;
 
 				int colorChance = std::rand() % 3;
 
@@ -231,7 +258,7 @@ void PTXStarAnim(PTX *ptx, float counter){
 
 		//kill the particles
 		else if (ptx[i].alpha > 0) {
-			ptx[i].alpha -= 0.1f;
+			ptx[i].alpha -= 0.001f;
 		}
 		else {
 			ptx[i].halflife = 0;
@@ -251,5 +278,3 @@ void PTXStarAnim(PTX *ptx, float counter){
 		}
 	}
 }
-
-//

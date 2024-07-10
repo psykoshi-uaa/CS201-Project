@@ -22,7 +22,7 @@
 #define SBARHEIGHT 30
 #define SBARFONTSIZE 22
 #define SBARNUMSEGS 2
-#define MAXSTARPTX 500
+#define MAXSTARPTX 250 
 #define NUMPLANETS 7
 #define ORBITALPOINTS 10
 #define PLANETBOUNDS 100
@@ -55,29 +55,12 @@ typedef struct PTX {
 	      dist;
 } PTX;
 
-typedef struct Planet {
-	float mass,
-	      radius,
-	      orbitAngle,
-	      alpha;
-	Vector2 pos,
-		orbitRadius,
-		orbitPointsAhead[ORBITALPOINTS],
-		orbitPointsBehind[ORBITALPOINTS],
-		angle;
-	Color color,
-	      elipse;
-} Planet;
-
 //global variables
 extern GameScreen currentScreen;
 extern Buttons btnHovered;
 extern Font sagaFont;
 
 //functions
-void DrawPlanet(Planet, Vector2, bool);
-void UpdatePlanet(Planet&);
-
 float GetDist(Vector2, Vector2);
 
 //-------------------------------------------------------------------------------
@@ -113,6 +96,30 @@ class Player {
 };
 
 
+class Planet {
+	private:
+	float mass,
+	      radius,
+	      orbitAngle,
+	      orbitDistance,
+	      orbitRadius,
+	      conicScale,
+	      distFromMouse,
+	      distFromSun,
+	      alpha;
+	Vector2 pos,
+		angle,
+		axisLengths,
+		orbitPointsAhead[ORBITALPOINTS],
+		orbitPointsBehind[ORBITALPOINTS];
+	Color color,
+	      elipse;
+
+	public:
+	Planet();
+	void DrawPlanet(Vector2, bool);
+	void UpdatePlanet(Vector2);
+};
 //-------------------------------------------------------------------------------
 //			code utility classes
 //-------------------------------------------------------------------------------
