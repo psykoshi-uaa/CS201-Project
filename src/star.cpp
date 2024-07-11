@@ -49,6 +49,7 @@ Planet::Planet() {
 	mass = (radius * 1000);
 	orbitDistance = (std::rand() % 350) + 100;
 	conicScale = orbitDistance/mass;
+	conicRotation = std::rand() % 6;
 
 	unsigned char colors[3] = {
 		(unsigned char)((std::rand() % 155) + 100),
@@ -66,7 +67,7 @@ void Planet::UpdatePlanet(Vector2 sunPos) {
 		orbitAngle = 0;
 	}
 
-	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - 0));
+	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
 
 	pos = (Vector2) {
 		sunPos.x + cos(orbitAngle) * orbitRadius,
@@ -101,7 +102,7 @@ void Planet::DrawPlanet(Vector2 sunPos, bool doDrawOrbital) {
 	if ((CheckCollisionPointCircle(GetMousePosition(), pos, radius)
 	|| (CheckCollisionPointCircle(GetMousePosition(), sunPos, 30) ) )
 	&& doDrawOrbital == true) {
-		DrawEllipseLines(sunPos.x, sunPos.y, orbitRadius, orbitRadius, WHITE);
+		//DrawEllipseLines(sunPos.x, sunPos.y, orbitRadius, orbitRadius, WHITE);
 	}
 	
 

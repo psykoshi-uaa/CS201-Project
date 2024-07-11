@@ -104,6 +104,7 @@ class Planet {
 	      orbitDistance,
 	      orbitRadius,
 	      conicScale,
+	      conicRotation,
 	      distFromMouse,
 	      distFromSun,
 	      alpha;
