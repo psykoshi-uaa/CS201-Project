@@ -83,6 +83,7 @@ float GetDist(Vector2, Vector2);
 //-------------------------------------------------------------------------------
 //			player, ship, and mission classes
 //-------------------------------------------------------------------------------
+
 class Player {
 	private: 
 	std::string	name;
@@ -110,6 +111,29 @@ class Player {
 	Player() 
 	: name("Unknown"), Class("Unknown"), money(0), debt(1000000), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
     }
+};
+
+class Mission {
+	public:
+	std::string name;
+	int reward;
+	int timeCost;
+	float cooldownTime;
+
+	// constructor?
+
+	//getters
+	std::string getName();
+	int getReward();
+	int getTimeCost();
+	//get button?
+
+	//setters
+	void setName(std::string new_name);
+	void setReward(int new_reward);
+	void setTimeCost(int new_time_cost);
+	void setCooldownTime(float new_cooldown_time);
+	//set button?
 };
 
 
