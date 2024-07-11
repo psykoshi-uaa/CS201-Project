@@ -11,7 +11,6 @@ which will create a green rectangle at (100, 100) with a width of 300 and a heig
 ```Vector2 exampleVector2 = (Vector2) {100, 200};```
 which a struct with two floats of 100 and 200 values. This is most often used as coordinates.
 
-
 ## main.cpp
 ```
     - preprocessor includes
@@ -31,40 +30,18 @@ which a struct with two floats of 100 and 200 values. This is most often used as
     - initGame()
         - load textures from resource folder
         - set some variables to 0
-        - set statusbar attributes
-        - generate planets
-		- create button settings (size and positions)
+        - set status bar attributes
 		
-	- update screen(), draw screen(), and check button collision()
-		// these three functions operate in the same way and could be merged but are seperate for readability 
-		- switch (based on current screen)
-			- do action based on screen
-			//update screen runs timers and switches to a different screen based on events
-			//draw screen draws all of the shapes and text
-			//check button collision changes the variable btnHovered based on which button your mouse is colliding with
+    - update screen(), draw screen(), and check button collision()
+	// these three functions operate in the same way and could be merged but are seperate for readability 
+	- switch (based on current screen)
+		- do action based on screen
+
+		//update screen() runs timers and switches to a different screen based on events
+		//draw screen() draws all of the shapes and text
+		//check button collision() changes the variable btnHovered based on which button your mouse is colliding with
 	
-	- register button()
-		-switch (based on current button hovered)
-			- do action relative to button pressed
-		
+    - register button()
+	-switch (based on current button hovered)
+		- do action relative to button pressed
 ```
-## star.cpp
-```
-	//An implementation file used for defining all classes that are not static functions in main.
-	//main static members can only be defined and called inside of main
-
-```
-
-## star.h
-```
-	// the enums are non changable lists that represent numbers. currentScreen is a enum variable tied to the screen enum
-	// for instance, currentScreen = LOGO is the same as currentScreen = 0
-	- globals defined
-	- classes defined
-	- functions defined
-```
-
-
-A Vector2 would be:
-|Vector2 exampleVector2 = (Vector2) {100, 200};
-which has the float values 100 and 200 and is primarily used for positioning.
