@@ -1,14 +1,10 @@
-<<<<<<< Updated upstream:main.cpp
-=======
-#include "star.hpp"
+#include "star.h"
 #include "../include/raylib-cpp.hpp"
 #include "../include/raylib.h"
 #include "../include/raymath.h"
->>>>>>> Stashed changes:src/main.cpp
 #include <ctime>
 #include <cstdlib> 
 #include <cmath>
-#include "lib/includes/star.h"
 
 //declaring structs and other init stuff
 Texture2D titleCard = { 0 };
@@ -87,11 +83,11 @@ static void InitGame() {
 	std::srand(std::time(nullptr));
 
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "Starcaller");
-	titleCard	= LoadTexture("../resources/title.png");
-	titleGlow	= LoadTexture("../resources/title_glow.png");
-	titleUnderline	= LoadTexture("../resources/title_ship.png");
-	logo 		= LoadTexture("../resources/logo.png");
-	sagaFont	= LoadFontEx("../resources/saga.ttf", 72, NULL, 0);
+	titleCard	= LoadTexture("resources/title.png");
+	titleGlow	= LoadTexture("resources/title_glow.png");
+	titleUnderline	= LoadTexture("resources/title_ship.png");
+	logo 		= LoadTexture("resources/logo.png");
+	sagaFont	= LoadFontEx("resources/saga.ttf", 72, NULL, 0);
 
 	currentScreen = LOGO;
 	btnHovered = NOBTN;

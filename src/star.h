@@ -2,8 +2,8 @@
 #define STAR_H
 
 //includes
-#include "raylib.h"
-#include "raymath.h"
+#include "../include/raylib-cpp.hpp"
+#include "../include/raylib.h"
 #include <string>
 
 //defines

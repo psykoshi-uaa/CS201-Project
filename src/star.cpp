@@ -1,13 +1,9 @@
-<<<<<<< Updated upstream
-=======
-#include "star.hpp"
+#include "star.h"
 #include "../include/raylib-cpp.hpp"
 #include "../include/raylib.h"
 #include "../include/raymath.h"
->>>>>>> Stashed changes
 #include <ctime>
-#include <cstdlib> 
-#include "../lib/includes/star.h"
+#include <cstdlib>
 
  
 //-------------------------------------------------------------------------------
@@ -139,7 +135,7 @@ int Dice::rollD6(int numRolls = 0) {
 
 
 float GetDist(Vector2 x1y1, Vector2 x2y2) {
-	return sqrt(pow(abs(x1y1.x - x2y2.x), 2) + pow(abs(x2y2.y - x2y2.y), 2) );
+	return sqrt(pow(x2y2.x - x1y1.x, 2) + pow(x2y2.y - x1y1.y, 2) );
 }
 
 //-------------------------------------------------------------------------------
