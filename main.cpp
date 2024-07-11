@@ -1,3 +1,10 @@
+<<<<<<< Updated upstream:main.cpp
+=======
+#include "star.hpp"
+#include "../include/raylib-cpp.hpp"
+#include "../include/raylib.h"
+#include "../include/raymath.h"
+>>>>>>> Stashed changes:src/main.cpp
 #include <ctime>
 #include <cstdlib> 
 #include <cmath>
@@ -18,17 +25,11 @@ static GUIbtn hubBtn[HUBNUMBTNS];
 static GUIbtn boardBtn[BOARDNUMBTNS];
 static GUIbtn newGameBtn = { 0 };
 static GUIbtn exitBtn = { 0 };
-static GUIbtn oddjobMissionBtn = { 0 };
-static GUIbtn gatherMissionBtn = { 0 };
-static GUIbtn salvageMissionBtn	= { 0 };
-static GUIbtn bountyMissionBtn = { 0 };
-static GUIbtn raidMissionBtn = { 0 };
 static GUIbtn backBtn = { 0 };
 static Timer screenTimer;
 static Timer animTimer;
 static Timer ptxTimer;
-static float alphaChannel[5];
-static float orbitAngle = 0;
+static float alphaChannel[NUMALPHACHANNELS];
 static bool increasing = true;
 
 //function prototypes
@@ -86,11 +87,11 @@ static void InitGame() {
 	std::srand(std::time(nullptr));
 
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "Starcaller");
-	titleCard	= LoadTexture("resources/title.png");
-	titleGlow	= LoadTexture("resources/title_glow.png");
-	titleUnderline	= LoadTexture("resources/title_ship.png");
-	logo 		= LoadTexture("resources/logo.png");
-	sagaFont	= LoadFontEx("resources/saga.ttf", 72, NULL, 0);
+	titleCard	= LoadTexture("../resources/title.png");
+	titleGlow	= LoadTexture("../resources/title_glow.png");
+	titleUnderline	= LoadTexture("../resources/title_ship.png");
+	logo 		= LoadTexture("../resources/logo.png");
+	sagaFont	= LoadFontEx("../resources/saga.ttf", 72, NULL, 0);
 
 	currentScreen = LOGO;
 	btnHovered = NOBTN;
@@ -342,7 +343,7 @@ static void CheckBtnCollision() {
 static void RegisterBtn() {
 	switch (btnHovered) {
 		case NEWGAMEBTN: {
-			for (int i=0; i<sizeof(alphaChannel); i++) {
+			for (int i=0; i<NUMALPHACHANNELS; i++) {
 				alphaChannel[i] = 0.0f;
 			}
 			currentScreen = INTRO;

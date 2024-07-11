@@ -1,3 +1,10 @@
+<<<<<<< Updated upstream
+=======
+#include "star.hpp"
+#include "../include/raylib-cpp.hpp"
+#include "../include/raylib.h"
+#include "../include/raymath.h"
+>>>>>>> Stashed changes
 #include <ctime>
 #include <cstdlib> 
 #include "../lib/includes/star.h"
