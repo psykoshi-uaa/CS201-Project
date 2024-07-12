@@ -5,6 +5,10 @@
 #include "../include/raylib-cpp.hpp"
 #include "../include/raylib.h"
 #include <string>
+//includes
+#include "raylib.h"
+#include "raymath.h"
+#include <string>
 
 //defines
 #define FPS 60
@@ -22,7 +26,7 @@
 #define SBARHEIGHT 30
 #define SBARFONTSIZE 22
 #define SBARNUMSEGS 2
-#define MAXSTARPTX 500
+#define MAXSTARPTX 250 
 #define NUMPLANETS 7
 #define ORBITALPOINTS 10
 #define PLANETBOUNDS 100
@@ -56,35 +60,17 @@ typedef struct PTX {
 	      dist;
 } PTX;
 
-typedef struct Planet {
-	float mass,
-	      radius,
-	      orbitAngle,
-	      alpha;
-	Vector2 pos,
-		orbitRadius,
-		orbitPointsAhead[ORBITALPOINTS],
-		orbitPointsBehind[ORBITALPOINTS],
-		angle;
-	Color color,
-	      elipse;
-} Planet;
-
 //global variables
 extern GameScreen currentScreen;
 extern Buttons btnHovered;
 extern Font sagaFont;
 
 //functions
-void DrawPlanet(Planet, Vector2, bool);
-void UpdatePlanet(Planet&);
-
 float GetDist(Vector2, Vector2);
 
 //-------------------------------------------------------------------------------
 //			player, ship, and mission classes
 //-------------------------------------------------------------------------------
-
 class Player {
 	private: 
 	std::string	name;
@@ -114,30 +100,32 @@ class Player {
     }
 };
 
-class Mission {
+
+class Planet {
+	private:
+	float mass,
+	      radius,
+	      orbitAngle,
+	      orbitDistance,
+	      orbitRadius,
+	      conicScale,
+	      conicRotation,
+	      distFromMouse,
+	      distFromSun,
+	      alpha;
+	Vector2 pos,
+		angle,
+		axisLengths,
+		orbitPointsAhead[ORBITALPOINTS],
+		orbitPointsBehind[ORBITALPOINTS];
+	Color color,
+	      elipse;
+
 	public:
-	std::string name;
-	int reward;
-	int timeCost;
-	float cooldownTime;
-
-	// constructor?
-
-	//getters
-	std::string getName();
-	int getReward();
-	int getTimeCost();
-	//get button?
-
-	//setters
-	void setName(std::string new_name);
-	void setReward(int new_reward);
-	void setTimeCost(int new_time_cost);
-	void setCooldownTime(float new_cooldown_time);
-	//set button?
+	Planet();
+	void DrawPlanet(Vector2, bool);
+	void UpdatePlanet(Vector2);
 };
-
-
 //-------------------------------------------------------------------------------
 //			code utility classes
 //-------------------------------------------------------------------------------

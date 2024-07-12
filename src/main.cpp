@@ -52,7 +52,6 @@ Buttons btnHovered = NOBTN;
 int main(){
 	InitGame();
 
-	SetTargetFPS(FPS);
 	ToggleFullscreen();
 
 	while (!WindowShouldClose()) {
@@ -69,6 +68,7 @@ int main(){
 	UnloadTexture(titleGlow);
 	UnloadTexture(titleUnderline);
 	UnloadTexture(logo);
+	UnloadFont(sagaFont);
 
 	CloseWindow();
 
@@ -81,6 +81,8 @@ int main(){
 //-------------------------------------------------------------------------------
 static void InitGame() {
 	std::srand(std::time(nullptr));
+
+	SetTargetFPS(FPS);
 
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "Starcaller");
 	titleCard	= LoadTexture("resources/title.png");
@@ -99,23 +101,6 @@ static void InitGame() {
 	sbar[0] = (Vector2) {15, sbarH};
 	sbar[1] = (Vector2) {195, sbarH};
 	sbar[2] = (Vector2) {SBARSEG[1] + 15, sbarH};
-
-	for (int i=0; i<NUMPLANETS; i++) {
-		float yOrbitRadius = (std::rand() % 400) + 60;
-		float xOrbitRadius = yOrbitRadius * 1.8; 
-		unsigned char colors[3] = {
-			(unsigned char)((std::rand() % 155) + 100),
-			(unsigned char)((std::rand() % 155) + 100),
-			(unsigned char)((std::rand() % 155) + 100),
-		};
-
-		planet[i].radius = (std::rand() % 10) + 5;
-		planet[i].mass = (std::rand() % 100 + planet[i].radius);
-		planet[i].orbitRadius = (Vector2) {xOrbitRadius, yOrbitRadius};
-		planet[i].orbitAngle = (std::rand() % 360) + 1;
-		planet[i].color = (Color) {colors[0], colors[1], colors[2], 255};
-		planet[i].alpha = 0.0f;
-	}
 
 	newGameBtn.origin = (Vector2) {SCREENWIDTH/5, SCREENHEIGHT - SCREENHEIGHT/4};
 	newGameBtn.border = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 100, 25};
@@ -215,6 +200,8 @@ static void DrawScreen() {
 	ClearBackground(BLACK);
 
 	PTXStarAnim(ptxStar, ptxTimer.GetCounter());
+
+	DrawFPS(800, 800);
 
 	switch (currentScreen) {
 		case LOGO: {
@@ -366,11 +353,3 @@ static void RegisterBtn() {
 		default: break;
 	}
 }
-			
-
-/* garbage
-DrawRectangle(MARGIN, SBARHEIGHT + MARGIN, SCREENWIDTH - MARGIN * 5, SCREENHEIGHT - MARGIN * 3, (Color){3, 3, 3, 255} );
-DrawRectangleLines(MARGIN, SBARHEIGHT + MARGIN, SCREENWIDTH - MARGIN * 5, SCREENHEIGHT - MARGIN * 3, WHITE);
-
-DrawTextEx(sagaFont, "missions available...", (Vector2){MARGIN * 3, SBARHEIGHT + MARGIN}, HUBSUBFONTSIZE, 0, WHITE);
-*/
