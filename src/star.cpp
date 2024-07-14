@@ -45,10 +45,6 @@ int Player::getBarter(){
 //-------------------------------------------------------------------------------
 //			Planets
 //-------------------------------------------------------------------------------
-void Sun::DrawSun() {
-	DrawCircleV(sunPos, sunRadius, (Color) {245, 255, 245, 255});
-}
-
 Planet::Planet() {
 	orbitAngle = (std::rand() % 360) + 1;
 	alpha = 0.0f;
@@ -69,7 +65,7 @@ Planet::Planet() {
 	orbitOn = false;
 }
 
-void Planet::UpdatePlanet() {
+void Planet::UpdatePlanet(Vector2 sunPos) {
 	if (orbitAngle < 360) {
 		orbitAngle -= (0.000001f / distFromSun) * mass;
 	}
@@ -80,8 +76,8 @@ void Planet::UpdatePlanet() {
 	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
 
 	pos = (Vector2) {
-		Sun::sunPos.x + cos(orbitAngle) * orbitRadius,
-		Sun::sunPos.y + sin(orbitAngle) * orbitRadius 
+		sunPos.x + cos(orbitAngle) * orbitRadius,
+		sunPos.y + sin(orbitAngle) * orbitRadius 
 	};
 	
 	for(int p=0; p<ORBITALPOINTS; p++) {
@@ -90,13 +86,13 @@ void Planet::UpdatePlanet() {
 		float splineAngleB = orbitAngle + (p * distScaler);
 
 		orbitPointsAhead[p] = {
-			Sun::sunPos.x + cos(splineAngleA) * (orbitDistance / (1 - conicScale * cos(splineAngleA - conicRotation)) ),
-			Sun::sunPos.y + sin(splineAngleA) * (orbitDistance / (1 - conicScale * cos(splineAngleA - conicRotation)) )
+			sunPos.x + cos(splineAngleA) * (orbitDistance / (1 - conicScale * cos(splineAngleA - conicRotation)) ),
+			sunPos.y + sin(splineAngleA) * (orbitDistance / (1 - conicScale * cos(splineAngleA - conicRotation)) )
 		};
 
 		orbitPointsBehind[p] = {
-			Sun::sunPos.x + cos(splineAngleB) * (orbitDistance / (1 - conicScale * cos(splineAngleB - conicRotation)) ),
-			Sun::sunPos.y + sin(splineAngleB) * (orbitDistance / (1 - conicScale * cos(splineAngleB - conicRotation)) )
+			sunPos.x + cos(splineAngleB) * (orbitDistance / (1 - conicScale * cos(splineAngleB - conicRotation)) ),
+			sunPos.y + sin(splineAngleB) * (orbitDistance / (1 - conicScale * cos(splineAngleB - conicRotation)) )
 		};
 	}
 
@@ -104,22 +100,22 @@ void Planet::UpdatePlanet() {
 		float splineAngleF = ((M_PI / ORBITALPOINTSFULL) * p * 2.041);
 
 		orbitPointsFull[p] = {
-			Sun::sunPos.x + cos(splineAngleF) * (orbitDistance / (1 - conicScale * cos(splineAngleF - conicRotation)) ),
-			Sun::sunPos.y + sin(splineAngleF) * (orbitDistance / (1 - conicScale * cos(splineAngleF - conicRotation)) )
+			sunPos.x + cos(splineAngleF) * (orbitDistance / (1 - conicScale * cos(splineAngleF - conicRotation)) ),
+			sunPos.y + sin(splineAngleF) * (orbitDistance / (1 - conicScale * cos(splineAngleF - conicRotation)) )
 		};
 	}
 
 	distFromMouse = GetDist(pos, GetMousePosition() );
-	distFromSun = GetDist(pos, Sun::sunPos);
+	distFromSun = GetDist(pos, sunPos);
 
 	if (distFromMouse < 10) {
 		distFromMouse = 10;
 	}
 }
 
-void Planet::DrawPlanet(bool doDrawOrbital) {
+void Planet::DrawPlanet(Vector2 sunPos, bool doDrawOrbital) {
 	if (((CheckCollisionPointCircle(GetMousePosition(), pos, radius)
-	|| CheckCollisionPointCircle(GetMousePosition(), Sun::sunPos, 30) )
+	|| CheckCollisionPointCircle(GetMousePosition(), sunPos, 30) )
 	&& doDrawOrbital == true)
 	|| orbitOn == true) {
 		DrawSplineLinear(orbitPointsFull, ORBITALPOINTSFULL, 2, orbitColor );
@@ -144,14 +140,13 @@ void Planet::RegisterPlanetClicked() {
 	}
 }
 
-void DrawAndUpdateSolarSystem(Sun sun, Planet *planet, bool doDrawOrbital) {
+void DrawAndUpdateSolarSystem(Planet *planet, Vector2 sunPos, bool doDrawOrbital) {
+	DrawCircleV(sunPos, 30, (Color) {245, 255, 245, 255});
 	
-	DrawSun(Sun);
-
 	for (int i=0; i<NUMPLANETS; i++) {
-		planet[i].UpdatePlanet(Sun::sunPos);
-		planet[i].RegisterPlanetClicked(Sun::sunPos);
-		planet[i].DrawPlanet(Sun::sunPos, doDrawOrbital);
+		planet[i].UpdatePlanet(sunPos);
+		planet[i].RegisterPlanetClicked();
+		planet[i].DrawPlanet(sunPos, doDrawOrbital);
 	}
 }
 

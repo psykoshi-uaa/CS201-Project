@@ -103,7 +103,7 @@ class Player {
     }
 };
 
-class Planet: public Sun {
+class Planet {
 	private:
 	float mass,
 	      radius,
@@ -129,7 +129,7 @@ class Planet: public Sun {
 	Planet();
 	void DrawPlanet(Vector2, bool);
 	void UpdatePlanet(Vector2);
-	void RegisterPlanetClicked(Vector2);
+	void RegisterPlanetClicked();
 };
 
 //-------------------------------------------------------------------------------
