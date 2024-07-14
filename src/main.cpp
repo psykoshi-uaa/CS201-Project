@@ -31,7 +31,7 @@ static bool increasing = true;
 //function prototypes
 void DrawStatusBar(Vector2*);
 void DrawBtnSelected(Rectangle, int);
-void DrawSolarSystem(Planet*, Vector2, bool);
+void DrawAndUpdateSolarSystem(Planet*, Vector2, bool);
 void AlphaWaveAnim(float&, float, float, float, bool&);
 void AlphaLinearAnim(float&, float, float, bool);
 void PTXStarAnim(PTX*, float);
@@ -80,8 +80,7 @@ int main(){
 //			initializations
 //-------------------------------------------------------------------------------
 static void InitGame() {
-	std::srand(std::time(nullptr));
-
+	std::srand(std::time( 0 ));
 	SetTargetFPS(FPS);
 
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "Starcaller");
@@ -181,9 +180,11 @@ static void UpdateCurrentScreen(){
 		} break;
 
 		case HUB: {
+			DrawAndUpdateSolarSystem(planet, (Vector2){SCREENWIDTH/2, SCREENHEIGHT/2}, true);
 		} break;
 
 		case BOARD: {
+			DrawAndUpdateSolarSystem(planet, (Vector2){SCREENWIDTH/2, SCREENHEIGHT/2}, false);
 		} break;
 
 		default:break;
@@ -201,7 +202,7 @@ static void DrawScreen() {
 
 	PTXStarAnim(ptxStar, ptxTimer.GetCounter());
 
-	DrawFPS(800, 800);
+	DrawFPS(SCREENWIDTH, SCREENHEIGHT);
 
 	switch (currentScreen) {
 		case LOGO: {
@@ -246,8 +247,6 @@ static void DrawScreen() {
 		case HUB: {
 			DrawStatusBar(sbar);
 			
-			DrawSolarSystem(planet, (Vector2){SCREENWIDTH/2, SCREENHEIGHT/2}, true);
-
 			for (int i=0; i<HUBNUMBTNS; i++) {
 				DrawBtnSelected(hubBtn[i].border, i + 3);
 				DrawRectangleLinesEx(hubBtn[i].border, 2, WHITE);
@@ -260,8 +259,6 @@ static void DrawScreen() {
 
 		case BOARD: {
 			DrawStatusBar(sbar);
-
-			DrawSolarSystem(planet, (Vector2){SCREENWIDTH/2, SCREENHEIGHT/2}, false);
 
 			DrawBtnSelected(backBtn.border, 12);
 			DrawTextEx(sagaFont, "Back", backBtn.origin, HUBMAINFONTSIZE, 0, WHITE);

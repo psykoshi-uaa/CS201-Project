@@ -4,7 +4,7 @@
 #include "../include/raymath.h"
 #include <ctime>
 #include <cstdlib>
-
+#include <cmath>
  
 //-------------------------------------------------------------------------------
 //			player, ship, and mission classes
@@ -45,13 +45,17 @@ int Player::getBarter(){
 //-------------------------------------------------------------------------------
 //			Planets
 //-------------------------------------------------------------------------------
+void Sun::DrawSun() {
+	DrawCircleV(sunPos, sunRadius, (Color) {245, 255, 245, 255});
+}
+
 Planet::Planet() {
 	orbitAngle = (std::rand() % 360) + 1;
 	alpha = 0.0f;
 	radius = (std::rand() % 10) + 3;
-	mass = (radius * 1000);
+	mass = pow(radius, 2) * 100;
 	orbitDistance = (std::rand() % 350) + 100;
-	conicScale = orbitDistance/mass;
+	conicScale = orbitDistance / mass;
 	conicRotation = std::rand() % 6;
 
 	unsigned char colors[3] = {
@@ -60,56 +64,95 @@ Planet::Planet() {
 		(unsigned char)((std::rand() % 155) + 100),
 	};
 	color = (Color) {colors[0], colors[1], colors[2], 255};
+	orbitColor = (Color) {colors[0], colors[1], colors[2], 55};
+
+	orbitOn = false;
 }
 
-void Planet::UpdatePlanet(Vector2 sunPos) {
+void Planet::UpdatePlanet() {
 	if (orbitAngle < 360) {
-		orbitAngle -= 0.00001 * distFromSun;
+		orbitAngle -= (0.000001f / distFromSun) * mass;
 	}
 	else {
-		orbitAngle = 0;
+		orbitAngle = 0.0f;
 	}
 
 	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
 
 	pos = (Vector2) {
-		sunPos.x + cos(orbitAngle) * orbitRadius,
-		sunPos.y + sin(orbitAngle) * orbitRadius 
+		Sun::sunPos.x + cos(orbitAngle) * orbitRadius,
+		Sun::sunPos.y + sin(orbitAngle) * orbitRadius 
 	};
 	
+	for(int p=0; p<ORBITALPOINTS; p++) {
+		float distScaler = 1 / distFromMouse;
+		float splineAngleA = orbitAngle - (p * distScaler);
+		float splineAngleB = orbitAngle + (p * distScaler);
+
+		orbitPointsAhead[p] = {
+			Sun::sunPos.x + cos(splineAngleA) * (orbitDistance / (1 - conicScale * cos(splineAngleA - conicRotation)) ),
+			Sun::sunPos.y + sin(splineAngleA) * (orbitDistance / (1 - conicScale * cos(splineAngleA - conicRotation)) )
+		};
+
+		orbitPointsBehind[p] = {
+			Sun::sunPos.x + cos(splineAngleB) * (orbitDistance / (1 - conicScale * cos(splineAngleB - conicRotation)) ),
+			Sun::sunPos.y + sin(splineAngleB) * (orbitDistance / (1 - conicScale * cos(splineAngleB - conicRotation)) )
+		};
+	}
+
+	for(int p=0; p<ORBITALPOINTSFULL; p++) {
+		float splineAngleF = ((M_PI / ORBITALPOINTSFULL) * p * 2.041);
+
+		orbitPointsFull[p] = {
+			Sun::sunPos.x + cos(splineAngleF) * (orbitDistance / (1 - conicScale * cos(splineAngleF - conicRotation)) ),
+			Sun::sunPos.y + sin(splineAngleF) * (orbitDistance / (1 - conicScale * cos(splineAngleF - conicRotation)) )
+		};
+	}
+
 	distFromMouse = GetDist(pos, GetMousePosition() );
-	distFromSun = GetDist(pos, sunPos);
+	distFromSun = GetDist(pos, Sun::sunPos);
+
+	if (distFromMouse < 10) {
+		distFromMouse = 10;
+	}
 }
 
-void Planet::DrawPlanet(Vector2 sunPos, bool doDrawOrbital) {
-	if (CheckCollisionPointCircle(GetMousePosition(), pos, PLANETBOUNDS) && doDrawOrbital == true) {
-		for(int p=0; p<ORBITALPOINTS; p++) {
-			float scaleSpline = 0.1 * (1 - (distFromMouse/PLANETBOUNDS));
-
-			orbitPointsAhead[p] = {
-				sunPos.x + cos(orbitAngle - p * scaleSpline) * orbitRadius,
-				sunPos.y + sin(orbitAngle - p * scaleSpline) * orbitRadius
-			};
-
-			orbitPointsBehind[p] = {
-				sunPos.x + cos(orbitAngle + p * scaleSpline) * orbitRadius,
-				sunPos.y + sin(orbitAngle + p * scaleSpline) * orbitRadius
-			};
-		}
-
-		DrawSplineLinear(orbitPointsAhead, ORBITALPOINTS, 2, (Color) {255, 255, 255, 75} );
-		DrawSplineLinear(orbitPointsBehind, ORBITALPOINTS, 2, (Color) {255, 255, 255, 75} );
+void Planet::DrawPlanet(bool doDrawOrbital) {
+	if (((CheckCollisionPointCircle(GetMousePosition(), pos, radius)
+	|| CheckCollisionPointCircle(GetMousePosition(), Sun::sunPos, 30) )
+	&& doDrawOrbital == true)
+	|| orbitOn == true) {
+		DrawSplineLinear(orbitPointsFull, ORBITALPOINTSFULL, 2, orbitColor );
 	}
-
-	
-	if ((CheckCollisionPointCircle(GetMousePosition(), pos, radius)
-	|| (CheckCollisionPointCircle(GetMousePosition(), sunPos, 30) ) )
-	&& doDrawOrbital == true) {
-		//DrawEllipseLines(sunPos.x, sunPos.y, orbitRadius, orbitRadius, WHITE);
+	else if (CheckCollisionPointCircle(GetMousePosition(), pos, PLANETBOUNDS) ) {
+		DrawSplineLinear(orbitPointsAhead, ORBITALPOINTS, 2, orbitColor );
+		DrawSplineLinear(orbitPointsBehind, ORBITALPOINTS, 2, orbitColor );
 	}
 	
-
 	DrawCircleV(pos, radius, color);
+}
+
+void Planet::RegisterPlanetClicked() {
+	if (CheckCollisionPointCircle(GetMousePosition(), pos, radius)
+	&& IsMouseButtonPressed(MOUSE_LEFT_BUTTON) ) {
+		if (orbitOn == false) {
+			orbitOn = true;
+		}
+		else if (orbitOn == true) {
+			orbitOn = false;
+		}
+	}
+}
+
+void DrawAndUpdateSolarSystem(Sun sun, Planet *planet, bool doDrawOrbital) {
+	
+	DrawSun(Sun);
+
+	for (int i=0; i<NUMPLANETS; i++) {
+		planet[i].UpdatePlanet(Sun::sunPos);
+		planet[i].RegisterPlanetClicked(Sun::sunPos);
+		planet[i].DrawPlanet(Sun::sunPos, doDrawOrbital);
+	}
 }
 
 
@@ -134,13 +177,6 @@ void DrawStatusBar(Vector2* sbar) {
 	DrawTextEx(sagaFont, "TIME LEFT TIL REPO: xyz", sbar[2], SBARFONTSIZE, 0, WHITE);
 }
 
-void DrawSolarSystem(Planet *planet, Vector2 sunPos, bool doDrawOrbital) {
-	DrawCircleV(sunPos, 30, (Color) {245, 255, 245, 255});
-	for (int i=0; i<NUMPLANETS; i++) {
-		planet[i].UpdatePlanet(sunPos);
-		planet[i].DrawPlanet(sunPos, doDrawOrbital);
-	}
-}
 
 
 //-------------------------------------------------------------------------------
@@ -227,7 +263,7 @@ void PTXStarAnim(PTX *ptx, float counter){
 			int chance = std::rand() % (350);
 			
 			if (chance == 1) {
-				ptx[i].dist += (std::rand() % 25) * 0.01f;
+				ptx[i].dist += (std::rand() % 45) * 0.01f;
 
 				int colorChance = std::rand() % 3;
 
