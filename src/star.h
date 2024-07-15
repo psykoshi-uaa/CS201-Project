@@ -6,10 +6,10 @@
 //includes
 #include "../include/raylib-cpp.hpp"
 #include "../include/raylib.h"
-#include "raylib.h"
-#include "raymath.h"
+#include "../include/raymath.h"
 #include <cmath>
 #include <string>
+#include <random>
 
 //defines
 #define FPS 60
@@ -28,7 +28,7 @@
 #define SBARFONTSIZE 22
 #define SBARNUMSEGS 2
 #define MAXSTARPTX 250 
-#define NUMPLANETS 9
+#define NUMPLANETS 7
 #define ORBITALPOINTS 10
 #define ORBITALPOINTSFULL 50
 #define PLANETBOUNDS 100
@@ -67,6 +67,7 @@ typedef struct PTX {
 extern GameScreen currentScreen;
 extern Buttons btnHovered;
 extern Font sagaFont;
+extern std::random_device rd;
 
 //functions
 float GetDist(Vector2, Vector2);
@@ -103,7 +104,16 @@ class Player {
     }
 };
 
-class Planet {
+class Sun {
+	public:
+	Vector2 sunPos;
+	float sunRadius;
+
+	Sun();
+	void DrawSun();
+};
+
+class Planet : public Sun {
 	private:
 	float mass,
 	      radius,
@@ -127,8 +137,8 @@ class Planet {
 
 	public:
 	Planet();
-	void DrawPlanet(Vector2, bool);
-	void UpdatePlanet(Vector2);
+	void DrawPlanet(bool);
+	void UpdatePlanet();
 	void RegisterPlanetClicked();
 };
 

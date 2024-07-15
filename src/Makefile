@@ -27,7 +27,7 @@
 PROJECT_NAME       ?= starcaller
 RAYLIB_VERSION     ?= 5.0.0
 RAYLIB_API_VERSION ?= 300
-RAYLIB_PATH        ?= ../..
+RAYLIB_PATH        ?= ../../raylib
 
 # Define compiler path on Windows
 COMPILER_PATH      ?= C:/raylib/mingw/bin

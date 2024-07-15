@@ -3,7 +3,6 @@
 #include "../include/raylib.h"
 #include "../include/raymath.h"
 #include <ctime>
-#include <cstdlib> 
 #include <cmath>
 
 //declaring structs and other init stuff
@@ -12,10 +11,11 @@ Texture2D titleGlow = { 0 };
 Texture2D titleUnderline = { 0 };
 Texture2D logo = { 0 };
 Texture2D particle = { 0 };
+Planet planet[NUMPLANETS];
+Sun sun;
 Font sagaFont = { 0 };
 Vector2 sbar[SBARNUMSEGS+1];
 PTX ptxStar[MAXSTARPTX];
-Planet planet[NUMPLANETS];
 
 static GUIbtn hubBtn[HUBNUMBTNS];
 static GUIbtn boardBtn[BOARDNUMBTNS];
@@ -31,7 +31,7 @@ static bool increasing = true;
 //function prototypes
 void DrawStatusBar(Vector2*);
 void DrawBtnSelected(Rectangle, int);
-void DrawAndUpdateSolarSystem(Planet*, Vector2, bool);
+void DrawAndUpdateSolarSystem(Sun, Planet*, bool);
 void AlphaWaveAnim(float&, float, float, float, bool&);
 void AlphaLinearAnim(float&, float, float, bool);
 void PTXStarAnim(PTX*, float);
@@ -80,7 +80,6 @@ int main(){
 //			initializations
 //-------------------------------------------------------------------------------
 static void InitGame() {
-	std::srand(std::time( 0 ));
 	SetTargetFPS(FPS);
 
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "Starcaller");
@@ -180,11 +179,11 @@ static void UpdateCurrentScreen(){
 		} break;
 
 		case HUB: {
-			DrawAndUpdateSolarSystem(planet, (Vector2){SCREENWIDTH/2, SCREENHEIGHT/2}, true);
+			DrawAndUpdateSolarSystem(sun, planet, true);
 		} break;
 
 		case BOARD: {
-			DrawAndUpdateSolarSystem(planet, (Vector2){SCREENWIDTH/2, SCREENHEIGHT/2}, false);
+			DrawAndUpdateSolarSystem(sun, planet, false);
 		} break;
 
 		default:break;
