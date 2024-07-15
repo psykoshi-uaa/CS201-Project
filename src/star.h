@@ -67,7 +67,6 @@ typedef struct PTX {
 extern GameScreen currentScreen;
 extern Buttons btnHovered;
 extern Font sagaFont;
-extern std::random_device rd;
 
 //functions
 float GetDist(Vector2, Vector2);
