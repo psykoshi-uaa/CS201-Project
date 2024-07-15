@@ -1,14 +1,15 @@
 #ifndef STAR_H
 #define STAR_H
 
+#define _USE_MATH_DEFINES
+
 //includes
 #include "../include/raylib-cpp.hpp"
 #include "../include/raylib.h"
+#include "../include/raymath.h"
+#include <cmath>
 #include <string>
-//includes
-#include "raylib.h"
-#include "raymath.h"
-#include <string>
+#include <random>
 
 //defines
 #define FPS 60
@@ -29,6 +30,7 @@
 #define MAXSTARPTX 250 
 #define NUMPLANETS 7
 #define ORBITALPOINTS 10
+#define ORBITALPOINTSFULL 50
 #define PLANETBOUNDS 100
 #define NUMALPHACHANNELS 10
 	  
@@ -39,7 +41,7 @@ const float SBARSEG[SBARNUMSEGS] = {180, 400},
 			MARGIN = 30,
 			BTNPADDING = 2;
 
-//enums and structs
+//enums
 typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, INTRO, HUB, BOARD, PLAYERSHEET, GAMEOVER, SUCCESS } GameScreen;
 typedef enum Buttons { NOBTN, NEWGAMEBTN, EXITBTN,
 			BOARDBTN, MARKETBTN, STATUSBTN, GIVEUPBTN,
@@ -47,23 +49,25 @@ typedef enum Buttons { NOBTN, NEWGAMEBTN, EXITBTN,
 			BACKBTN
 } Buttons;
 
+//structs
 typedef struct GUIbtn {
 	Rectangle border;
 	Vector2 origin;
 } GUIbtn;
 
 typedef struct PTX {
-	int halflife;	
+	int halflife;
 	Vector2 pos;
 	Color color;
 	float alpha,
 	      dist;
-} PTX;
+}PTX;
 
 //global variables
 extern GameScreen currentScreen;
 extern Buttons btnHovered;
 extern Font sagaFont;
+extern std::random_device rd;
 
 //functions
 float GetDist(Vector2, Vector2);
@@ -100,8 +104,16 @@ class Player {
     }
 };
 
+class Sun {
+	public:
+	Vector2 sunPos;
+	float sunRadius;
 
-class Planet {
+	Sun();
+	void DrawSun();
+};
+
+class Planet : public Sun {
 	private:
 	float mass,
 	      radius,
@@ -116,16 +128,20 @@ class Planet {
 	Vector2 pos,
 		angle,
 		axisLengths,
+		orbitPointsFull[ORBITALPOINTSFULL],
 		orbitPointsAhead[ORBITALPOINTS],
 		orbitPointsBehind[ORBITALPOINTS];
 	Color color,
-	      elipse;
+	      orbitColor;
+	bool orbitOn;
 
 	public:
 	Planet();
-	void DrawPlanet(Vector2, bool);
-	void UpdatePlanet(Vector2);
+	void DrawPlanet(bool);
+	void UpdatePlanet();
+	void RegisterPlanetClicked();
 };
+
 //-------------------------------------------------------------------------------
 //			code utility classes
 //-------------------------------------------------------------------------------

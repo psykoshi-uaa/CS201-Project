@@ -3,7 +3,6 @@
 #include "../include/raylib.h"
 #include "../include/raymath.h"
 #include <ctime>
-#include <cstdlib> 
 #include <cmath>
 
 //declaring structs and other init stuff
@@ -12,10 +11,11 @@ Texture2D titleGlow = { 0 };
 Texture2D titleUnderline = { 0 };
 Texture2D logo = { 0 };
 Texture2D particle = { 0 };
+Planet planet[NUMPLANETS];
+Sun sun;
 Font sagaFont = { 0 };
 Vector2 sbar[SBARNUMSEGS+1];
 PTX ptxStar[MAXSTARPTX];
-Planet planet[NUMPLANETS];
 
 static GUIbtn hubBtn[HUBNUMBTNS];
 static GUIbtn boardBtn[BOARDNUMBTNS];
@@ -31,7 +31,7 @@ static bool increasing = true;
 //function prototypes
 void DrawStatusBar(Vector2*);
 void DrawBtnSelected(Rectangle, int);
-void DrawSolarSystem(Planet*, Vector2, bool);
+void DrawAndUpdateSolarSystem(Sun, Planet*, bool);
 void AlphaWaveAnim(float&, float, float, float, bool&);
 void AlphaLinearAnim(float&, float, float, bool);
 void PTXStarAnim(PTX*, float);
@@ -80,8 +80,6 @@ int main(){
 //			initializations
 //-------------------------------------------------------------------------------
 static void InitGame() {
-	std::srand(std::time(nullptr));
-
 	SetTargetFPS(FPS);
 
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "Starcaller");
@@ -181,9 +179,11 @@ static void UpdateCurrentScreen(){
 		} break;
 
 		case HUB: {
+			DrawAndUpdateSolarSystem(sun, planet, true);
 		} break;
 
 		case BOARD: {
+			DrawAndUpdateSolarSystem(sun, planet, false);
 		} break;
 
 		default:break;
@@ -201,7 +201,7 @@ static void DrawScreen() {
 
 	PTXStarAnim(ptxStar, ptxTimer.GetCounter());
 
-	DrawFPS(800, 800);
+	DrawFPS(SCREENWIDTH, SCREENHEIGHT);
 
 	switch (currentScreen) {
 		case LOGO: {
@@ -246,8 +246,6 @@ static void DrawScreen() {
 		case HUB: {
 			DrawStatusBar(sbar);
 			
-			DrawSolarSystem(planet, (Vector2){SCREENWIDTH/2, SCREENHEIGHT/2}, true);
-
 			for (int i=0; i<HUBNUMBTNS; i++) {
 				DrawBtnSelected(hubBtn[i].border, i + 3);
 				DrawRectangleLinesEx(hubBtn[i].border, 2, WHITE);
@@ -260,8 +258,6 @@ static void DrawScreen() {
 
 		case BOARD: {
 			DrawStatusBar(sbar);
-
-			DrawSolarSystem(planet, (Vector2){SCREENWIDTH/2, SCREENHEIGHT/2}, false);
 
 			DrawBtnSelected(backBtn.border, 12);
 			DrawTextEx(sagaFont, "Back", backBtn.origin, HUBMAINFONTSIZE, 0, WHITE);

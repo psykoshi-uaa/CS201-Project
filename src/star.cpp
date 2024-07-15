@@ -3,9 +3,12 @@
 #include "../include/raylib.h"
 #include "../include/raymath.h"
 #include <ctime>
-#include <cstdlib>
+#include <cmath>
+#include <random>
 
- 
+
+std::random_device rd;
+
 //-------------------------------------------------------------------------------
 //			player, ship, and mission classes
 //-------------------------------------------------------------------------------
@@ -43,33 +46,48 @@ int Player::getBarter(){
 
 
 //-------------------------------------------------------------------------------
-//			Planets
+//			Sun and Planets
 //-------------------------------------------------------------------------------
-Planet::Planet() {
-	orbitAngle = (std::rand() % 360) + 1;
-	alpha = 0.0f;
-	radius = (std::rand() % 10) + 3;
-	mass = (radius * 1000);
-	orbitDistance = (std::rand() % 350) + 100;
-	conicScale = orbitDistance/mass;
-	conicRotation = std::rand() % 6;
-
-	unsigned char colors[3] = {
-		(unsigned char)((std::rand() % 155) + 100),
-		(unsigned char)((std::rand() % 155) + 100),
-		(unsigned char)((std::rand() % 155) + 100),
+Sun::Sun() {
+	sunPos = (Vector2) {
+		SCREENWIDTH/2,
+		SCREENHEIGHT/2
 	};
-	color = (Color) {colors[0], colors[1], colors[2], 255};
+
+	sunRadius = 30;
 }
 
-void Planet::UpdatePlanet(Vector2 sunPos) {
-	if (orbitAngle < 360) {
-		orbitAngle -= 0.00001 * distFromSun;
-	}
-	else {
-		orbitAngle = 0;
-	}
+void Sun::DrawSun() {
+	DrawCircleV(sunPos, sunRadius, (Color) {252, 255, 252, 255});
+}
 
+Planet::Planet() {
+	std::uniform_int_distribution<int> rand_angle(0, 360);
+	std::uniform_int_distribution<int> rand_radius(3, 15);
+	std::uniform_int_distribution<int> rand_dist(50, 450);
+	std::uniform_int_distribution<int> rand_conic(0, 6);
+	std::uniform_int_distribution<int> rand_RGB(25, 255);
+
+	orbitAngle = rand_angle(rd);
+	radius = rand_radius(rd);
+	orbitDistance = rand_dist(rd);
+	conicRotation = rand_conic(rd);
+	mass = pow(radius, 2) * 100;
+	conicScale = orbitDistance / mass;
+	alpha = 0.0f;
+
+	unsigned char colors[3] = {
+		(unsigned char)(rand_RGB(rd) ),
+		(unsigned char)(rand_RGB(rd) ),
+		(unsigned char)(rand_RGB(rd) )
+	};
+	color = (Color) {colors[0], colors[1], colors[2], 255};
+	orbitColor = (Color) {colors[0], colors[1], colors[2], 55};
+
+	orbitOn = false;
+}
+
+void Planet::UpdatePlanet() {
 	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
 
 	pos = (Vector2) {
@@ -77,39 +95,82 @@ void Planet::UpdatePlanet(Vector2 sunPos) {
 		sunPos.y + sin(orbitAngle) * orbitRadius 
 	};
 	
+	for(int p=0; p<ORBITALPOINTS; p++) {
+		float distScaler = 1 / distFromMouse;
+		float splineAngleA = orbitAngle - (p * distScaler);
+		float splineAngleB = orbitAngle + (p * distScaler);
+
+		orbitPointsAhead[p] = {
+			sunPos.x + cos(splineAngleA) * (orbitDistance / (1 - conicScale * cos(splineAngleA - conicRotation)) ),
+			sunPos.y + sin(splineAngleA) * (orbitDistance / (1 - conicScale * cos(splineAngleA - conicRotation)) )
+		};
+
+		orbitPointsBehind[p] = {
+			sunPos.x + cos(splineAngleB) * (orbitDistance / (1 - conicScale * cos(splineAngleB - conicRotation)) ),
+			sunPos.y + sin(splineAngleB) * (orbitDistance / (1 - conicScale * cos(splineAngleB - conicRotation)) )
+		};
+	}
+
+	for(int p=0; p<ORBITALPOINTSFULL; p++) {
+		float splineAngleF = ((M_PI / ORBITALPOINTSFULL) * p * 2.041);
+
+		orbitPointsFull[p] = {
+			sunPos.x + cos(splineAngleF) * (orbitDistance / (1 - conicScale * cos(splineAngleF - conicRotation)) ),
+			sunPos.y + sin(splineAngleF) * (orbitDistance / (1 - conicScale * cos(splineAngleF - conicRotation)) )
+		};
+	}
+
 	distFromMouse = GetDist(pos, GetMousePosition() );
 	distFromSun = GetDist(pos, sunPos);
+
+	if (distFromMouse < 10) {
+		distFromMouse = 10;
+	}
+
+	if (orbitAngle > 0) {
+		orbitAngle -= (0.000001 / distFromSun) * mass;
+	}
+	else {
+		orbitAngle = 360;
+	}
+
 }
 
-void Planet::DrawPlanet(Vector2 sunPos, bool doDrawOrbital) {
-	if (CheckCollisionPointCircle(GetMousePosition(), pos, PLANETBOUNDS) && doDrawOrbital == true) {
-		for(int p=0; p<ORBITALPOINTS; p++) {
-			float scaleSpline = 0.1 * (1 - (distFromMouse/PLANETBOUNDS));
-
-			orbitPointsAhead[p] = {
-				sunPos.x + cos(orbitAngle - p * scaleSpline) * orbitRadius,
-				sunPos.y + sin(orbitAngle - p * scaleSpline) * orbitRadius
-			};
-
-			orbitPointsBehind[p] = {
-				sunPos.x + cos(orbitAngle + p * scaleSpline) * orbitRadius,
-				sunPos.y + sin(orbitAngle + p * scaleSpline) * orbitRadius
-			};
-		}
-
-		DrawSplineLinear(orbitPointsAhead, ORBITALPOINTS, 2, (Color) {255, 255, 255, 75} );
-		DrawSplineLinear(orbitPointsBehind, ORBITALPOINTS, 2, (Color) {255, 255, 255, 75} );
+void Planet::DrawPlanet(bool doDrawOrbital) {
+	if (((CheckCollisionPointCircle(GetMousePosition(), pos, radius)
+	|| CheckCollisionPointCircle(GetMousePosition(), sunPos, 30) )
+	&& doDrawOrbital == true)
+	|| orbitOn == true) {
+		DrawSplineLinear(orbitPointsFull, ORBITALPOINTSFULL, 2, orbitColor );
 	}
-
-	
-	if ((CheckCollisionPointCircle(GetMousePosition(), pos, radius)
-	|| (CheckCollisionPointCircle(GetMousePosition(), sunPos, 30) ) )
-	&& doDrawOrbital == true) {
-		//DrawEllipseLines(sunPos.x, sunPos.y, orbitRadius, orbitRadius, WHITE);
+	else if (CheckCollisionPointCircle(GetMousePosition(), pos, PLANETBOUNDS) ) {
+		DrawSplineLinear(orbitPointsAhead, ORBITALPOINTS, 2, orbitColor );
+		DrawSplineLinear(orbitPointsBehind, ORBITALPOINTS, 2, orbitColor );
 	}
 	
-
 	DrawCircleV(pos, radius, color);
+}
+
+void Planet::RegisterPlanetClicked() {
+	if (CheckCollisionPointCircle(GetMousePosition(), pos, radius)
+	&& IsMouseButtonPressed(MOUSE_LEFT_BUTTON) ) {
+		if (orbitOn == false) {
+			orbitOn = true;
+		}
+		else if (orbitOn == true) {
+			orbitOn = false;
+		}
+	}
+}
+
+void DrawAndUpdateSolarSystem(Sun sun, Planet *planet, bool doDrawOrbital) {
+	sun.DrawSun();
+	
+	for (int i=0; i<NUMPLANETS; i++) {
+		planet[i].UpdatePlanet();
+		planet[i].RegisterPlanetClicked();
+		planet[i].DrawPlanet(doDrawOrbital);
+	}
 }
 
 
@@ -134,13 +195,6 @@ void DrawStatusBar(Vector2* sbar) {
 	DrawTextEx(sagaFont, "TIME LEFT TIL REPO: xyz", sbar[2], SBARFONTSIZE, 0, WHITE);
 }
 
-void DrawSolarSystem(Planet *planet, Vector2 sunPos, bool doDrawOrbital) {
-	DrawCircleV(sunPos, 30, (Color) {245, 255, 245, 255});
-	for (int i=0; i<NUMPLANETS; i++) {
-		planet[i].UpdatePlanet(sunPos);
-		planet[i].DrawPlanet(sunPos, doDrawOrbital);
-	}
-}
 
 
 //-------------------------------------------------------------------------------
@@ -169,7 +223,7 @@ bool Timer::Wait(double mark){
 Dice::Dice() {
 	static bool seeded = false;
 	if (!seeded) {
-		std::srand(std::time(nullptr));
+		//std::srand(std::time(nullptr)); 	obsolete, switched to uniform_int_distribution
 		seeded = true;
 	}
 }
@@ -177,7 +231,7 @@ Dice::Dice() {
 int Dice::rollD6(int numRolls = 0) {
 	int total = 0;
 	for (int i=0; i<numRolls; ++i) {
-		total += std::rand() % 6 + 1;
+		//total += std::rand() % 6 + 1;		obsolete, switched to uniform_int_distribution
 	}
 	return total;
 }
@@ -224,12 +278,19 @@ void PTXStarAnim(PTX *ptx, float counter){
 	for (int i=0; i<MAXSTARPTX; i++) {
 		//initiialize the particles
 		if (ptx[i].halflife == 0 ) {
-			int chance = std::rand() % (350);
+			std::uniform_int_distribution<int> rand_chance(0, 400);
+
+			int chance = rand_chance(rd);
 			
 			if (chance == 1) {
-				ptx[i].dist += (std::rand() % 25) * 0.01f;
+				std::uniform_int_distribution<int> rand_dist(0, 45);
+				std::uniform_int_distribution<int> rand_color_selector(1, 3);
+				std::uniform_int_distribution<int> rand_screen_x(1, SCREENWIDTH);
+				std::uniform_int_distribution<int> rand_screen_y(1, SCREENHEIGHT);
 
-				int colorChance = std::rand() % 3;
+				ptx[i].dist += rand_dist(rd) * 0.01f;
+
+				int colorChance = rand_color_selector(rd);
 
 				switch (colorChance) {
 					case 0: ptx[i].color = {220, 233, 255, 255};
@@ -245,7 +306,7 @@ void PTXStarAnim(PTX *ptx, float counter){
 				}
 
 				ptx[i].halflife = 1;
-				ptx[i].pos = {float(std::rand()%SCREENWIDTH), float(std::rand()%SCREENHEIGHT)};
+				ptx[i].pos = {float(rand_screen_x(rd) ), float(rand_screen_y(rd) )};
 			}
 		}
 		
