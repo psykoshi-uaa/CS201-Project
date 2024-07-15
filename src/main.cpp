@@ -16,6 +16,7 @@ Sun sun;
 Font sagaFont = { 0 };
 Vector2 sbar[SBARNUMSEGS+1];
 PTX ptxStar[MAXSTARPTX];
+std::random_device main_rd;
 
 static GUIbtn hubBtn[HUBNUMBTNS];
 static GUIbtn boardBtn[BOARDNUMBTNS];

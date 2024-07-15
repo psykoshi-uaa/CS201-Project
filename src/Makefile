@@ -359,7 +359,8 @@ OBJ_DIR = obj
 SRC = $(call rwildcard, *.cpp, *.h)
 #OBJS = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 OBJS ?= main.cpp \
-		star.cpp
+		star.cpp \
+		SolarSystem.cpp
 
 # For Android platform we call a custom Makefile.Android
 ifeq ($(PLATFORM),PLATFORM_ANDROID)
