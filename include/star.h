@@ -103,6 +103,57 @@ class Player {
     }
 };
 
+//====================================
+//     Mission Class Header 
+//====================================
+
+
+class Mission
+{
+    // ==========
+    // Attributes
+    // ==========
+    private:
+    std::string name;
+    int reward;
+    int timeCost;
+    float cooldownTime;
+    float currentCooldown;
+    Rectangle button;
+    bool onCooldown;
+
+    public:
+
+    // Constructor
+    Mission(std::string name, int reward, int timeCost, float cooldownTime, Rectangle rect);
+
+    // Getters
+    std::string getName();
+    int getReward();
+    int getTimeCost();
+    float getCooldownTime();
+    float getCurrentCooldown();
+
+    // Setters
+    void setName(std::string& name);
+    void setReward(int reward);
+    void setTimeCost(int timeCost);
+    void setCooldownTime(float cooldownTime);
+    void setCurrentCooldown(float currentCooldown);
+
+    //      =======
+    //      Methods
+    //      =======
+
+    void startCooldown();
+    void updateTimer(float deltaTime);
+    void DrawButton();
+    void IsClicked();
+    void CompleteMission(Player& player);
+
+
+};
+
 class Sun {
 	public:
 	Vector2 sunPos;
