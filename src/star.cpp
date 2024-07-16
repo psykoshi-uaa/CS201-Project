@@ -141,6 +141,7 @@ void AlphaLinearAnim(float& counter, float goal, float increment, bool increase)
 }
 
 
+<<<<<<< Updated upstream
 //-------------------------------------------------------------------------------
 //			particle animations (PTX = particles)
 //-------------------------------------------------------------------------------
@@ -213,3 +214,5 @@ void PTXStarAnim(PTX *ptx, float counter){
 		}
 	}
 }
+=======
+>>>>>>> Stashed changes

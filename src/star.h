@@ -41,6 +41,7 @@ const float SBARSEG[SBARNUMSEGS] = {180, 400},
 			MARGIN = 30,
 			BTNPADDING = 2;
 
+
 //enums
 typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, INTRO, HUB, BOARD, PLAYERSHEET, GAMEOVER, SUCCESS } GameScreen;
 typedef enum Buttons { NOBTN, NEWGAMEBTN, EXITBTN,
@@ -49,19 +50,21 @@ typedef enum Buttons { NOBTN, NEWGAMEBTN, EXITBTN,
 			BACKBTN
 } Buttons;
 
+
 //structs
 typedef struct GUIbtn {
 	Rectangle border;
 	Vector2 origin;
 } GUIbtn;
 
-typedef struct PTX {
-	int halflife;
+typedef struct PTXstar {
+	float dist;
+	int life;
 	Vector2 pos;
 	Color color;
-	float alpha,
-	      dist;
-}PTX;
+	float alpha;
+};
+
 
 //global variables
 extern GameScreen currentScreen;
@@ -70,6 +73,7 @@ extern Font sagaFont;
 
 //functions
 float GetDist(Vector2, Vector2);
+
 
 //-------------------------------------------------------------------------------
 //			player, ship, and mission classes
@@ -103,6 +107,10 @@ class Player {
     }
 };
 
+
+//-------------------------------------------------------------------------------
+//			solar system and planet classes
+//-------------------------------------------------------------------------------
 class Sun {
 	public:
 	Vector2 sunPos;
@@ -140,6 +148,29 @@ class Planet : public Sun {
 	void UpdatePlanet();
 	void RegisterPlanetClicked();
 };
+
+
+//-------------------------------------------------------------------------------
+//			particle classes
+//-------------------------------------------------------------------------------
+
+class PTXstarmanager {
+	public:
+	PTXstar ptx[MAXSTARPTX];
+	const char FXstar[3] = {"+", "*", "x"};
+	float lifetime;
+	Vector2 area;
+
+	public:
+	PTXstarmanager();
+	void PTXstarLifeCycle();
+	void DrawSelf(PTXstar&);
+	void UpdateSelf(PTXstar&);
+	void DiminishSelf(PTXstar&);
+	void GenerateStar(PTXstar&);
+};
+
+
 
 //-------------------------------------------------------------------------------
 //			code utility classes
