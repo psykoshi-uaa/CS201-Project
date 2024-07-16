@@ -359,8 +359,8 @@ OBJ_DIR = obj
 SRC = $(call rwildcard, *.cpp, *.h)
 #OBJS = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 OBJS ?= main.cpp \
-		star.cpp \
-		SolarSystem.cpp 
+		src/star.cpp \
+		src/SolarSystem.cpp 
         
 
 # For Android platform we call a custom Makefile.Android
