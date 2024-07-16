@@ -27,8 +27,8 @@
 #define SBARHEIGHT 30
 #define SBARFONTSIZE 22
 #define SBARNUMSEGS 2
-#define MAXSTARPTX 250 
 #define NUMPLANETS 7
+#define MAXSTARPTX 100000
 #define ORBITALPOINTS 10
 #define ORBITALPOINTSFULL 50
 #define PLANETBOUNDS 100
@@ -36,7 +36,7 @@
 	  
 const int SCREENWIDTH = 1920,
           SCREENHEIGHT = 1080;
-			  
+
 const float SBARSEG[SBARNUMSEGS] = {180, 400},
 			MARGIN = 30,
 			BTNPADDING = 2;
@@ -63,8 +63,7 @@ typedef struct PTXstar {
 	Vector2 pos;
 	Color color;
 	float alpha;
-};
-
+} PTXstar;
 
 //global variables
 extern GameScreen currentScreen;
@@ -115,12 +114,13 @@ class Sun {
 	public:
 	Vector2 sunPos;
 	float sunRadius;
+	bool sunClicked;
 
 	Sun();
 	void DrawSun();
 };
 
-class Planet : public Sun {
+class Planet : private Sun {
 	private:
 	float mass,
 	      radius,
@@ -142,34 +142,34 @@ class Planet : public Sun {
 	      orbitColor;
 	bool orbitOn;
 
+
 	public:
 	Planet();
 	void DrawPlanet(bool);
 	void UpdatePlanet();
-	void RegisterPlanetClicked();
+	void RegisterClick();
 };
 
 
 //-------------------------------------------------------------------------------
 //			particle classes
 //-------------------------------------------------------------------------------
-
 class PTXstarmanager {
-	public:
+	private:
 	PTXstar ptx[MAXSTARPTX];
-	const char FXstar[3] = {"+", "*", "x"};
+	char starFX[3];
 	float lifetime;
 	Vector2 area;
+	int counter, updateTime;
+		//functions
+	void GenerateStar(PTXstar&);
+	void UpdateSelf(PTXstar&);
+	void DrawSelf(PTXstar&);
 
 	public:
 	PTXstarmanager();
-	void PTXstarLifeCycle();
-	void DrawSelf(PTXstar&);
-	void UpdateSelf(PTXstar&);
-	void DiminishSelf(PTXstar&);
-	void GenerateStar(PTXstar&);
+	void LifeCycle();
 };
-
 
 
 //-------------------------------------------------------------------------------

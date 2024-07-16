@@ -6,15 +6,17 @@
 #include <random>
 
 
+std::random_device ss_rd;
+
 //-------------------------------------------------------------------------------
 //			Sun and Planets
 //-------------------------------------------------------------------------------
 void DrawAndUpdateSolarSystem(Sun sun, Planet *planet, bool doDrawOrbital) {
 	sun.DrawSun();
-	
+
 	for (int i=0; i<NUMPLANETS; i++) {
 		planet[i].UpdatePlanet();
-		planet[i].RegisterPlanetClicked();
+		planet[i].RegisterClick();
 		planet[i].DrawPlanet(doDrawOrbital);
 	}
 }
@@ -27,11 +29,13 @@ Sun::Sun() {
 	};
 
 	sunRadius = 30;
+	sunClicked = false;
 }
 
 void Sun::DrawSun() {
-	DrawCircleV(sunPos, sunRadius, (Color) {252, 255, 252, 255});
+	DrawCircleV(sunPos, sunRadius, YELLOW); 
 }
+
 
 //Planet functions
 Planet::Planet() {
@@ -41,18 +45,18 @@ Planet::Planet() {
 	std::uniform_int_distribution<int> rand_conic(0, 6);
 	std::uniform_int_distribution<int> rand_RGB(25, 255);
 
-	orbitAngle = rand_angle(rd);
-	radius = rand_radius(rd);
-	orbitDistance = rand_dist(rd);
-	conicRotation = rand_conic(rd);
+	orbitAngle = rand_angle(ss_rd);
+	radius = rand_radius(ss_rd);
+	orbitDistance = rand_dist(ss_rd);
+	conicRotation = rand_conic(ss_rd);
 	mass = pow(radius, 2) * 100;
 	conicScale = orbitDistance / mass;
 	alpha = 0.0f;
 
 	unsigned char colors[3] = {
-		(unsigned char)(rand_RGB(rd) ),
-		(unsigned char)(rand_RGB(rd) ),
-		(unsigned char)(rand_RGB(rd) )
+		(unsigned char)(rand_RGB(ss_rd) ),
+		(unsigned char)(rand_RGB(ss_rd) ),
+		(unsigned char)(rand_RGB(ss_rd) )
 	};
 	color = (Color) {colors[0], colors[1], colors[2], 255};
 	orbitColor = (Color) {colors[0], colors[1], colors[2], 55};
@@ -112,8 +116,9 @@ void Planet::UpdatePlanet() {
 void Planet::DrawPlanet(bool doDrawOrbital) {
 	if (((CheckCollisionPointCircle(GetMousePosition(), pos, radius)
 	|| CheckCollisionPointCircle(GetMousePosition(), sunPos, 30) )
-	&& doDrawOrbital == true)
-	|| orbitOn == true) {
+	|| orbitOn == true
+	|| sunClicked == true)
+	&& doDrawOrbital == true) {
 		DrawSplineLinear(orbitPointsFull, ORBITALPOINTSFULL, 2, orbitColor );
 	}
 	else if (CheckCollisionPointCircle(GetMousePosition(), pos, PLANETBOUNDS) ) {
@@ -124,13 +129,23 @@ void Planet::DrawPlanet(bool doDrawOrbital) {
 	DrawCircleV(pos, radius, color);
 }
 
-void Planet::RegisterPlanetClicked() {
+void Planet::RegisterClick() {
+	if (CheckCollisionPointCircle(GetMousePosition(), sunPos, sunRadius)
+	&& IsMouseButtonPressed(MOUSE_LEFT_BUTTON) ) {
+		if (sunClicked == false) {
+			sunClicked = true;
+		}
+		else {
+			sunClicked = false;
+		}
+	}
+
 	if (CheckCollisionPointCircle(GetMousePosition(), pos, radius)
 	&& IsMouseButtonPressed(MOUSE_LEFT_BUTTON) ) {
 		if (orbitOn == false) {
 			orbitOn = true;
 		}
-		else if (orbitOn == true) {
+		else {
 			orbitOn = false;
 		}
 	}

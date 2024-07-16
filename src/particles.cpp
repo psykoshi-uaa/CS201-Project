@@ -6,14 +6,20 @@
 #include <random>
 
 
+std::random_device ptx_rd;
+
 //-------------------------------------------------------------------------------
 //			particle animations (PTX = particles)
 //-------------------------------------------------------------------------------
 PTXstarmanager::PTXstarmanager() {
-	//Create FX area here instead of tied to full screen?
+	starFX[0] = '+';
+	starFX[1] = '*';
+	starFX[2] = 'x';
+	counter = 0;
+	updateTime = FPS;
 }
 
-PTXstarmanager::LifeCycle() {
+void PTXstarmanager::LifeCycle() {
 	for (int i=0; i<MAXSTARPTX; i++) {
 		if (ptx[i].life == 0) {
 			GenerateStar(ptx[i]);
@@ -21,8 +27,9 @@ PTXstarmanager::LifeCycle() {
 		else if (ptx[i].life > 0 && ptx[i].life < FPS) {
 			UpdateSelf(ptx[i]);
 			DrawSelf(ptx[i]);
+		}
 		else if (ptx[i].alpha > 0) {
-			DiminishSelf(ptx[i]);
+			ptx[i].alpha -= 0.001f;
 			DrawSelf(ptx[i]);
 		}
 		else {
@@ -33,19 +40,19 @@ PTXstarmanager::LifeCycle() {
 
 void PTXstarmanager::GenerateStar(PTXstar &ptx) {
 	if (ptx.life == 0) {
-		std::uniform_int_distribution<int> rand_chance(0, 400);
+		std::uniform_int_distribution<int> rand_chance(0, 100);
 
-		int chance = rand_chance(rd);
+		int chance = rand_chance(ptx_rd);
 		
 		if (chance == 1) {
-			std::uniform_int_distribution<int> rand_dist(0, 45);
+			std::uniform_int_distribution<int> rand_dist(20, 45);
 			std::uniform_int_distribution<int> rand_color_selector(1, 3);
 			std::uniform_int_distribution<int> rand_screen_x(1, SCREENWIDTH);
 			std::uniform_int_distribution<int> rand_screen_y(1, SCREENHEIGHT);
 
-			ptx[i].dist += rand_dist(rd) * 0.01f;
+			ptx.dist += rand_dist(ptx_rd) * 0.01f;
 
-			int colorChance = rand_color_selector(rd);
+			int colorChance = rand_color_selector(ptx_rd);
 
 			switch (colorChance) {
 				case 0: ptx.color = {220, 233, 255, 255};
@@ -61,51 +68,38 @@ void PTXstarmanager::GenerateStar(PTXstar &ptx) {
 			}
 
 			ptx.life = 1;
-			ptx.pos = {float(rand_screen_x(rd) ), float(rand_screen_y(rd) ) };
+			ptx.pos = {float(rand_screen_x(ptx_rd) ), float(rand_screen_y(ptx_rd) ) };
+		}
 	}
 }
 
 void PTXstarmanager::UpdateSelf(PTXstar &ptx) {
+	if (counter == updateTime) {
+		ptx.life++;
+	}
 
-			if (int(counter) % FPS == 0) {
-				ptx[i].halflife++;
-			}
+	if (counter > updateTime) {
+		counter = 0;
+	}
+	else {
+		counter++;
+	}
 
-			if (ptx[i].alpha < ptx[i].dist) {
-				ptx[i].alpha += 0.001f;
-			}
+	if (ptx.alpha < ptx.dist) {
+		ptx.alpha += 0.001f;
+	}
 }
 
-void PTXStarAnim(PTX *ptx, float counter){
-	for (int i=0; i<MAXSTARPTX; i++) {
-		//initiialize the particles
-		if (ptx[i].halflife == 0 ) {
-			}
+void PTXstarmanager::DrawSelf(PTXstar &ptx) {
+	if (ptx.life > 0) {
+		if ((ptx.life + 1) % 3 == 0) {
+			DrawTextCodepoint(GetFontDefault(), starFX[0], ptx.pos, 10, ColorAlpha(ptx.color, ptx.alpha) );
 		}
-		
-		//update the particles
-		else if (ptx[i].halflife > 0 && ptx[i].halflife < FPS) {
-		}
-
-		//kill the particles
-		else if (ptx[i].alpha > 0) {
-			ptx[i].alpha -= 0.001f;
+		else if ((ptx.life + 1) % 3 == 1) {
+			DrawTextCodepoint(GetFontDefault(), starFX[1], ptx.pos, 10, ColorAlpha(ptx.color, ptx.alpha) );
 		}
 		else {
-			ptx[i].halflife = 0;
-		}
-		
-		//draw the particles
-		if (ptx[i].halflife != 0) {
-			if (ptx[i].halflife % 3 == 0) {
-				DrawTextEx(GetFontDefault(), "+", ptx[i].pos, 10, 0, ColorAlpha(ptx[i].color, ptx[i].alpha) );
-			}
-			else if (ptx[i].halflife % 3 == 1) {
-				DrawTextEx(GetFontDefault(), "*", ptx[i].pos, 10, 0, ColorAlpha(ptx[i].color, ptx[i].alpha) );
-			}
-			else {
-				DrawTextEx(GetFontDefault(), "x", ptx[i].pos, 10, 0, ColorAlpha(ptx[i].color, ptx[i].alpha) );
-			}
+			DrawTextCodepoint(GetFontDefault(), starFX[2], ptx.pos, 10, ColorAlpha(ptx.color, ptx.alpha) );
 		}
 	}
 }
