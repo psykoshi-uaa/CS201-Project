@@ -9,7 +9,7 @@
 std::random_device imp_rd;
 
 //-------------------------------------------------------------------------------
-//			player, ship, and mission classes
+//			player
 //-------------------------------------------------------------------------------
 std::string Player::getName() {
 	return name;

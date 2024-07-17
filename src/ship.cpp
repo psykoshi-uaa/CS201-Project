@@ -45,6 +45,7 @@ void DrawShip(Ship& ship, Vector2 destination, float radius, Color color) {
     DrawTriangle(points[0], points[1], points[2], color);
 }
 
+/*
 int main() {
     
     const int screenWidth = 800;
@@ -85,3 +86,4 @@ int main() {
 
     return 0;
 }
+*/

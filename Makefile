@@ -27,7 +27,7 @@
 PROJECT_NAME       ?= starcaller
 RAYLIB_VERSION     ?= 5.0.0
 RAYLIB_API_VERSION ?= 300
-RAYLIB_PATH        ?= ../../raylib
+RAYLIB_PATH        ?= ../raylib
 
 # Define compiler path on Windows
 COMPILER_PATH      ?= C:/raylib/mingw/bin
@@ -359,9 +359,10 @@ OBJ_DIR = obj
 SRC = $(call rwildcard, *.cpp, *.h)
 #OBJS = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 OBJS ?= main.cpp \
-		star.cpp \
-		particles.cpp \
-		solarsystem.cpp
+		src/star.cpp \
+		src/particles.cpp \
+		src/solarsystem.cpp \
+		src/ship.cpp
 
 # For Android platform we call a custom Makefile.Android
 ifeq ($(PLATFORM),PLATFORM_ANDROID)
