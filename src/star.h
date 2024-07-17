@@ -75,7 +75,7 @@ float GetDist(Vector2, Vector2);
 
 
 //-------------------------------------------------------------------------------
-//			player
+//			player, ship, and mission classes
 //-------------------------------------------------------------------------------
 class Player {
 	private: 
@@ -104,6 +104,17 @@ class Player {
 	Player() 
 	: name("Unknown"), Class("Unknown"), money(0), debt(1000000), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
     }
+};
+
+class Ship {
+    Vector2 position,
+	    velocity,
+	    destination;
+	
+    public:
+    Ship();
+    void DrawSelf(float, Color);
+    void UpdateDestination(Vector2);
 };
 
 
@@ -175,8 +186,11 @@ class PTXstarmanager {
 //-------------------------------------------------------------------------------
 //			code utility classes
 //-------------------------------------------------------------------------------
+class MapPlanetMenu {
+	Rectangle dimensions;
+};
+
 class Timer {
-	private:
 	float	frameCounter;
 	static double	waitTime;
 

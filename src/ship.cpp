@@ -1,12 +1,14 @@
+#include "star.h"
 #include "raylib.h"
 #include <cmath>
 
-struct Ship {
-    Vector2 position;
-    Vector2 velocity;
-};
+Ship::Ship() {
 
-void DrawShip(Ship& ship, Vector2 destination, float radius, Color color) {
+	destination = (Vector2){400, 400};
+	position = destination;
+}
+
+void Ship::DrawSelf(float radius, Color color) {
         
     Vector2 direction = {destination.x - position.x, destination.y - position.y};
     float distance = sqrt(direction.x * direction.x + direction.y * direction.y);
@@ -43,6 +45,10 @@ void DrawShip(Ship& ship, Vector2 destination, float radius, Color color) {
     }
 
     DrawTriangle(points[0], points[1], points[2], color);
+}
+
+void Ship::UpdateDestination(Vector2 dest) {
+	destination = dest;
 }
 
 /*
