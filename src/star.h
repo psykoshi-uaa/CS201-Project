@@ -27,8 +27,8 @@
 #define SBARHEIGHT 30
 #define SBARFONTSIZE 22
 #define SBARNUMSEGS 2
-#define MAXSTARPTX 250 
 #define NUMPLANETS 7
+#define MAXSTARPTX 100000
 #define ORBITALPOINTS 10
 #define ORBITALPOINTSFULL 50
 #define PLANETBOUNDS 100
@@ -36,10 +36,11 @@
 	  
 const int SCREENWIDTH = 1920,
           SCREENHEIGHT = 1080;
-			  
+
 const float SBARSEG[SBARNUMSEGS] = {180, 400},
 			MARGIN = 30,
 			BTNPADDING = 2;
+
 
 //enums
 typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, INTRO, HUB, BOARD, PLAYERSHEET, GAMEOVER, SUCCESS } GameScreen;
@@ -49,19 +50,20 @@ typedef enum Buttons { NOBTN, NEWGAMEBTN, EXITBTN,
 			BACKBTN
 } Buttons;
 
+
 //structs
 typedef struct GUIbtn {
 	Rectangle border;
 	Vector2 origin;
 } GUIbtn;
 
-typedef struct PTX {
-	int halflife;
+typedef struct PTXstar {
+	float dist;
+	int life;
 	Vector2 pos;
 	Color color;
-	float alpha,
-	      dist;
-}PTX;
+	float alpha;
+} PTXstar;
 
 //global variables
 extern GameScreen currentScreen;
@@ -70,6 +72,7 @@ extern Font sagaFont;
 
 //functions
 float GetDist(Vector2, Vector2);
+
 
 //-------------------------------------------------------------------------------
 //			player, ship, and mission classes
@@ -103,16 +106,21 @@ class Player {
     }
 };
 
+
+//-------------------------------------------------------------------------------
+//			solar system and planet classes
+//-------------------------------------------------------------------------------
 class Sun {
 	public:
 	Vector2 sunPos;
 	float sunRadius;
+	bool sunClicked;
 
 	Sun();
 	void DrawSun();
 };
 
-class Planet : public Sun {
+class Planet : private Sun {
 	private:
 	float mass,
 	      radius,
@@ -134,12 +142,35 @@ class Planet : public Sun {
 	      orbitColor;
 	bool orbitOn;
 
+
 	public:
 	Planet();
 	void DrawPlanet(bool);
 	void UpdatePlanet();
-	void RegisterPlanetClicked();
+	void RegisterClick();
 };
+
+
+//-------------------------------------------------------------------------------
+//			particle classes
+//-------------------------------------------------------------------------------
+class PTXstarmanager {
+	private:
+	PTXstar ptx[MAXSTARPTX];
+	char starFX[3];
+	float lifetime;
+	Vector2 area;
+	int counter, updateTime;
+		//functions
+	void GenerateStar(PTXstar&);
+	void UpdateSelf(PTXstar&);
+	void DrawSelf(PTXstar&);
+
+	public:
+	PTXstarmanager();
+	void LifeCycle();
+};
+
 
 //-------------------------------------------------------------------------------
 //			code utility classes

@@ -11,11 +11,11 @@ Texture2D titleGlow = { 0 };
 Texture2D titleUnderline = { 0 };
 Texture2D logo = { 0 };
 Texture2D particle = { 0 };
-Planet planet[NUMPLANETS];
-Sun sun;
 Font sagaFont = { 0 };
 Vector2 sbar[SBARNUMSEGS+1];
-PTX ptxStar[MAXSTARPTX];
+PTXstarmanager ptxStar;
+Sun sun;
+Planet planet[NUMPLANETS];
 std::random_device main_rd;
 
 static GUIbtn hubBtn[HUBNUMBTNS];
@@ -25,7 +25,6 @@ static GUIbtn exitBtn = { 0 };
 static GUIbtn backBtn = { 0 };
 static Timer screenTimer;
 static Timer animTimer;
-static Timer ptxTimer;
 static float alphaChannel[NUMALPHACHANNELS];
 static bool increasing = true;
 
@@ -35,7 +34,6 @@ void DrawBtnSelected(Rectangle, int);
 void DrawAndUpdateSolarSystem(Sun, Planet*, bool);
 void AlphaWaveAnim(float&, float, float, float, bool&);
 void AlphaLinearAnim(float&, float, float, bool);
-void PTXStarAnim(PTX*, float);
 
 static void InitGame();
 static void UpdateCurrentScreen();
@@ -131,12 +129,7 @@ static void InitGame() {
 //			update screen
 //-------------------------------------------------------------------------------
 static void UpdateCurrentScreen(){
-	if (ptxTimer.GetCounter() <= FPS*10) {
-		ptxTimer.Run();
-	}
-	else {
-		ptxTimer.Reset();
-	}
+	ptxStar.LifeCycle();
 
 	switch (currentScreen)
 	{
@@ -200,9 +193,7 @@ static void DrawScreen() {
 
 	ClearBackground(BLACK);
 
-	PTXStarAnim(ptxStar, ptxTimer.GetCounter());
-
-	DrawFPS(SCREENWIDTH, SCREENHEIGHT);
+	DrawFPS(1800, 900);
 
 	switch (currentScreen) {
 		case LOGO: {
