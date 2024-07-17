@@ -68,7 +68,7 @@ void Mission::updateTimer(float deltaTime){
 } // Deltatime?
 
 // BUTTON METHODS : WORK IN PROGRESS
-/* void Mission::DrawButton(){
+void Mission::DrawButton(){
     if (onCooldown)
     {
         DrawRectangleRec(button, DARKGREEN);
@@ -76,11 +76,11 @@ void Mission::updateTimer(float deltaTime){
     {
         DrawRectangleRec(button, GRAY);
     }
-
+    std::string yeild_text =  "Yeild: " + std::to_string(reward);
     DrawText(name.c_str(), button.x + 10, button.y + 10, 20, BLACK);
-    DrawText(("Yeild: " + reward).c_str(), button.x + 10, button.y + 40, 20, BLACK);
+    DrawText(yeild_text.c_str(), button.x + 10, button.y + 40, 20, BLACK));
 }
-*/
+
 
 
 // Need to fill out player class to integrate
