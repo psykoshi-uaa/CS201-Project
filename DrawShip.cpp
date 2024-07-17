@@ -6,17 +6,37 @@ struct Ship {
     Vector2 velocity;
 };
 
-void DrawShip(Ship& ship, float rotationDegrees, Color color) {
+void DrawShip(Ship& ship, Vector2 destination, float radius, Color color) {
+        
+    Vector2 direction = {destination.x - ship.position.x, destination.y - ship.position.y};
+    float distance = sqrt(direction.x * direction.x + direction.y * direction.y);
+    float rotation = 0;
+
+    if (distance > radius + 1)
+    {
+        ship.position.x += direction.x * (ship.velocity.x / distance);
+        ship.position.y += direction.y * (ship.velocity.x / distance);
+        rotation = atan2f(direction.y, direction.x) + acos(0.0);
+    }
+    else
+    {
+        float time = GetTime();
+
+        ship.position.x = destination.x - radius * cosf(time);
+        ship.position.y = destination.y - radius * sinf(time);
+        rotation = time;
+    }
+
+        
     Vector2 points[3] = {
-        { ship.position.x, ship.position.y - 20 },
+        { ship.position.x, ship.position.y - 10 },
         { ship.position.x - 10, ship.position.y + 10 },
         { ship.position.x + 10, ship.position.y + 10 }
     };
 
     for (int i = 0; i < 3; ++i) {
-        float angle = (rotationDegrees + acos(0.0));
-        float cosA = cosf(angle);
-        float sinA = sinf(angle);
+        float cosA = cosf(rotation);
+        float sinA = sinf(rotation);
         float rotatedX = cosA * (points[i].x - ship.position.x) - sinA * (points[i].y - ship.position.y) + ship.position.x;
         float rotatedY = sinA * (points[i].x - ship.position.x) + cosA * (points[i].y - ship.position.y) + ship.position.y;
         points[i] = { rotatedX, rotatedY };
@@ -39,34 +59,24 @@ int main() {
     ship.velocity.y = 2.0;
 
     Vector2 destination = {0, 0};
+    float radius = 0;
 
     SetTargetFPS(60);
-
     
     while (!WindowShouldClose()) {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             
-            destination.x = (float)GetRandomValue(0, screenWidth);
-            destination.y = (float)GetRandomValue(0, screenHeight);
+            destination.x = (float)GetRandomValue(0, screenWidth - 100);
+            destination.y = (float)GetRandomValue(0, screenHeight - 100);
+            radius = GetRandomValue(30, 100);
         }
-
-        Vector2 direction = {destination.x - ship.position.x, destination.y - ship.position.y};
-        float distance = sqrt(direction.x * direction.x + direction.y * direction.y);
-
-        if (distance > 1)
-        {
-        ship.position.x += direction.x * (ship.velocity.x / distance);
-        ship.position.y += direction.y * (ship.velocity.x / distance);
-        }
-
-        float rotation = atan2f(direction.y, direction.x);
 
         BeginDrawing();
         ClearBackground(BLACK);
 
         DrawCircle(destination.x, destination.y, 2, WHITE);
 
-        DrawShip(ship, rotation, WHITE);
+        DrawShip(ship, destination, radius, WHITE);
 
         EndDrawing();
     }
