@@ -8,37 +8,37 @@ struct Ship {
 
 void DrawShip(Ship& ship, Vector2 destination, float radius, Color color) {
         
-    Vector2 direction = {destination.x - ship.position.x, destination.y - ship.position.y};
+    Vector2 direction = {destination.x - position.x, destination.y - position.y};
     float distance = sqrt(direction.x * direction.x + direction.y * direction.y);
     float rotation = 0;
 
     if (distance > radius + 1)
     {
-        ship.position.x += direction.x * (ship.velocity.x / distance);
-        ship.position.y += direction.y * (ship.velocity.x / distance);
+        position.x += direction.x * (velocity.x / distance);
+        position.y += direction.y * (velocity.x / distance);
         rotation = atan2f(direction.y, direction.x) + acos(0.0);
     }
     else
     {
         float time = GetTime();
 
-        ship.position.x = destination.x - radius * cosf(time);
-        ship.position.y = destination.y - radius * sinf(time);
+        position.x = destination.x - radius * cosf(time);
+        position.y = destination.y - radius * sinf(time);
         rotation = time;
     }
 
         
     Vector2 points[3] = {
-        { ship.position.x, ship.position.y - 10 },
-        { ship.position.x - 10, ship.position.y + 10 },
-        { ship.position.x + 10, ship.position.y + 10 }
+        { position.x, position.y - 10 },
+        { position.x - 10, position.y + 10 },
+        { position.x + 10, position.y + 10 }
     };
 
     for (int i = 0; i < 3; ++i) {
         float cosA = cosf(rotation);
         float sinA = sinf(rotation);
-        float rotatedX = cosA * (points[i].x - ship.position.x) - sinA * (points[i].y - ship.position.y) + ship.position.x;
-        float rotatedY = sinA * (points[i].x - ship.position.x) + cosA * (points[i].y - ship.position.y) + ship.position.y;
+        float rotatedX = cosA * (points[i].x - position.x) - sinA * (points[i].y - position.y) + position.x;
+        float rotatedY = sinA * (points[i].x - position.x) + cosA * (points[i].y - position.y) + position.y;
         points[i] = { rotatedX, rotatedY };
     }
 

@@ -16,6 +16,10 @@ Vector2 sbar[SBARNUMSEGS+1];
 PTXstarmanager ptxStar;
 Sun sun;
 Planet planet[NUMPLANETS];
+<<<<<<< Updated upstream
+=======
+Ship ship;
+>>>>>>> Stashed changes
 std::random_device main_rd;
 
 static GUIbtn hubBtn[HUBNUMBTNS];
@@ -174,6 +178,10 @@ static void UpdateCurrentScreen(){
 
 		case HUB: {
 			DrawAndUpdateSolarSystem(sun, planet, true);
+<<<<<<< Updated upstream
+=======
+			ship.DrawSelf(20, WHITE);
+>>>>>>> Stashed changes
 		} break;
 
 		case BOARD: {

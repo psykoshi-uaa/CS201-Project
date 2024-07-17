@@ -361,8 +361,13 @@ SRC = $(call rwildcard, *.cpp, *.h)
 OBJS ?= main.cpp \
 		src/star.cpp \
 		src/particles.cpp \
+<<<<<<< Updated upstream
 		src/solarsystem.cpp \
 		src/ship.cpp
+=======
+		src/ship.cpp \
+		src/solarsystem.cpp
+>>>>>>> Stashed changes
 
 # For Android platform we call a custom Makefile.Android
 ifeq ($(PLATFORM),PLATFORM_ANDROID)
