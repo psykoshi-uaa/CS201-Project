@@ -87,8 +87,10 @@ class Player {
 	int piloting;
 	int repair;
 	int bartering;
+	int timeRemaining;
 
 	public:
+	// getters
 	std::string getName();
 	int getMoney();
 	int getDebt();
@@ -97,9 +99,27 @@ class Player {
 	int getPilot();
 	int getRepair();
 	int getBarter();
+	int getTimeRemaining();
+
+	// setters
+	void setName(std::string);
+	void setMoney(int);
+	void setDebt(int);
+	void setHP(int);
+	void setSP(int);
+	void setPilot(int);
+	void setRepair(int);
+	void setBarter(int);
+	void setTimeRemaining(int);
+
+	// methods
+	void addMoney(int);
+	void payDebt(int);
+	void loseTime(int);
+
 
 	Player() 
-	: name("Unknown"), Class("Unknown"), money(0), debt(1000000), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
+	: name("Unknown"), Class("Unknown"), money(0), debt(-1000000), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
     }
 };
 
@@ -121,6 +141,7 @@ class Mission
     float currentCooldown;
     Rectangle button;
     bool onCooldown;
+	
 
     public:
 
@@ -148,7 +169,7 @@ class Mission
     void startCooldown();
     void updateTimer(float deltaTime);
     void DrawButton();
-    void IsClicked();
+    bool IsClicked();
     void CompleteMission(Player& player);
 
 

@@ -11,6 +11,13 @@ std::random_device imp_rd;
 //-------------------------------------------------------------------------------
 //			player, ship, and mission classes
 //-------------------------------------------------------------------------------
+
+// ================================
+//          Player Class
+// ================================
+
+//+++++ Getters +++++
+
 std::string Player::getName() {
 	return name;
 }
@@ -22,26 +29,73 @@ int Player::getMoney() {
 int Player::getDebt() {
 	return debt;
 }
+int Player::getTimeRemaining(){
+	return timeRemaining;
+}
 
+/*
 int Player::getHP() {
 	return HP;
 }
-
+						//HP AND SP NOT NECESSARY AT THE MOMENT
 int Player::getSP() {
 	return SP;
 }
-
+*/
+/*
 int Player::getPilot(){
 	return piloting;
 }
 
-int Player::getRepair(){
+int Player::getRepair(){  // SKILLS NOT NECESSARY AT THE MOMENT
 	return repair;
 }
 
 int Player::getBarter(){
 	return bartering;
 }
+*/
+
+//+++++ Setters +++++
+
+void Player::setName(std::string new_name)
+{
+	name = new_name;
+}
+void Player::setMoney(int money)
+{
+	money = money;
+}
+void Player::setDebt(int debt)
+{
+	debt = debt;
+}
+void Player::setHP(int HP)
+{
+	HP = HP;
+}
+void Player::setTimeRemaining(int time)
+{
+	timeRemaining = time;
+}
+
+//++++++++ METHODS +++++++
+
+// add money to player account
+void Player::addMoney(int money_to_add)
+{
+	money += money_to_add;
+}
+// add money to negative debt total
+void Player::payDebt(int money_paid)
+{
+	debt += money_paid;
+}
+void Player::loseTime(int time_lost)
+{
+	timeRemaining -= time_lost;
+}
+
 
 
 //-------------------------------------------------------------------------------
