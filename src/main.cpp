@@ -16,6 +16,7 @@ Vector2 sbar[SBARNUMSEGS+1];
 PTXstarmanager ptxStar;
 Sun sun;
 Planet planet[NUMPLANETS];
+Ship ship;
 std::random_device main_rd;
 
 static GUIbtn hubBtn[HUBNUMBTNS];
@@ -174,6 +175,7 @@ static void UpdateCurrentScreen(){
 
 		case HUB: {
 			DrawAndUpdateSolarSystem(sun, planet, true);
+			ship.DrawSelf(20, WHITE);
 		} break;
 
 		case BOARD: {

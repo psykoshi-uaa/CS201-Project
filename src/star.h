@@ -106,6 +106,17 @@ class Player {
     }
 };
 
+class Ship {
+    Vector2 position,
+	    velocity,
+	    destination;
+	
+    public:
+    Ship();
+    void DrawSelf(float, Color);
+    void UpdateDestination(Vector2);
+};
+
 
 //-------------------------------------------------------------------------------
 //			solar system and planet classes
@@ -175,8 +186,12 @@ class PTXstarmanager {
 //-------------------------------------------------------------------------------
 //			code utility classes
 //-------------------------------------------------------------------------------
+class MapPlanetMenu {
+	Rectangle dimensions;
+	GUIbutton Travel
+}
+
 class Timer {
-	private:
 	float	frameCounter;
 	static double	waitTime;
 
