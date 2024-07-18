@@ -1,7 +1,6 @@
-#include "star.h"
-#include "../include/raylib-cpp.hpp"
-#include "../include/raylib.h"
-#include "../include/raymath.h"
+#include "../include/star.h"
+#include raylib.h"
+#include "raymath.h"
 #include <ctime>
 #include <cmath>
 #include <random>

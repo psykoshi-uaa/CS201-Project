@@ -1,4 +1,4 @@
-#include "star.h"
+#include "../include/star.h"
 #include "raylib.h"
 #include <cmath>
 
