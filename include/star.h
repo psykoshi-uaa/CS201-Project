@@ -4,12 +4,10 @@
 #define _USE_MATH_DEFINES
 
 //includes
-#include "../include/raylib-cpp.hpp"
-#include "../include/raylib.h"
-#include "../include/raymath.h"
+#include "raylib.h"
+#include "raymath.h"
 #include <cmath>
 #include <string>
-#include <random>
 
 //defines
 #define FPS 60
@@ -75,7 +73,7 @@ float GetDist(Vector2, Vector2);
 
 
 //-------------------------------------------------------------------------------
-//			player, ship, and mission classes
+//			player
 //-------------------------------------------------------------------------------
 class Player {
 	private: 
@@ -90,8 +88,10 @@ class Player {
 	int piloting;
 	int repair;
 	int bartering;
+	int timeRemaining;
 
 	public:
+	// getters
 	std::string getName();
 	int getMoney();
 	int getDebt();
@@ -100,9 +100,27 @@ class Player {
 	int getPilot();
 	int getRepair();
 	int getBarter();
+	int getTimeRemaining();
+
+	// setters
+	void setName(std::string);
+	void setMoney(int);
+	void setDebt(int);
+	void setHP(int);
+	void setSP(int);
+	void setPilot(int);
+	void setRepair(int);
+	void setBarter(int);
+	void setTimeRemaining(int);
+
+	// methods
+	void addMoney(int);
+	void payDebt(int);
+	void loseTime(int);
+
 
 	Player() 
-	: name("Unknown"), Class("Unknown"), money(0), debt(1000000), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
+	: name("Unknown"), Class("Unknown"), money(0), debt(-1000000), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
     }
 };
 
@@ -115,6 +133,57 @@ class Ship {
     Ship();
     void DrawSelf(float, Color);
     void UpdateDestination(Vector2);
+};
+
+
+//====================================
+//     Mission Class Header 
+//====================================
+class Mission
+{
+    // ==========
+    // Attributes
+    // ==========
+    private:
+    std::string name;
+    int reward;
+    int timeCost;
+    float cooldownTime;
+    float currentCooldown;
+    Rectangle button;
+    bool onCooldown;
+	
+
+    public:
+
+    // Constructor
+    Mission(std::string name, int reward, int timeCost, float cooldownTime, Rectangle rect);
+
+    // Getters
+    std::string getName();
+    int getReward();
+    int getTimeCost();
+    float getCooldownTime();
+    float getCurrentCooldown();
+
+    // Setters
+    void setName(std::string& name);
+    void setReward(int reward);
+    void setTimeCost(int timeCost);
+    void setCooldownTime(float cooldownTime);
+    void setCurrentCooldown(float currentCooldown);
+
+    //      =======
+    //      Methods
+    //      =======
+
+    void startCooldown();
+    void updateTimer(float deltaTime);
+    void DrawButton();
+    bool IsClicked();
+    void CompleteMission(Player& player);
+
+
 };
 
 
@@ -167,7 +236,7 @@ class Planet : private Sun {
 //-------------------------------------------------------------------------------
 class PTXstarmanager {
 	private:
-	PTXstar ptx[MAXSTARPTX];
+	PTXstar ptxstar[MAXSTARPTX];
 	char starFX[3];
 	float lifetime;
 	Vector2 area;

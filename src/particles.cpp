@@ -20,19 +20,19 @@ PTXstarmanager::PTXstarmanager() {
 
 void PTXstarmanager::LifeCycle() {
 	for (int i=0; i<MAXSTARPTX; i++) {
-		if (ptx[i].life == 0) {
-			GenerateStar(ptx[i]);
+		if (ptxstar[i].life == 0) {
+			GenerateStar(ptxstar[i]);
 		}
-		else if (ptx[i].life > 0 && ptx[i].life < FPS) {
-			UpdateSelf(ptx[i]);
-			DrawSelf(ptx[i]);
+		else if (ptxstar[i].life > 0 && ptxstar[i].life < FPS) {
+			UpdateSelf(ptxstar[i]);
+			DrawSelf(ptxstar[i]);
 		}
-		else if (ptx[i].alpha > 0) {
-			ptx[i].alpha -= 0.001f;
-			DrawSelf(ptx[i]);
+		else if (ptxstar[i].alpha > 0) {
+			ptxstar[i].alpha -= 0.001f;
+			DrawSelf(ptxstar[i]);
 		}
 		else {
-			ptx[i].life = 0;
+			ptxstar[i].life = 0;
 		}
 	}
 }
