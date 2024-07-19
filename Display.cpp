@@ -1,32 +1,7 @@
 #include "raylib.h"
 #include <iostream>
 
-int main() {
-    const int screenWidth = 800;
-    const int screenHeight = 450;
-
-    InitWindow(screenWidth, screenHeight, "Draw Ship");
-
-    SetTargetFPS(60);
-
-    Font Saga = LoadFontEx("saga.ttf", 72, NULL, 0);
-
-    while (!WindowShouldClose()) {
-        BeginDrawing();
-        ClearBackground(BLACK);
-
-        //Top Bar
-        DrawLine(screenWidth / 160, screenHeight / 90, screenWidth - (screenWidth / 160), screenHeight / 90, WHITE);
-        DrawLine(screenWidth / 160, screenHeight / 15, screenWidth - (screenWidth / 160), screenHeight / 15, WHITE);
-        DrawLine(screenWidth / 160, screenHeight / 90, screenWidth / 160, screenHeight / 15, WHITE);
-        DrawLine(screenWidth - (screenWidth / 160), screenHeight / 90, screenWidth - (screenWidth / 150), screenHeight / 15, WHITE);
-        DrawLine(screenWidth / 6, screenHeight / 90, screenWidth / 6, screenHeight / 15, WHITE);
-        DrawLine(screenWidth / 3, screenHeight / 90, screenWidth / 3, screenHeight / 15, WHITE);
-
-        DrawTextEx(Saga, "Pilot: xyz", {screenWidth / 80, screenHeight / 36}, ((screenHeight / 20)-(screenHeight / 36)), 1, WHITE);
-        DrawTextEx(Saga, "Currency: xyz", {screenWidth / 5.78, screenHeight / 36}, ((screenHeight / 20)-(screenHeight / 36)), 1, WHITE);
-        DrawTextEx(Saga, "Time Left Until Repo: xyz", {screenWidth / 2.94, screenHeight / 36}, ((screenHeight / 20)-(screenHeight / 36)), 1, WHITE);
-
+void DrawStatusScreen() {
         //MissionBoard
         DrawLine(screenWidth / 75, screenHeight / 9, screenWidth / 5, screenHeight / 9, WHITE);
         DrawLine(screenWidth / 75, screenHeight / 5, screenWidth / 5, screenHeight / 5, WHITE);
@@ -88,17 +63,4 @@ int main() {
         DrawTextEx(Saga, "MORT CORP is protected under the Right to", {screenWidth / 3.72f, screenHeight / 1.35f}, ((screenHeight / 1.31f)-(screenHeight / 1.35f)), 1, WHITE);
         DrawTextEx(Saga, "Dismemberment Act and the Right to Slay Act.", {screenWidth / 3.72f, screenHeight / 1.30f}, ((screenHeight / 1.26f)-(screenHeight / 1.30f)), 1, WHITE);
         DrawTextEx(Saga, "Debt owed to MORT CORP: Debt", {screenWidth / 3.72f, screenHeight / 1.21f}, ((screenHeight / 1.17f)-(screenHeight / 1.21f)), 1, WHITE);
-
-        //Back
-        DrawLine(screenWidth / 1.11f, screenHeight / 1.13f, screenWidth / 1.03f, screenHeight / 1.13f, WHITE);
-        DrawLine(screenWidth / 1.11f, screenHeight / 1.05f, screenWidth / 1.03f, screenHeight / 1.05f, WHITE);
-        DrawLine(screenWidth / 1.11f, screenHeight / 1.05f, screenWidth / 1.11f, screenHeight / 1.13f, WHITE);
-        DrawLine(screenWidth / 1.03f, screenHeight / 1.05f, screenWidth / 1.03f, screenHeight / 1.13f, WHITE);
-
-        DrawTextEx(Saga, "Back", {screenWidth / 1.10f, screenHeight / 1.11f}, ((screenHeight / 1.06f)-(screenHeight / 1.11f)), 1, WHITE);
-
-        EndDrawing();
-    }
-        CloseWindow();
-    
 }
