@@ -12,10 +12,10 @@ Mission::Mission(std::string name, int reward, int timeCost, float cooldownTime,
 std::string Mission::getName(){
     return name;
 }
-int Mission::getReward(){
+int Mission::getReward(){		//CALVIN - this should take player data to determine reward
     return reward;
 }
-int Mission::getTimeCost(){
+int Mission::getTimeCost(){		//CALVIN - this should take player speed to determine time taken
     return timeCost;
 }
 float Mission::getCooldownTime(){
@@ -42,6 +42,10 @@ void Mission::setCooldownTime(float cooldownTime){
 }
 void Mission::setCurrentCooldown(float currentCooldown){
     currentCooldown = currentCooldown;
+}
+
+void Mission::setButton(Rectangle rec){
+    button = rec;
 }
 
 
@@ -76,7 +80,7 @@ void Mission::DrawButton(){
     {
         DrawRectangleRec(button, GRAY);
     }
-    
+   
     std::string yeild_text =  "Yeild: " + std::to_string(reward); // adaptable text for yeild
     std::string time_cost_text = "Time Cost: " + std::to_string(timeCost); // text for timecost
     std::string cooldown_text = "Cooldown: " + std::to_string(currentCooldown); // text for cooldown timer

@@ -6,6 +6,7 @@ Ship::Ship() {
 
 	destination = (Vector2){400, 400};
 	position = destination;
+	velocity = (Vector2){2.0, 2.0};
 }
 
 void Ship::DrawSelf(float radius, Color color) {
@@ -31,9 +32,9 @@ void Ship::DrawSelf(float radius, Color color) {
 
         
     Vector2 points[3] = {
-        { position.x, position.y - 10 },
-        { position.x - 10, position.y + 10 },
-        { position.x + 10, position.y + 10 }
+        { position.x, position.y - 4 },
+        { position.x - 5, position.y + 5 },
+        { position.x + 5, position.y + 5 }
     };
 
     for (int i = 0; i < 3; ++i) {
