@@ -2,10 +2,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include <cmath>
-#include <random>
 
-
-std::random_device ptx_rd;
 
 //-------------------------------------------------------------------------------
 //			particle animations (PTX = particles)
@@ -35,39 +32,43 @@ void PTXstarmanager::LifeCycle() {
 			ptxstar[i].life = 0;
 		}
 	}
+
+	if (counter > updateTime) {
+		counter = 0;
+	}
+	else {
+		counter++;
+	}
+
 }
 
 void PTXstarmanager::GenerateStar(PTXstar &ptx) {
 	if (ptx.life == 0) {
-		std::uniform_int_distribution<int> rand_chance(0, 100);
-
-		int chance = rand_chance(ptx_rd);
+		int chance = GetRandomValue(0, 400);
 		
 		if (chance == 1) {
-			std::uniform_int_distribution<int> rand_dist(20, 45);
-			std::uniform_int_distribution<int> rand_color_selector(1, 3);
-			std::uniform_int_distribution<int> rand_screen_x(1, SCREENWIDTH);
-			std::uniform_int_distribution<int> rand_screen_y(1, SCREENHEIGHT);
+			ptx.dist = GetRandomValue(3, 20) * 0.01f;
 
-			ptx.dist += rand_dist(ptx_rd) * 0.01f;
-
-			int colorChance = rand_color_selector(ptx_rd);
+			int colorChance = GetRandomValue(0, 3);
 
 			switch (colorChance) {
-				case 0: ptx.color = {220, 233, 255, 255};
+				case 0: ptx.color = {70, 200, 255, 255};
 						break;
 				
-				case 1: ptx.color = {125, 112, 180, 255};
+				case 1: ptx.color = {70, 70, 255, 255};
 						break;
 						
-				case 2: ptx.color = {22, 90, 153, 255};
+				case 2: ptx.color = {70, 150, 255, 255};
+						break;
+				
+				case 3: ptx.color = {255, 250, 230, 255};
 						break;
 				
 				default: break;
 			}
 
 			ptx.life = 1;
-			ptx.pos = {float(rand_screen_x(ptx_rd) ), float(rand_screen_y(ptx_rd) ) };
+			ptx.pos = { (float)GetRandomValue(0, SCREENWIDTH), (float)GetRandomValue(0, SCREENHEIGHT) };
 		}
 	}
 }
@@ -75,13 +76,6 @@ void PTXstarmanager::GenerateStar(PTXstar &ptx) {
 void PTXstarmanager::UpdateSelf(PTXstar &ptx) {
 	if (counter == updateTime) {
 		ptx.life++;
-	}
-
-	if (counter > updateTime) {
-		counter = 0;
-	}
-	else {
-		counter++;
 	}
 
 	if (ptx.alpha < ptx.dist) {

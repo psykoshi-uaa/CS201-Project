@@ -12,7 +12,7 @@
 //defines
 #define FPS 60
 #define MAINMENUFONTSIZE 30
-#define HUBNUMBTNS 4
+#define HUBNUMBTNS 5
 #define HUBMAINFONTSIZE 36
 #define HUBSUBFONTSIZE 24
 #define HUBBTNWIDTH 250
@@ -26,7 +26,8 @@
 #define SBARFONTSIZE 22
 #define SBARNUMSEGS 2
 #define NUMPLANETS 7
-#define MAXSTARPTX 400
+#define NUMMISSIONS 5
+#define MAXSTARPTX 200
 #define ORBITALPOINTS 10
 #define ORBITALPOINTSFULL 50
 #define PLANETBOUNDS 100
@@ -41,12 +42,13 @@ const float SBARSEG[SBARNUMSEGS] = {180, 400},
 
 
 //enums
-typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, INTRO, HUB, BOARD, PLAYERSHEET, GAMEOVER, SUCCESS } GameScreen;
+typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, INTRO, HUB, BOARD, PLAYERSHEET, MAP, GAMEOVER, SUCCESS } GameScreen;
 typedef enum Buttons { NOBTN, NEWGAMEBTN, EXITBTN,
-			BOARDBTN, MARKETBTN, STATUSBTN, GIVEUPBTN,
+			BOARDBTN, MARKETBTN, STATUSBTN, MAPBTN, GIVEUPBTN,
 			ODDJOBBTN, GATHERBTN, SALVAGEBTN, BOUNTYBTN, RAIDBTN,
 			BACKBTN
 } Buttons;
+enum Missions { ODDJOBMISSION, GATHERMISSION, SALVAGEMISSION, BOUNTYMISSION, RAIDMISSION };
 
 
 //structs
@@ -172,6 +174,7 @@ class Mission
     void setTimeCost(int timeCost);
     void setCooldownTime(float cooldownTime);
     void setCurrentCooldown(float currentCooldown);
+    void setButton(Rectangle);
 
     //      =======
     //      Methods
@@ -220,7 +223,8 @@ class Planet : private Sun {
 		orbitPointsBehind[ORBITALPOINTS];
 	Color color,
 	      orbitColor;
-	bool orbitOn;
+	bool orbitOn,
+	     isShipDest;
 
 
 	public:
@@ -228,6 +232,8 @@ class Planet : private Sun {
 	void DrawPlanet(bool);
 	void UpdatePlanet();
 	void RegisterClick();
+	Vector2 GetPos();
+	float GetRadius();
 };
 
 

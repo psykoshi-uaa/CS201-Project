@@ -10,8 +10,11 @@ std::random_device ss_rd;
 //-------------------------------------------------------------------------------
 //			Sun and Planets
 //-------------------------------------------------------------------------------
-void DrawAndUpdateSolarSystem(Sun sun, Planet *planet, bool doDrawOrbital) {
+void DrawAndUpdateSolarSystem(Sun sun, Planet *planet, Planet &hubBase, bool doDrawOrbital) {
 	sun.DrawSun();
+
+	hubBase.UpdatePlanet();
+	hubBase.RegisterClick();
 
 	for (int i=0; i<NUMPLANETS; i++) {
 		planet[i].UpdatePlanet();
@@ -109,7 +112,6 @@ void Planet::UpdatePlanet() {
 	else {
 		orbitAngle = 360;
 	}
-
 }
 
 void Planet::DrawPlanet(bool doDrawOrbital) {
@@ -148,4 +150,12 @@ void Planet::RegisterClick() {
 			orbitOn = false;
 		}
 	}
+}
+
+Vector2 Planet::GetPos() {
+	return pos;
+}
+
+float Planet::GetRadius() {
+	return radius;
 }

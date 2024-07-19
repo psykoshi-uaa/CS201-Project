@@ -10,33 +10,43 @@ Texture2D titleGlow = { 0 };
 Texture2D titleUnderline = { 0 };
 Texture2D logo = { 0 };
 Texture2D particle = { 0 };
+Texture2D hubBase = { 0 };
 Font sagaFont = { 0 };
 Vector2 sbar[SBARNUMSEGS+1];
 PTXstarmanager ptxStar;
 Sun sun;
 Planet planet[NUMPLANETS];
+Planet hubPlanet;
 Ship ship;
+Mission mission[NUMMISSIONS] {
+	Mission("Odd Jobs", 400, 1, 0.0, (Rectangle) {0, 0, 0, 0} ),
+	Mission("Gather", 1200, 3, 3.0, (Rectangle) {0, 0, 0, 0} ),
+	Mission("Salvage", 5000, 3, 7.0, (Rectangle) {0, 0, 0, 0} ),
+	Mission("Bounty", 34000, 14, 30.0,  (Rectangle) {0, 0, 0, 0} ),
+	Mission("Raid", 100000, 28, 90.0, (Rectangle) {0, 0, 0, 0} ),
+};
 
 static GUIbtn hubBtn[HUBNUMBTNS];
 static GUIbtn boardBtn[BOARDNUMBTNS];
 static GUIbtn newGameBtn = { 0 };
 static GUIbtn exitBtn = { 0 };
 static GUIbtn backBtn = { 0 };
+static GUIbtn missionBtn[NUMMISSIONS];
 static Timer screenTimer;
 static Timer animTimer;
 static float alphaChannel[NUMALPHACHANNELS];
+static int shipDest;
 static bool increasing = true;
 
 //function prototypes
 void DrawStatusBar(Vector2*);
 void DrawBtnSelected(Rectangle, int);
-void DrawAndUpdateSolarSystem(Sun, Planet*, bool);
+void DrawAndUpdateSolarSystem(Sun, Planet*, Planet&, bool);
 void AlphaWaveAnim(float&, float, float, float, bool&);
 void AlphaLinearAnim(float&, float, float, bool);
 
 static void InitGame();
-static void UpdateCurrentScreen();
-static void DrawScreen();
+static void UpdateAndDrawCurrentScreen();
 static void CheckBtnCollision();
 static void RegisterBtn();
 
@@ -53,8 +63,7 @@ int main(){
 	ToggleFullscreen();
 
 	while (!WindowShouldClose()) {
-		UpdateCurrentScreen();
-		DrawScreen();
+		UpdateAndDrawCurrentScreen();
 		CheckBtnCollision();
 
 		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -66,6 +75,7 @@ int main(){
 	UnloadTexture(titleGlow);
 	UnloadTexture(titleUnderline);
 	UnloadTexture(logo);
+	UnloadTexture(hubBase);
 	UnloadFont(sagaFont);
 
 	CloseWindow();
@@ -85,6 +95,7 @@ static void InitGame() {
 	titleGlow	= LoadTexture("resources/title_glow.png");
 	titleUnderline	= LoadTexture("resources/title_ship.png");
 	logo 		= LoadTexture("resources/logo.png");
+	hubBase		= LoadTexture("resources/hub_base.png");
 	sagaFont	= LoadFontEx("resources/saga.ttf", 72, NULL, 0);
 
 	currentScreen = LOGO;
@@ -121,18 +132,29 @@ static void InitGame() {
 	for (int i=0; i<BOARDNUMBTNS; i++) {
 		boardBtn[i].origin = (Vector2) { MARGIN, };
 	}
+
+	for (int i=0; i<NUMMISSIONS; i++) {
+		missionBtn[i].origin = (Vector2) { MARGIN * 4, SCREENHEIGHT - (MARGIN * i) + 50 };
+		missionBtn[i].border = (Rectangle) { (missionBtn[i].origin.x - 20) * ((i % 2) + 1), missionBtn[i].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
+		mission[i].setButton(missionBtn[i].border);
+	}
 }
 
 
 //-------------------------------------------------------------------------------
-//			update screen
+//			update and draw screen
 //-------------------------------------------------------------------------------
-static void UpdateCurrentScreen(){
+static void UpdateAndDrawCurrentScreen(){
+	BeginDrawing();
+
+	ClearBackground(BLACK);
+
 	ptxStar.LifeCycle();
 
 	switch (currentScreen)
 	{
 		case LOGO: {
+			//update
 			screenTimer.Run();
 
 			if (screenTimer.Wait(3) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -140,9 +162,13 @@ static void UpdateCurrentScreen(){
 				animTimer.Reset();
 				currentScreen = TITLE;
 			}
+
+			//draw
+			DrawTexture(logo, SCREENWIDTH/2 - logo.width/2, SCREENHEIGHT/2 - logo.height/2, WHITE);
 		} break;
 		
 		case TITLE: {
+			//update
 			if (alphaChannel[1] < 1.0f) {
 				alphaChannel[0] += 0.005f;
 				alphaChannel[1] += 0.005f;
@@ -155,52 +181,8 @@ static void UpdateCurrentScreen(){
 				screenTimer.Reset();
 				currentScreen = MAINMENU;
 			}
-		} break;
 
-		case MAINMENU: {
-			AlphaWaveAnim(alphaChannel[0], 1.0f, 0.5f, 0.006f, increasing);
-		} break;
-
-		case INTRO: {
-			AlphaLinearAnim(alphaChannel[0], 1.0f, 0.006f, true);
-			screenTimer.Run();
-
-			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || screenTimer.GetCounter() > 6 * FPS) {
-				screenTimer.Reset();
-				currentScreen = HUB;
-			}
-		} break;
-
-		case HUB: {
-			DrawAndUpdateSolarSystem(sun, planet, true);
-			ship.DrawSelf(20, WHITE);
-		} break;
-
-		case BOARD: {
-			DrawAndUpdateSolarSystem(sun, planet, false);
-		} break;
-
-		default:break;
-	}
-}
-
-
-//-------------------------------------------------------------------------------
-//			draw screen
-//-------------------------------------------------------------------------------
-static void DrawScreen() {
-	BeginDrawing();
-
-	ClearBackground(BLACK);
-
-	DrawFPS(1800, 900);
-
-	switch (currentScreen) {
-		case LOGO: {
-			DrawTexture(logo, SCREENWIDTH/2 - logo.width/2, SCREENHEIGHT/2 - logo.height/2, WHITE);
-		} break;
-		
-		case TITLE: {
+			//draw
 			if (alphaChannel[1] < 1.0f) {
 				DrawTexture(titleGlow, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[0]) );
 				DrawTexture(titleCard, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[1]) );
@@ -213,6 +195,10 @@ static void DrawScreen() {
 		} break;
 
 		case MAINMENU: {
+			//update
+			AlphaWaveAnim(alphaChannel[0], 1.0f, 0.5f, 0.006f, increasing);
+
+			//draw
 			DrawTexture(titleGlow, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[0]) );
 			DrawTexture(titleCard, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, WHITE);
 					
@@ -231,12 +217,32 @@ static void DrawScreen() {
 		} break;
 
 		case INTRO: {
+			//update
+			AlphaLinearAnim(alphaChannel[0], 1.0f, 0.006f, true);
+			screenTimer.Run();
+
+			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || screenTimer.GetCounter() > 6 * FPS) {
+				screenTimer.Reset();
+				currentScreen = HUB;
+			}
+
+			//draw
 			DrawTextEx(sagaFont, "Intro text block blah dee blah dee blah\nhello how are you woohoo you are player John Doe",
 					(Vector2){MARGIN * 3, SCREENHEIGHT/2 - 50}, MAINMENUFONTSIZE, 0, ColorAlpha(WHITE, alphaChannel[0]) );	
 		} break;
 
 		case HUB: {
+			DrawAndUpdateSolarSystem(sun, planet, hubPlanet, false);
+
+			//update
+			ship.UpdateDestination(planet[shipDest].GetPos());
+
+			//draw
 			DrawStatusBar(sbar);
+
+			ship.DrawSelf(planet[shipDest].GetRadius(), WHITE);
+
+			DrawTextureV(hubBase, hubPlanet.GetPos(), WHITE);
 			
 			for (int i=0; i<HUBNUMBTNS; i++) {
 				DrawBtnSelected(hubBtn[i].border, i + 3);
@@ -245,10 +251,21 @@ static void DrawScreen() {
 			DrawTextEx(sagaFont, "Mission Board", hubBtn[0].origin, HUBMAINFONTSIZE, 0, WHITE);
 			DrawTextEx(sagaFont, "Market", hubBtn[1].origin, HUBMAINFONTSIZE, 0, WHITE);
 			DrawTextEx(sagaFont, "Status", hubBtn[2].origin, HUBMAINFONTSIZE, 0, WHITE);
-			DrawTextEx(sagaFont, "Give Up", hubBtn[3].origin, HUBMAINFONTSIZE, 0, WHITE);
+			DrawTextEx(sagaFont, "Galaxy Map", hubBtn[3].origin, HUBMAINFONTSIZE, 0, WHITE);
+			DrawTextEx(sagaFont, "Give Up", hubBtn[4].origin, HUBMAINFONTSIZE, 0, WHITE);
 		} break;
 
 		case BOARD: {
+			//update
+			for (int i=0; i<NUMMISSIONS; i++) {
+				if (mission[i].IsClicked()) {
+					mission[i].startCooldown();
+				}
+
+				mission[i].DrawButton();
+			}
+
+			//draw
 			DrawStatusBar(sbar);
 
 			DrawBtnSelected(backBtn.border, 12);
@@ -256,7 +273,29 @@ static void DrawScreen() {
 			DrawRectangleLinesEx(backBtn.border, 2, WHITE);
 		} break;
 
-		default:break; 
+		case MAP: {
+			//update
+			DrawAndUpdateSolarSystem(sun, planet, hubPlanet, true);
+
+			for (int i=0; i<NUMPLANETS; i++) {
+				if (CheckCollisionPointCircle(GetMousePosition(), planet[i].GetPos(), planet[i].GetRadius())
+				&& IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) ) {
+					shipDest = i;
+				}
+			}
+			ship.UpdateDestination(planet[shipDest].GetPos());
+
+			//draw
+			ship.DrawSelf(planet[shipDest].GetRadius(), WHITE);
+
+			DrawTextureV(hubBase, hubPlanet.GetPos(), WHITE);
+
+			DrawBtnSelected(backBtn.border, 12);
+			DrawTextEx(sagaFont, "Back", backBtn.origin, HUBMAINFONTSIZE, 0, WHITE);
+			DrawRectangleLinesEx(backBtn.border, 2, WHITE);
+		} break;
+
+		default:break;
 	}
 
 	EndDrawing();
@@ -291,6 +330,9 @@ static void CheckBtnCollision() {
 				btnHovered = STATUSBTN;
 			}
 			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[3].border)) {
+				btnHovered = MAPBTN;
+			}
+			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[4].border)) {
 				btnHovered = GIVEUPBTN;
 			}
 			else {
@@ -299,6 +341,9 @@ static void CheckBtnCollision() {
 		} break;
 
 		case BOARD: {
+		}
+
+		case MAP: {
 			if (CheckCollisionPointRec(GetMousePosition(), backBtn.border)) {
 				btnHovered = BACKBTN;
 			}
@@ -306,6 +351,7 @@ static void CheckBtnCollision() {
 				btnHovered = NOBTN;
 			}
 		}
+
 
 		default: break;
 	}
@@ -328,12 +374,16 @@ static void RegisterBtn() {
 			currentScreen = BOARD;
 		} break;
 
+		case MAPBTN: {
+			currentScreen = MAP;
+		} break;
+
 		case GIVEUPBTN: {
 			CloseWindow();
 		} break;
 		
 		case BACKBTN: {
-			if (currentScreen == BOARD) {
+			if (currentScreen == BOARD || currentScreen == MAP) {
 				currentScreen = HUB;
 			}
 		} break;
