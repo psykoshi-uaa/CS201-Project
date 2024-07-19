@@ -35,7 +35,7 @@ Sun::Sun() {
 }
 
 void Sun::DrawSun() {
-	DrawCircleV(sunPos, sunRadius, YELLOW); 
+	DrawCircleV(sunPos, sunRadius, WHITE); 
 }
 
 

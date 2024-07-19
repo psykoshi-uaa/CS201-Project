@@ -19,7 +19,7 @@ Planet planet[NUMPLANETS];
 Planet hubPlanet;
 Ship ship;
 Mission mission[NUMMISSIONS] {
-	Mission("Odd Jobs", 400, 1, 0.0, (Rectangle) {0, 0, 0, 0} ),
+	Mission("Odd Jobs", 400, 1, 0.1, (Rectangle) {0, 0, 0, 0} ),
 	Mission("Gather", 1200, 3, 3.0, (Rectangle) {0, 0, 0, 0} ),
 	Mission("Salvage", 5000, 3, 7.0, (Rectangle) {0, 0, 0, 0} ),
 	Mission("Bounty", 34000, 14, 30.0,  (Rectangle) {0, 0, 0, 0} ),
@@ -40,15 +40,16 @@ static bool increasing = true;
 
 //function prototypes
 void DrawStatusBar(Vector2*);
+void DrawStatusScreen(Font);
 void DrawBtnSelected(Rectangle, int);
+void DrawMainBtns(GUIbtn*);
 void DrawAndUpdateSolarSystem(Sun, Planet*, Planet&, bool);
 void AlphaWaveAnim(float&, float, float, float, bool&);
 void AlphaLinearAnim(float&, float, float, bool);
 
 static void InitGame();
 static void UpdateAndDrawCurrentScreen();
-static void CheckBtnCollision();
-static void RegisterBtn();
+static void ButtonCollisionAndClick();
 
 //declaring global
 GameScreen currentScreen = LOGO;
@@ -64,11 +65,7 @@ int main(){
 
 	while (!WindowShouldClose()) {
 		UpdateAndDrawCurrentScreen();
-		CheckBtnCollision();
-
-		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-			RegisterBtn();
-		}
+		ButtonCollisionAndClick();
 	}
 
 	UnloadTexture(titleCard);
@@ -134,8 +131,8 @@ static void InitGame() {
 	}
 
 	for (int i=0; i<NUMMISSIONS; i++) {
-		missionBtn[i].origin = (Vector2) { MARGIN * 4, SCREENHEIGHT - (MARGIN * i) + 50 };
-		missionBtn[i].border = (Rectangle) { (missionBtn[i].origin.x - 20) * ((i % 2) + 1), missionBtn[i].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
+		missionBtn[i].origin = (Vector2) { MARGIN * 14, (MARGIN * 4) * i + MARGIN * 3 };
+		missionBtn[i].border = (Rectangle) { missionBtn[i].origin.x - 20, missionBtn[i].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
 		mission[i].setButton(missionBtn[i].border);
 	}
 }
@@ -232,67 +229,61 @@ static void UpdateAndDrawCurrentScreen(){
 		} break;
 
 		case HUB: {
-			DrawAndUpdateSolarSystem(sun, planet, hubPlanet, false);
+			DrawAndUpdateSolarSystem(sun, planet, hubPlanet, true);
 
 			//update
 			ship.UpdateDestination(planet[shipDest].GetPos());
-
-			//draw
-			DrawStatusBar(sbar);
-
-			ship.DrawSelf(planet[shipDest].GetRadius(), WHITE);
-
-			DrawTextureV(hubBase, hubPlanet.GetPos(), WHITE);
 			
-			for (int i=0; i<HUBNUMBTNS; i++) {
-				DrawBtnSelected(hubBtn[i].border, i + 3);
-				DrawRectangleLinesEx(hubBtn[i].border, 2, WHITE);
-			}
-			DrawTextEx(sagaFont, "Mission Board", hubBtn[0].origin, HUBMAINFONTSIZE, 0, WHITE);
-			DrawTextEx(sagaFont, "Market", hubBtn[1].origin, HUBMAINFONTSIZE, 0, WHITE);
-			DrawTextEx(sagaFont, "Status", hubBtn[2].origin, HUBMAINFONTSIZE, 0, WHITE);
-			DrawTextEx(sagaFont, "Galaxy Map", hubBtn[3].origin, HUBMAINFONTSIZE, 0, WHITE);
-			DrawTextEx(sagaFont, "Give Up", hubBtn[4].origin, HUBMAINFONTSIZE, 0, WHITE);
-		} break;
-
-		case BOARD: {
-			//update
-			for (int i=0; i<NUMMISSIONS; i++) {
-				if (mission[i].IsClicked()) {
-					mission[i].startCooldown();
-				}
-
-				mission[i].DrawButton();
-			}
-
-			//draw
-			DrawStatusBar(sbar);
-
-			DrawBtnSelected(backBtn.border, 12);
-			DrawTextEx(sagaFont, "Back", backBtn.origin, HUBMAINFONTSIZE, 0, WHITE);
-			DrawRectangleLinesEx(backBtn.border, 2, WHITE);
-		} break;
-
-		case MAP: {
-			//update
-			DrawAndUpdateSolarSystem(sun, planet, hubPlanet, true);
-
 			for (int i=0; i<NUMPLANETS; i++) {
 				if (CheckCollisionPointCircle(GetMousePosition(), planet[i].GetPos(), planet[i].GetRadius())
 				&& IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) ) {
 					shipDest = i;
 				}
 			}
-			ship.UpdateDestination(planet[shipDest].GetPos());
 
 			//draw
 			ship.DrawSelf(planet[shipDest].GetRadius(), WHITE);
 
 			DrawTextureV(hubBase, hubPlanet.GetPos(), WHITE);
 
-			DrawBtnSelected(backBtn.border, 12);
-			DrawTextEx(sagaFont, "Back", backBtn.origin, HUBMAINFONTSIZE, 0, WHITE);
-			DrawRectangleLinesEx(backBtn.border, 2, WHITE);
+			DrawStatusBar(sbar);
+			DrawMainBtns(hubBtn);
+		} break;
+
+		case BOARD: {
+			//mission update and draw
+			for (int i=0; i<NUMMISSIONS; i++) {
+				if (mission[i].IsClicked() && mission[i].getCurrentCooldown() == 0) {
+					mission[i].startCooldown();
+				}
+				
+				if (mission[i].getCurrentCooldown() > 0) {
+					mission[i].updateTimer(0.001);
+				}
+				mission[i].DrawButton();
+			}
+
+			//update
+			//draw
+			DrawStatusBar(sbar);
+			DrawMainBtns(hubBtn);
+		} break;
+		
+		case MARKET: {
+
+			DrawStatusBar(sbar);
+			DrawMainBtns(hubBtn);
+		} break;
+		
+		case PLAYERSHEET: {
+			//update
+			//draw
+			DrawStatusScreen(sagaFont);
+			
+			DrawStatusBar(sbar);
+
+			DrawStatusBar(sbar);
+			DrawMainBtns(hubBtn);
 		} break;
 
 		default:break;
@@ -305,7 +296,7 @@ static void UpdateAndDrawCurrentScreen(){
 //-------------------------------------------------------------------------------
 //			button handling
 //-------------------------------------------------------------------------------
-static void CheckBtnCollision() {
+static void ButtonCollisionAndClick() {
 	switch (currentScreen) {
 		case MAINMENU: {
 			if (CheckCollisionPointRec(GetMousePosition(), newGameBtn.border)) {
@@ -319,6 +310,9 @@ static void CheckBtnCollision() {
 			}
 		} break;
 
+		case PLAYERSHEET:
+		case BOARD:
+		case MARKET:
 		case HUB: {
 			if (CheckCollisionPointRec(GetMousePosition(), hubBtn[0].border)) {
 				btnHovered = BOARDBTN;
@@ -340,54 +334,40 @@ static void CheckBtnCollision() {
 			}
 		} break;
 
-		case BOARD: {
-		}
-
-		case MAP: {
-			if (CheckCollisionPointRec(GetMousePosition(), backBtn.border)) {
-				btnHovered = BACKBTN;
-			}
-			else {
-				btnHovered = NOBTN;
-			}
-		}
-
-
 		default: break;
 	}
-}
+	
+	// if button clicked do whatever
+	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+		switch (btnHovered) {
+			case NEWGAMEBTN: {
+				for (int i=0; i<NUMALPHACHANNELS; i++) {
+					alphaChannel[i] = 0.0f;
+				}
+				currentScreen = INTRO;
+			} break;
 
-static void RegisterBtn() {
-	switch (btnHovered) {
-		case NEWGAMEBTN: {
-			for (int i=0; i<NUMALPHACHANNELS; i++) {
-				alphaChannel[i] = 0.0f;
-			}
-			currentScreen = INTRO;
-		} break;
+			case EXITBTN: {
+				CloseWindow();
+			} break;
+						
+			case BOARDBTN: {
+				currentScreen = BOARD;
+			} break;
+			
+			case STATUSBTN: {
+				currentScreen = PLAYERSHEET;
+			} break;
 
-		case EXITBTN: {
-			CloseWindow();
-		} break;
-					
-		case BOARDBTN: {
-			currentScreen = BOARD;
-		} break;
-
-		case MAPBTN: {
-			currentScreen = MAP;
-		} break;
-
-		case GIVEUPBTN: {
-			CloseWindow();
-		} break;
-		
-		case BACKBTN: {
-			if (currentScreen == BOARD || currentScreen == MAP) {
+			case MAPBTN: {
 				currentScreen = HUB;
-			}
-		} break;
-		
-		default: break;
+			} break;
+
+			case GIVEUPBTN: {
+				CloseWindow();
+			} break;
+			
+			default: break;
+		}
 	}
 }

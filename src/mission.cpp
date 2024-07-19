@@ -12,10 +12,10 @@ Mission::Mission(std::string name, int reward, int timeCost, float cooldownTime,
 std::string Mission::getName(){
     return name;
 }
-int Mission::getReward(){		//CALVIN - this should take player data to determine reward
+int Mission::getReward(){
     return reward;
 }
-int Mission::getTimeCost(){		//CALVIN - this should take player speed to determine time taken
+int Mission::getTimeCost(){
     return timeCost;
 }
 float Mission::getCooldownTime(){

@@ -1,0 +1,9 @@
+Missions merge with Market
+
+Missions randomize based on planet
+
+planet difficulty determined by dist from sun
+
+speed of ship affected by thrusters
+
+make hub always same distance from sun and mass and radius
