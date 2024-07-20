@@ -18,13 +18,9 @@ Sun sun;
 Planet planet[NUMPLANETS];
 Planet hubPlanet;
 Ship ship;
-Mission mission[NUMMISSIONS] {
-	Mission("Odd Jobs", 400, 1, 0.1, (Rectangle) {0, 0, 0, 0} ),
-	Mission("Gather", 1200, 3, 3.0, (Rectangle) {0, 0, 0, 0} ),
-	Mission("Salvage", 5000, 3, 7.0, (Rectangle) {0, 0, 0, 0} ),
-	Mission("Bounty", 34000, 14, 30.0,  (Rectangle) {0, 0, 0, 0} ),
-	Mission("Raid", 100000, 28, 90.0, (Rectangle) {0, 0, 0, 0} ),
-};
+SubMenu leftSideMenu(true);
+SubMenu rightSideMenu(false);
+Mission hubJob("Odd Jobs", 400, 1, 0.1, (Rectangle) {0, 0, 0, 0} );
 
 static GUIbtn hubBtn[HUBNUMBTNS];
 static GUIbtn boardBtn[BOARDNUMBTNS];
@@ -34,8 +30,8 @@ static GUIbtn backBtn = { 0 };
 static GUIbtn missionBtn[NUMMISSIONS];
 static Timer screenTimer;
 static Timer animTimer;
-static float alphaChannel[NUMALPHACHANNELS];
 static int shipDest;
+static float alphaChannel[NUMALPHACHANNELS];
 static bool increasing = true;
 
 //function prototypes
@@ -61,7 +57,7 @@ Buttons btnHovered = NOBTN;
 int main(){
 	InitGame();
 
-	ToggleFullscreen();
+	//ToggleFullscreen();
 
 	while (!WindowShouldClose()) {
 		UpdateAndDrawCurrentScreen();
@@ -115,25 +111,26 @@ static void InitGame() {
 	backBtn.origin = (Vector2) {(Vector2){SCREENWIDTH - MARGIN * 3, SCREENHEIGHT - MARGIN * 3}};
 	backBtn.border = (Rectangle) {backBtn.origin.x - 20, backBtn.origin.y - BTNPADDING, 100, 40 + BTNPADDING * 2};
 	
-	for (int i=0; i<HUBNUMBTNS; i++) {
-		if (i == HUBNUMBTNS - 1) {
-			hubBtn[i].origin = (Vector2) { MARGIN, SCREENHEIGHT - MARGIN * 2};
-			hubBtn[i].border = (Rectangle) { hubBtn[i].origin.x - 20, hubBtn[i].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
-		}
-		else {
-			hubBtn[i].origin = (Vector2) { MARGIN, MARGIN + SBARHEIGHT + 60 * i };
-			hubBtn[i].border = (Rectangle) { hubBtn[i].origin.x - 20, hubBtn[i].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
-		}
-	}
+	hubBtn[0].origin = (Vector2) { SCREENWIDTH - HUBBTNWIDTH + 20, MARGIN + SBARHEIGHT + 80};
+	hubBtn[0].border = (Rectangle) { hubBtn[0].origin.x - 20, hubBtn[0].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
+	hubBtn[1].origin = (Vector2) { 0, MARGIN + SBARHEIGHT + 80};
+	hubBtn[1].border = (Rectangle) { hubBtn[1].origin.x - 20, hubBtn[1].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
+	hubBtn[2].origin = (Vector2) { 0, MARGIN + SBARHEIGHT + 40};
+	hubBtn[2].border = (Rectangle) { hubBtn[2].origin.x - 20, hubBtn[2].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
+	hubBtn[3].origin = (Vector2) { MARGIN, SCREENHEIGHT - MARGIN * 2};
+	hubBtn[3].border = (Rectangle) { hubBtn[3].origin.x - 20, hubBtn[3].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
 
 	for (int i=0; i<BOARDNUMBTNS; i++) {
-		boardBtn[i].origin = (Vector2) { MARGIN, };
+		boardBtn[i].origin = (Vector2) { MARGIN, MARGIN};
 	}
 
 	for (int i=0; i<NUMMISSIONS; i++) {
-		missionBtn[i].origin = (Vector2) { MARGIN * 14, (MARGIN * 4) * i + MARGIN * 3 };
+		missionBtn[i].origin = (Vector2) { SCREENWIDTH - (SCREENWIDTH / 7), (float)(SCREENWIDTH / 7 + (i * 125)) };
 		missionBtn[i].border = (Rectangle) { missionBtn[i].origin.x - 20, missionBtn[i].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
-		mission[i].setButton(missionBtn[i].border);
+	}
+	
+	for (int i=0; i<NUMPLANETS; i++) {
+		planet[i].GenerateMissions(missionBtn);
 	}
 }
 
@@ -232,8 +229,6 @@ static void UpdateAndDrawCurrentScreen(){
 			DrawAndUpdateSolarSystem(sun, planet, hubPlanet, true);
 
 			//update
-			ship.UpdateDestination(planet[shipDest].GetPos());
-			
 			for (int i=0; i<NUMPLANETS; i++) {
 				if (CheckCollisionPointCircle(GetMousePosition(), planet[i].GetPos(), planet[i].GetRadius())
 				&& IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) ) {
@@ -241,51 +236,25 @@ static void UpdateAndDrawCurrentScreen(){
 				}
 			}
 
+			ship.UpdateDestination(planet[shipDest].GetPos());
+			
 			//draw
 			ship.DrawSelf(planet[shipDest].GetRadius(), WHITE);
 
 			DrawTextureV(hubBase, hubPlanet.GetPos(), WHITE);
 
 			DrawStatusBar(sbar);
-			DrawMainBtns(hubBtn);
-		} break;
 
-		case BOARD: {
 			//mission update and draw
-			for (int i=0; i<NUMMISSIONS; i++) {
-				if (mission[i].IsClicked() && mission[i].getCurrentCooldown() == 0) {
-					mission[i].startCooldown();
-				}
-				
-				if (mission[i].getCurrentCooldown() > 0) {
-					mission[i].updateTimer(0.001);
-				}
-				mission[i].DrawButton();
+			if (rightSideMenu.GetActive() && ship.IsAtDestination(planet[shipDest].GetRadius()) ) {
+				planet[shipDest].MissionHandler();
 			}
-
-			//update
-			//draw
-			DrawStatusBar(sbar);
-			DrawMainBtns(hubBtn);
-		} break;
-		
-		case MARKET: {
-
-			DrawStatusBar(sbar);
-			DrawMainBtns(hubBtn);
-		} break;
-		
-		case PLAYERSHEET: {
-			//update
-			//draw
-			DrawStatusScreen(sagaFont);
 			
-			DrawStatusBar(sbar);
-
-			DrawStatusBar(sbar);
 			DrawMainBtns(hubBtn);
+			rightSideMenu.UpdateAndDrawSelf();
+			leftSideMenu.UpdateAndDrawSelf();
 		} break;
-
+		
 		default:break;
 	}
 
@@ -310,23 +279,17 @@ static void ButtonCollisionAndClick() {
 			}
 		} break;
 
-		case PLAYERSHEET:
-		case BOARD:
-		case MARKET:
 		case HUB: {
 			if (CheckCollisionPointRec(GetMousePosition(), hubBtn[0].border)) {
 				btnHovered = BOARDBTN;
 			}
 			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[1].border)) {
-				btnHovered = MARKETBTN;
-			}
-			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[2].border)) {
 				btnHovered = STATUSBTN;
 			}
-			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[3].border)) {
-				btnHovered = MAPBTN;
+			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[2].border)) {
+				btnHovered = MARKETBTN;
 			}
-			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[4].border)) {
+			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[3].border)) {
 				btnHovered = GIVEUPBTN;
 			}
 			else {
@@ -352,15 +315,14 @@ static void ButtonCollisionAndClick() {
 			} break;
 						
 			case BOARDBTN: {
-				currentScreen = BOARD;
+				rightSideMenu.HandleActivation();
+			} break;
+
+			case MARKETBTN: {
 			} break;
 			
 			case STATUSBTN: {
-				currentScreen = PLAYERSHEET;
-			} break;
-
-			case MAPBTN: {
-				currentScreen = HUB;
+				leftSideMenu.HandleActivation();
 			} break;
 
 			case GIVEUPBTN: {

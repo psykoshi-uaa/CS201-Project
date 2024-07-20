@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include <cmath>
+#include <vector>
 #include <random>
 
 
@@ -44,7 +45,7 @@ Planet::Planet() {
 	std::uniform_int_distribution<int> rand_angle(0, 360);
 	std::uniform_int_distribution<int> rand_radius(3, 15);
 	std::uniform_int_distribution<int> rand_dist(50, 450);
-	std::uniform_int_distribution<int> rand_conic(0, 6);
+	std::uniform_int_distribution<int> rand_conic(-2, 2);
 	std::uniform_int_distribution<int> rand_RGB(25, 255);
 
 	orbitAngle = rand_angle(ss_rd);
@@ -64,6 +65,16 @@ Planet::Planet() {
 	orbitColor = (Color) {colors[0], colors[1], colors[2], 55};
 
 	orbitOn = false;
+
+	numMissionsAvail = ceil(orbitDistance / 100);
+}
+
+void Planet::GenerateMissions(GUIbtn * btnSetting) {
+	missionsAvail.emplace_back("OddJob", 1200, 3, 10.0, (btnSetting)->border );
+	missionsAvail.emplace_back("Gather", 1200, 3, 10.0, (btnSetting + 1)->border );
+	missionsAvail.emplace_back("Salvage", 1200, 3, 10.0, (btnSetting + 2)->border );
+	missionsAvail.emplace_back("Bounty", 1200, 3, 10.0, (btnSetting + 3)->border );
+	missionsAvail.emplace_back("Raid", 1200, 3, 10.0, (btnSetting + 4)->border );
 }
 
 void Planet::UpdatePlanet() {
@@ -152,10 +163,27 @@ void Planet::RegisterClick() {
 	}
 }
 
+void Planet::MissionHandler() {
+	for (int i=0; i<GetNumMissions(); i++) {
+		if (missionsAvail[i].IsClicked() && missionsAvail[i].getCurrentCooldown() == 0) {
+			missionsAvail[i].startCooldown();
+		}
+		
+		if (missionsAvail[i].getCurrentCooldown() > 0) {
+			missionsAvail[i].updateTimer(0.001);
+		}
+		missionsAvail[i].DrawButton();
+	}
+}
+
 Vector2 Planet::GetPos() {
 	return pos;
 }
 
 float Planet::GetRadius() {
 	return radius;
+}
+
+int Planet::GetNumMissions() {
+	return numMissionsAvail;
 }

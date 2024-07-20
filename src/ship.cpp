@@ -10,9 +10,8 @@ Ship::Ship() {
 }
 
 void Ship::DrawSelf(float radius, Color color) {
-        
     Vector2 direction = {destination.x - position.x, destination.y - position.y};
-    float distance = sqrt(direction.x * direction.x + direction.y * direction.y);
+    distance = sqrt(direction.x * direction.x + direction.y * direction.y);
     float rotation = 0;
 
     if (distance > radius + 1)
@@ -50,6 +49,15 @@ void Ship::DrawSelf(float radius, Color color) {
 
 void Ship::UpdateDestination(Vector2 dest) {
 	destination = dest;
+}
+
+bool Ship::IsAtDestination(float radius) {
+	if (distance <= radius + 1) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 /*

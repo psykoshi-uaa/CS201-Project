@@ -8,11 +8,12 @@
 #include "raymath.h"
 #include <cmath>
 #include <string>
+#include <vector>
 
 //defines
 #define FPS 60
 #define MAINMENUFONTSIZE 30
-#define HUBNUMBTNS 5
+#define HUBNUMBTNS 4
 #define HUBMAINFONTSIZE 36
 #define HUBSUBFONTSIZE 24
 #define HUBBTNWIDTH 250
@@ -42,12 +43,13 @@ const float SBARSEG[SBARNUMSEGS] = {180, 400},
 
 
 //enums
-typedef enum GameScreen  { LOGO = 0, TITLE, MAINMENU, INTRO, HUB, BOARD, MARKET, PLAYERSHEET, GAMEOVER, SUCCESS } GameScreen;
+typedef enum GameScreen { LOGO = 0, TITLE, MAINMENU, INTRO, HUB, GAMEOVER, SUCCESS } GameScreen;
 typedef enum Buttons { NOBTN, NEWGAMEBTN, EXITBTN,
-			BOARDBTN, MARKETBTN, STATUSBTN, MAPBTN, GIVEUPBTN,
+			BOARDBTN, STATUSBTN, MARKETBTN, GIVEUPBTN,
 			ODDJOBBTN, GATHERBTN, SALVAGEBTN, BOUNTYBTN, RAIDBTN,
 			BACKBTN
 } Buttons;
+
 enum Missions { ODDJOBMISSION, GATHERMISSION, SALVAGEMISSION, BOUNTYMISSION, RAIDMISSION };
 
 
@@ -130,11 +132,13 @@ class Ship {
     Vector2 position,
 	    velocity,
 	    destination;
+    float distance;
 	
     public:
     Ship();
     void DrawSelf(float, Color);
     void UpdateDestination(Vector2);
+    bool IsAtDestination(float);
 };
 
 
@@ -204,7 +208,7 @@ class Sun {
 };
 
 class Planet : private Sun {
-	private:
+	int numMissionsAvail;
 	float mass,
 	      radius,
 	      orbitAngle,
@@ -225,15 +229,18 @@ class Planet : private Sun {
 	      orbitColor;
 	bool orbitOn,
 	     isShipDest;
-
+	std::vector<Mission> missionsAvail;
 
 	public:
 	Planet();
+	void GenerateMissions(GUIbtn*);
 	void DrawPlanet(bool);
 	void UpdatePlanet();
 	void RegisterClick();
+	void MissionHandler();
 	Vector2 GetPos();
 	float GetRadius();
+	int GetNumMissions();
 };
 
 
@@ -241,7 +248,6 @@ class Planet : private Sun {
 //			particle classes
 //-------------------------------------------------------------------------------
 class PTXstarmanager {
-	private:
 	PTXstar ptxstar[MAXSTARPTX];
 	char starFX[3];
 	float lifetime;
@@ -257,6 +263,21 @@ class PTXstarmanager {
 	void LifeCycle();
 };
 
+//-------------------------------------------------------------------------------
+//			menu
+//-------------------------------------------------------------------------------
+class SubMenu {
+	Vector2 pos, dim;
+	float min_x, max_x;
+	Rectangle border;
+	bool isActive, isLeftSide;
+
+	public:
+	SubMenu(bool leftSide);
+	void HandleActivation();
+	void UpdateAndDrawSelf();
+	bool GetActive();
+};
 
 //-------------------------------------------------------------------------------
 //			code utility classes
@@ -284,4 +305,3 @@ class Dice {
 
 
 #endif
-		

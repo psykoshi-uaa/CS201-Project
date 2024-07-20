@@ -117,10 +117,9 @@ void DrawMainBtns(GUIbtn *hubBtn) {
 		DrawRectangleLinesEx(hubBtn[i].border, 2, WHITE);
 	}
 	DrawTextEx(sagaFont, "Mission Board", hubBtn[0].origin, HUBMAINFONTSIZE, 0, WHITE);
-	DrawTextEx(sagaFont, "Market", hubBtn[1].origin, HUBMAINFONTSIZE, 0, WHITE);
-	DrawTextEx(sagaFont, "Status", hubBtn[2].origin, HUBMAINFONTSIZE, 0, WHITE);
-	DrawTextEx(sagaFont, "Map", hubBtn[3].origin, HUBMAINFONTSIZE, 0, WHITE);
-	DrawTextEx(sagaFont, "Give Up", hubBtn[4].origin, HUBMAINFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, "Status", hubBtn[1].origin, HUBMAINFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, "Market", hubBtn[2].origin, HUBMAINFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, "Give Up", hubBtn[3].origin, HUBMAINFONTSIZE, 0, WHITE);
 }
 
 void DrawStatusScreen(Font sagaFont) {
@@ -137,7 +136,7 @@ void DrawStatusScreen(Font sagaFont) {
 		};
  
         //Ship
- 		DrawRectangleLinesEx(menuBor[0], 2, WHITE);
+	DrawRectangleLinesEx(menuBor[0], 2, WHITE);
 
         DrawTextEx(sagaFont, "Ship", {menuPos[0].x + MARGIN, menuPos[0].y + 50}, HUBMAINFONTSIZE, 1, WHITE);
         DrawTextEx(sagaFont, "Weapon LVL:", {menuPos[0].x + MARGIN, menuPos[0].y + 100}, HUBMAINFONTSIZE, 1, WHITE);
@@ -145,8 +144,8 @@ void DrawStatusScreen(Font sagaFont) {
         DrawTextEx(sagaFont, "Gathering Tool LVL:", {menuPos[0].x + MARGIN, menuPos[0].y + 200}, HUBMAINFONTSIZE, 1, WHITE);
         DrawTextEx(sagaFont, "Overall Speed:", {menuPos[0].x + MARGIN, menuPos[0].y + 250}, HUBMAINFONTSIZE, 1, WHITE);
    	    
-		//Pilot
-		DrawRectangleLinesEx(menuBor[1], 2, WHITE);
+	//Pilot
+	DrawRectangleLinesEx(menuBor[1], 2, WHITE);
 
         DrawTextEx(sagaFont, "Pilot: XYZ", {menuPos[1].x + MARGIN, menuPos[1].y + 50}, HUBMAINFONTSIZE, 1, WHITE);
         DrawTextEx(sagaFont, "Registered Pilot Under", {menuPos[1].x + MARGIN, menuPos[1].y + 100}, HUBSUBFONTSIZE, 1, WHITE);
@@ -155,7 +154,7 @@ void DrawStatusScreen(Font sagaFont) {
         DrawTextEx(sagaFont, "Birthdate:           09/12/2223", {menuPos[1].x + MARGIN, menuPos[1].y + 250}, HUBSUBFONTSIZE, 1, WHITE);
 
         //Debt
-  		DrawRectangleLinesEx(menuBor[2], 2, WHITE);
+	DrawRectangleLinesEx(menuBor[2], 2, WHITE);
 
         DrawTextEx(sagaFont, "This pilot is to pay of their debt to MORT CORP by", {menuPos[2].x + MARGIN, menuPos[2].y + 50}, HUBSUBFONTSIZE, 1, WHITE);
         DrawTextEx(sagaFont, "08/28/2242", {menuPos[2].x + MARGIN, menuPos[2].y + 100}, HUBSUBFONTSIZE, 1, WHITE);
@@ -164,6 +163,64 @@ void DrawStatusScreen(Font sagaFont) {
         DrawTextEx(sagaFont, "MORT CORP is protected under the Right to", {menuPos[2].x + MARGIN, menuPos[2].y + 250}, HUBSUBFONTSIZE, 1, WHITE);
         DrawTextEx(sagaFont, "Dismemberment Act and the Right to Slay Act.", {menuPos[2].x + MARGIN, menuPos[2].y + 300}, HUBSUBFONTSIZE, 1, WHITE);
         DrawTextEx(sagaFont, "Debt owed to MORT CORP: Debt", {menuPos[2].x + MARGIN, menuPos[2].y + 350}, HUBSUBFONTSIZE, 1, WHITE);
+}
+
+
+//-------------------------------------------------------------------------------
+//			menu
+//-------------------------------------------------------------------------------
+SubMenu::SubMenu(bool leftSide) {
+	float menuWidth = SCREENWIDTH / 5,
+	      menuHeight = SCREENHEIGHT / 1.5;
+
+	if (leftSide) {
+		pos = (Vector2) { 0 - menuWidth, SCREENHEIGHT / 5 };
+		dim = (Vector2) { menuWidth, menuHeight };
+		min_x = pos.x;
+		max_x = pos.x + menuWidth;
+	}
+	else {
+		pos = (Vector2) { SCREENWIDTH, SCREENHEIGHT / 5 };
+		dim = (Vector2) { menuWidth, menuHeight };
+		min_x = pos.x - menuWidth;
+		max_x = pos.x;
+	}
+
+	isLeftSide = leftSide;
+	border = (Rectangle){ pos.x, pos.y, dim.x, dim.y };
+	isActive = false;
+}
+
+void SubMenu::HandleActivation() {
+	if (isActive == false) {
+		isActive = true;
+	}
+	else {
+		isActive = false;
+	}
+}
+
+void SubMenu::UpdateAndDrawSelf() {
+	if (isActive && isLeftSide) {
+		pos.x = max_x;
+		DrawRectangleLinesEx(border, 2, WHITE);
+	}
+	else if (isActive && !isLeftSide) {
+		pos.x = min_x;
+		DrawRectangleLinesEx(border, 2, WHITE);
+	}
+	else if (!isActive && isLeftSide) {
+		pos.x = min_x;
+	}
+	else {
+		pos.x = max_x;
+	}
+
+	border = (Rectangle){ pos.x, pos.y, dim.x, dim.y };
+}
+
+bool SubMenu::GetActive() {
+	return isActive;
 }
 
 
