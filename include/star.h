@@ -129,15 +129,16 @@ class Player {
 };
 
 class Ship {
-    Vector2 position,
-	    velocity,
-	    destination;
+    Vector2 destination,
+	    position,
+	    velocity;
     float distance;
 	
     public:
-    Ship();
+    Ship(Vector2);
     void DrawSelf(float, Color);
     void UpdateDestination(Vector2);
+    void SetPosition(Vector2);
     bool IsAtDestination(float);
 };
 
@@ -241,6 +242,35 @@ class Planet : private Sun {
 	Vector2 GetPos();
 	float GetRadius();
 	int GetNumMissions();
+};
+
+class HubPort : private Sun {
+	float mass,
+	      radius,
+	      orbitAngle,
+	      orbitDistance,
+	      orbitRadius,
+	      conicScale,
+	      conicRotation,
+	      distFromMouse,
+	      distFromSun;
+	Vector2 pos,
+		angle,
+		axisLengths,
+		orbitPointsFull[ORBITALPOINTSFULL],
+		orbitPointsAhead[ORBITALPOINTS],
+		orbitPointsBehind[ORBITALPOINTS];
+	bool orbitOn,
+	     isShipDest;
+
+	public:
+	HubPort(float, float);
+	void DrawHubPort(bool, Texture2D);
+	void UpdateHubPort();
+	void RegisterClick();
+	void MarketHandler();
+	Vector2 GetPos();
+	float GetRadius();
 };
 
 

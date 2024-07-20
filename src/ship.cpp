@@ -2,10 +2,8 @@
 #include "raylib.h"
 #include <cmath>
 
-Ship::Ship() {
-
-	destination = (Vector2){400, 400};
-	position = destination;
+Ship::Ship(Vector2 startingPoint) 
+	: destination(startingPoint), position(startingPoint) {
 	velocity = (Vector2){2.0, 2.0};
 }
 
@@ -50,6 +48,10 @@ void Ship::DrawSelf(float radius, Color color) {
 void Ship::UpdateDestination(Vector2 dest) {
 	destination = dest;
 }
+
+void Ship::SetPosition(Vector2 pos) {
+	position = pos;
+}	
 
 bool Ship::IsAtDestination(float radius) {
 	if (distance <= radius + 1) {

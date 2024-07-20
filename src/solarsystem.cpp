@@ -11,11 +11,12 @@ std::random_device ss_rd;
 //-------------------------------------------------------------------------------
 //			Sun and Planets
 //-------------------------------------------------------------------------------
-void DrawAndUpdateSolarSystem(Sun sun, Planet *planet, Planet &hubBase, bool doDrawOrbital) {
+void DrawAndUpdateSolarSystem(Sun sun, Planet *planet, HubPort &hubBase, bool doDrawOrbital, Texture2D hubBaseTX) {
 	sun.DrawSun();
 
-	hubBase.UpdatePlanet();
+	hubBase.UpdateHubPort();
 	hubBase.RegisterClick();
+	hubBase.DrawHubPort(doDrawOrbital, hubBaseTX);
 
 	for (int i=0; i<NUMPLANETS; i++) {
 		planet[i].UpdatePlanet();
@@ -186,4 +187,115 @@ float Planet::GetRadius() {
 
 int Planet::GetNumMissions() {
 	return numMissionsAvail;
+}
+
+HubPort::HubPort(float radius, float orbitDistance) 
+	: radius(radius), orbitDistance(orbitDistance) {
+	orbitAngle = 30;
+	mass = pow(radius, 2) * 100;
+	conicScale = orbitDistance / mass;
+	conicRotation = 0;
+
+	orbitOn = false;
+
+	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
+	pos = (Vector2) {
+		sunPos.x + cos(orbitAngle) * orbitRadius,
+		sunPos.y + sin(orbitAngle) * orbitRadius 
+	};
+}
+
+void HubPort::UpdateHubPort() {
+	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
+
+	pos = (Vector2) {
+		sunPos.x + cos(orbitAngle) * orbitRadius,
+		sunPos.y + sin(orbitAngle) * orbitRadius 
+	};
+	
+	for(int p=0; p<ORBITALPOINTS; p++) {
+		float distScaler = 1 / distFromMouse;
+		float splineAngleA = orbitAngle - (p * distScaler);
+		float splineAngleB = orbitAngle + (p * distScaler);
+
+		orbitPointsAhead[p] = {
+			sunPos.x + cos(splineAngleA) * (orbitDistance / (1 - conicScale * cos(splineAngleA - conicRotation)) ),
+			sunPos.y + sin(splineAngleA) * (orbitDistance / (1 - conicScale * cos(splineAngleA - conicRotation)) )
+		};
+
+		orbitPointsBehind[p] = {
+			sunPos.x + cos(splineAngleB) * (orbitDistance / (1 - conicScale * cos(splineAngleB - conicRotation)) ),
+			sunPos.y + sin(splineAngleB) * (orbitDistance / (1 - conicScale * cos(splineAngleB - conicRotation)) )
+		};
+	}
+
+	for(int p=0; p<ORBITALPOINTSFULL; p++) {
+		float splineAngleF = ((M_PI / ORBITALPOINTSFULL) * p * 2.041);
+
+		orbitPointsFull[p] = {
+			sunPos.x + cos(splineAngleF) * (orbitDistance / (1 - conicScale * cos(splineAngleF - conicRotation)) ),
+			sunPos.y + sin(splineAngleF) * (orbitDistance / (1 - conicScale * cos(splineAngleF - conicRotation)) )
+		};
+	}
+
+	distFromMouse = GetDist(pos, GetMousePosition() );
+	distFromSun = GetDist(pos, sunPos);
+
+	if (distFromMouse < 10) {
+		distFromMouse = 10;
+	}
+
+	if (orbitAngle > 0) {
+		orbitAngle -= (0.000001 / distFromSun) * mass;
+	}
+	else {
+		orbitAngle = 360;
+	}
+}
+
+void HubPort::DrawHubPort(bool doDrawOrbital, Texture2D hubBaseTX) {
+	if (((CheckCollisionPointCircle(GetMousePosition(), pos, radius)
+	|| CheckCollisionPointCircle(GetMousePosition(), sunPos, 30) )
+	|| orbitOn == true
+	|| sunClicked == true)
+	&& doDrawOrbital == true) {
+		DrawSplineLinear(orbitPointsFull, ORBITALPOINTSFULL, 2, GRAY );
+	}
+	else if (CheckCollisionPointCircle(GetMousePosition(), pos, PLANETBOUNDS) ) {
+		DrawSplineLinear(orbitPointsAhead, ORBITALPOINTS, 2, GRAY );
+		DrawSplineLinear(orbitPointsBehind, ORBITALPOINTS, 2, GRAY );
+		}
+		
+	Vector2 texPos = (Vector2){ pos.x - 16, pos.y - 16 };
+	DrawTextureV(hubBaseTX, texPos, WHITE);
+}
+
+void HubPort::RegisterClick() {
+	if (CheckCollisionPointCircle(GetMousePosition(), sunPos, sunRadius)
+	&& IsMouseButtonPressed(MOUSE_LEFT_BUTTON) ) {
+		if (sunClicked == false) {
+			sunClicked = true;
+		}
+		else {
+			sunClicked = false;
+		}
+	}
+
+	if (CheckCollisionPointCircle(GetMousePosition(), pos, radius)
+	&& IsMouseButtonPressed(MOUSE_LEFT_BUTTON) ) {
+		if (orbitOn == false) {
+			orbitOn = true;
+		}
+		else {
+			orbitOn = false;
+		}
+	}
+}
+
+Vector2 HubPort::GetPos() {
+	return pos;
+}
+
+float HubPort::GetRadius() {
+	return radius;
 }

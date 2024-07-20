@@ -16,8 +16,8 @@ Vector2 sbar[SBARNUMSEGS+1];
 PTXstarmanager ptxStar;
 Sun sun;
 Planet planet[NUMPLANETS];
-Planet hubPlanet;
-Ship ship;
+HubPort hubPort(15, 125);
+Ship ship(hubPort.GetPos());
 SubMenu leftSideMenu(true);
 SubMenu rightSideMenu(false);
 Mission hubJob("Odd Jobs", 400, 1, 0.1, (Rectangle) {0, 0, 0, 0} );
@@ -30,7 +30,7 @@ static GUIbtn backBtn = { 0 };
 static GUIbtn missionBtn[NUMMISSIONS];
 static Timer screenTimer;
 static Timer animTimer;
-static int shipDest;
+static int shipDest = -1;
 static float alphaChannel[NUMALPHACHANNELS];
 static bool increasing = true;
 
@@ -39,7 +39,7 @@ void DrawStatusBar(Vector2*);
 void DrawStatusScreen(Font);
 void DrawBtnSelected(Rectangle, int);
 void DrawMainBtns(GUIbtn*);
-void DrawAndUpdateSolarSystem(Sun, Planet*, Planet&, bool);
+void DrawAndUpdateSolarSystem(Sun, Planet*, HubPort&, bool, Texture2D);
 void AlphaWaveAnim(float&, float, float, float, bool&);
 void AlphaLinearAnim(float&, float, float, bool);
 
@@ -226,30 +226,38 @@ static void UpdateAndDrawCurrentScreen(){
 		} break;
 
 		case HUB: {
-			DrawAndUpdateSolarSystem(sun, planet, hubPlanet, true);
+			DrawAndUpdateSolarSystem(sun, planet, hubPort, true, hubBase);
 
-			//update
-			for (int i=0; i<NUMPLANETS; i++) {
-				if (CheckCollisionPointCircle(GetMousePosition(), planet[i].GetPos(), planet[i].GetRadius())
-				&& IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) ) {
-					shipDest = i;
+			if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+				if (CheckCollisionPointCircle(GetMousePosition(), hubPort.GetPos(), hubPort.GetRadius()) ) {
+					shipDest = -1;
+				}
+				else {
+					for (int i=0; i<NUMPLANETS; i++) {
+						if (CheckCollisionPointCircle(GetMousePosition(), planet[i].GetPos(), planet[i].GetRadius()) ) {
+							shipDest = i;
+						}
+					}
 				}
 			}
 
-			ship.UpdateDestination(planet[shipDest].GetPos());
-			
-			//draw
-			ship.DrawSelf(planet[shipDest].GetRadius(), WHITE);
-
-			DrawTextureV(hubBase, hubPlanet.GetPos(), WHITE);
-
-			DrawStatusBar(sbar);
+			if (shipDest >= 0) {
+				ship.UpdateDestination(planet[shipDest].GetPos());
+				ship.DrawSelf(planet[shipDest].GetRadius(), WHITE);
 
 			//mission update and draw
-			if (rightSideMenu.GetActive() && ship.IsAtDestination(planet[shipDest].GetRadius()) ) {
-				planet[shipDest].MissionHandler();
+				if (rightSideMenu.GetActive() && ship.IsAtDestination(planet[shipDest].GetRadius()) ) {
+					planet[shipDest].MissionHandler();
+				}
+			}
+			else {
+				ship.UpdateDestination(hubPort.GetPos());
+				ship.DrawSelf(hubPort.GetRadius(), WHITE);
+
+				//MARKET GO HERE
 			}
 			
+			DrawStatusBar(sbar);
 			DrawMainBtns(hubBtn);
 			rightSideMenu.UpdateAndDrawSelf();
 			leftSideMenu.UpdateAndDrawSelf();
