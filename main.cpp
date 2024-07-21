@@ -30,7 +30,8 @@ static GUIbtn backBtn = { 0 };
 static GUIbtn missionBtn[NUMMISSIONS];
 static Timer screenTimer;
 static Timer animTimer;
-static int shipDest = -1;
+static int shipDest = -1,
+	   shootingStarStage = 0;
 static float alphaChannel[NUMALPHACHANNELS];
 static bool increasing = true;
 
@@ -40,6 +41,7 @@ void DrawStatusScreen(Font);
 void DrawBtnSelected(Rectangle, int);
 void DrawMainBtns(GUIbtn*);
 void DrawAndUpdateSolarSystem(Sun, Planet*, HubPort&, bool, Texture2D);
+void ShootingStar(float, float, int&);
 void AlphaWaveAnim(float&, float, float, float, bool&);
 void AlphaLinearAnim(float&, float, float, bool);
 
@@ -57,7 +59,7 @@ Buttons btnHovered = NOBTN;
 int main(){
 	InitGame();
 
-	ToggleFullscreen();
+	//ToggleFullscreen();
 
 	while (!WindowShouldClose()) {
 		UpdateAndDrawCurrentScreen();
@@ -139,11 +141,19 @@ static void InitGame() {
 //			update and draw screen
 //-------------------------------------------------------------------------------
 static void UpdateAndDrawCurrentScreen(){
+	int shootingStarChance = GetRandomValue(0, 1000);
+
 	BeginDrawing();
 
 	ClearBackground(BLACK);
 
 	ptxStar.LifeCycle();
+
+	if (shootingStarChance == 1 && shootingStarStage == -1) {
+		shootingStarStage = 0; 
+	}
+
+	ShootingStar(SCREENWIDTH, SCREENHEIGHT, shootingStarStage);
 
 	switch (currentScreen)
 	{

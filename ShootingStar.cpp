@@ -89,25 +89,3 @@ void shootingStar(float screenWidth, float screenHeight, int& count)
         DrawText("*", position.x, position.y, screenWidth / 80, WHITE);
     }
 };
-
-int main() {
-    const int screenWidth = 800;
-    const int screenHeight = 450;
-
-    InitWindow(screenWidth, screenHeight, "Draw Ship");
-
-    SetTargetFPS(60);
-
-    int count = 0;
-
-    while (!WindowShouldClose()) {
-
-        BeginDrawing();
-        ClearBackground(BLACK);
-        
-        shootingStar(screenWidth, screenHeight, count);
-
-        EndDrawing();
-    }
-        CloseWindow();
-}
