@@ -99,16 +99,17 @@ void DrawBtnSelected(Rectangle rct, int btn) {
 	}
 }
 
-void DrawStatusBar(Vector2* sbar) {
+void DrawStatusBar(Player pilot, Vector2* sbar) {
 	DrawRectangleLinesEx((Rectangle) {0, 0, SCREENWIDTH, SBARHEIGHT}, 3, WHITE);
 
 	for (int i=0; i<SBARNUMSEGS; i++) {
 		DrawLine(SBARSEG[i], 0, SBARSEG[i], SBARHEIGHT, WHITE);
 	}
 
-	DrawTextEx(sagaFont, "PILOT: xyz", sbar[0], SBARFONTSIZE, 0, WHITE);
-	DrawTextEx(sagaFont, "CURRENCY: xyz", sbar[1], SBARFONTSIZE, 0, WHITE);
-	DrawTextEx(sagaFont, "TIME LEFT TIL REPO: xyz", sbar[2], SBARFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, "PILOT: ", sbar[0], SBARFONTSIZE, 0, WHITE);
+//	DrawTextEx(sagaFont, pilot.getName(), (Vector2) {sbar[0].x + 50, sbar[0].y}, SBARFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, "CURRENCY: ", sbar[1], SBARFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, "TIME LEFT TIL REPO: ", sbar[2], SBARFONTSIZE, 0, WHITE);
 }
 
 void DrawMainBtns(GUIbtn *hubBtn) {

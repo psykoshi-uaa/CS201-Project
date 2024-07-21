@@ -29,9 +29,14 @@ void Ship::DrawSelf(float radius, Color color) {
 
         
     Vector2 points[3] = {
-        { position.x, position.y - 4 },
+        { position.x, position.y - 2 },
         { position.x - 5, position.y + 5 },
         { position.x + 5, position.y + 5 }
+    };
+    Vector2 outlinepoints[3] = {
+        { position.x, points[0].y - 1 },
+        { points[1].x - 1, points[1].y + 1 },
+        { points[2].x + 1, points[2].y + 1 }
     };
 
     for (int i = 0; i < 3; ++i) {
@@ -39,9 +44,13 @@ void Ship::DrawSelf(float radius, Color color) {
         float sinA = sinf(rotation);
         float rotatedX = cosA * (points[i].x - position.x) - sinA * (points[i].y - position.y) + position.x;
         float rotatedY = sinA * (points[i].x - position.x) + cosA * (points[i].y - position.y) + position.y;
+        float outlinerotatedX = cosA * (outlinepoints[i].x - position.x) - sinA * (outlinepoints[i].y - position.y) + position.x;
+        float outlinerotatedY = sinA * (outlinepoints[i].x - position.x) + cosA * (outlinepoints[i].y - position.y) + position.y;
         points[i] = { rotatedX, rotatedY };
+        outlinepoints[i] = { outlinerotatedX, outlinerotatedY };
     }
 
+    DrawTriangle(outlinepoints[0], outlinepoints[1], outlinepoints[2], BLACK);
     DrawTriangle(points[0], points[1], points[2], color);
 }
 

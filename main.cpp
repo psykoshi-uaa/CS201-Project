@@ -12,16 +12,16 @@ Texture2D logo = { 0 };
 Texture2D particle = { 0 };
 Texture2D hubBase = { 0 };
 Font sagaFont = { 0 };
-Vector2 sbar[SBARNUMSEGS+1];
-PTXstarmanager ptxStar;
-Sun sun;
-Planet planet[NUMPLANETS];
-HubPort hubPort(15, 125);
-Ship ship(hubPort.GetPos());
-SubMenu leftSideMenu(true);
-SubMenu rightSideMenu(false);
-Mission hubJob("Odd Jobs", 400, 1, 0.1, (Rectangle) {0, 0, 0, 0} );
 
+static Vector2 sbar[SBARNUMSEGS+1];
+static PTXstarmanager ptxStar;
+static Sun sun;
+static Planet planet[NUMPLANETS];
+static HubPort hubPort(15, 125);
+static Ship ship(hubPort.GetPos());
+static Player pilot;
+static SubMenu leftSideMenu(true);
+static SubMenu rightSideMenu(false);
 static GUIbtn hubBtn[HUBNUMBTNS];
 static GUIbtn boardBtn[BOARDNUMBTNS];
 static GUIbtn newGameBtn = { 0 };
@@ -35,7 +35,7 @@ static float alphaChannel[NUMALPHACHANNELS];
 static bool increasing = true;
 
 //function prototypes
-void DrawStatusBar(Vector2*);
+void DrawStatusBar(Player, Vector2*);
 void DrawStatusScreen(Font);
 void DrawBtnSelected(Rectangle, int);
 void DrawMainBtns(GUIbtn*);
@@ -57,7 +57,7 @@ Buttons btnHovered = NOBTN;
 int main(){
 	InitGame();
 
-	//ToggleFullscreen();
+	ToggleFullscreen();
 
 	while (!WindowShouldClose()) {
 		UpdateAndDrawCurrentScreen();
@@ -221,7 +221,7 @@ static void UpdateAndDrawCurrentScreen(){
 			}
 
 			//draw
-			DrawTextEx(sagaFont, "Intro text block blah dee blah dee blah\nhello how are you woohoo you are player John Doe",
+			DrawTextEx(sagaFont, "Intro text block blah dee blah dee blah\nhello how are you woohoo you are pilot John Doe",
 					(Vector2){MARGIN * 3, SCREENHEIGHT/2 - 50}, MAINMENUFONTSIZE, 0, ColorAlpha(WHITE, alphaChannel[0]) );	
 		} break;
 
@@ -229,7 +229,7 @@ static void UpdateAndDrawCurrentScreen(){
 			DrawAndUpdateSolarSystem(sun, planet, hubPort, true, hubBase);
 
 			if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-				if (CheckCollisionPointCircle(GetMousePosition(), hubPort.GetPos(), hubPort.GetRadius()) ) {
+				if (CheckCollisionPointCircle(GetMousePosition(), hubPort.GetPos(), hubPort.GetRadius() + 5) ) {
 					shipDest = -1;
 				}
 				else {
@@ -257,7 +257,7 @@ static void UpdateAndDrawCurrentScreen(){
 				//MARKET GO HERE
 			}
 			
-			DrawStatusBar(sbar);
+			DrawStatusBar(pilot, sbar);
 			DrawMainBtns(hubBtn);
 			rightSideMenu.UpdateAndDrawSelf();
 			leftSideMenu.UpdateAndDrawSelf();

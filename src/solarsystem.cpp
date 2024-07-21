@@ -46,7 +46,7 @@ Planet::Planet() {
 	std::uniform_int_distribution<int> rand_angle(0, 360);
 	std::uniform_int_distribution<int> rand_radius(3, 15);
 	std::uniform_int_distribution<int> rand_dist(50, 450);
-	std::uniform_int_distribution<int> rand_conic(-2, 2);
+	std::uniform_int_distribution<int> rand_conic(-0.8, 0.8);
 	std::uniform_int_distribution<int> rand_RGB(25, 255);
 
 	orbitAngle = rand_angle(ss_rd);
