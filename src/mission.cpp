@@ -117,10 +117,14 @@ bool Mission::IsClicked()
 
 void Mission:: CompleteMission(Player& player)
 {
-    if ((!onCooldown) && IsClicked())
+    if (IsClicked())
     {
         player.addMoney(reward);
         player.loseTime(timeCost);
         startCooldown();
     }
+	
+	if (onCooldown) {
+		startCooldown();
+	}
 }

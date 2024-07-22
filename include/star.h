@@ -238,7 +238,7 @@ class Planet : private Sun {
 	void DrawPlanet(bool);
 	void UpdatePlanet();
 	void RegisterClick();
-	void MissionHandler();
+	void MissionHandler(Player&);
 	Vector2 GetPos();
 	float GetRadius();
 	int GetNumMissions();
