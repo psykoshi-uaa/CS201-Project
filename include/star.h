@@ -185,7 +185,6 @@ class Mission
     //      Methods
     //      =======
 
-    void startCooldown();
     void updateTimer(float deltaTime);
     void DrawButton();
     bool IsClicked();

@@ -43,7 +43,6 @@ void Mission::setCooldownTime(float cooldownTime){
 void Mission::setCurrentCooldown(float currentCooldown){
     currentCooldown = currentCooldown;
 }
-
 void Mission::setButton(Rectangle rec){
     button = rec;
 }
@@ -53,28 +52,15 @@ void Mission::setButton(Rectangle rec){
 //      Methods
 //      =======
 
-//COOLDOWN START METHOD
-void Mission::startCooldown(){
-    onCooldown = true;
-    //currentCooldown = cooldownTime;
-    int dt = 1/FPS;
-    while(onCooldown){
-        updateTimer(dt);
-    }
-        
-}
 // TIMER UPDATE METHOD
 void Mission::updateTimer(float deltaTime){
-    if (onCooldown)
-    {
-        currentCooldown -= deltaTime;
-        if (currentCooldown <= 0)
-        {
-            onCooldown = false;
-            currentCooldown = 0;
-        }
-    }
-} // Deltatime?
+	currentCooldown -= deltaTime;
+	if (currentCooldown <= 0)
+	{
+		onCooldown = false;
+		currentCooldown = 0;
+	}
+}
 
 // BUTTON METHODS : WORK IN PROGRESS
 void Mission::DrawButton(){
@@ -111,20 +97,20 @@ bool Mission::IsClicked()
 }
 
 
-
 // Need to fill out player class to integrate
 // COMPLETE MISSION: ADD REWARD AND TAKE TIME FROM PLAYER
 
 void Mission:: CompleteMission(Player& player)
 {
-    if (IsClicked())
+    if (IsClicked() && cooldownTime == 0)
     {
         player.addMoney(reward);
         player.loseTime(timeCost);
-        startCooldown();
+		onCooldown = true;
     }
 	
 	if (onCooldown) {
-		startCooldown();
+		int dt = 1/FPS;
+		updateTimer(dt);
 	}
 }
