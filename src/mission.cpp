@@ -6,7 +6,7 @@
 
     // Constructor FIXME
 Mission::Mission(std::string name, int reward, int timeCost, float cooldownTime, Rectangle rect)
-    : name(name), reward(reward), currentCooldown(0), button(rect), onCooldown(false) {}
+    : name(name), reward(reward), cooldownTime(cooldownTime), currentCooldown(0), button(rect), onCooldown(false) {}
 
 // Getters
 std::string Mission::getName(){
@@ -43,7 +43,6 @@ void Mission::setCooldownTime(float cooldownTime){
 void Mission::setCurrentCooldown(float currentCooldown){
     currentCooldown = currentCooldown;
 }
-
 void Mission::setButton(Rectangle rec){
     button = rec;
 }
@@ -53,23 +52,7 @@ void Mission::setButton(Rectangle rec){
 //      Methods
 //      =======
 
-//COOLDOWN START METHOD
-void Mission::startCooldown(){
-    onCooldown = true;
-    currentCooldown = cooldownTime;
-}
 // TIMER UPDATE METHOD
-void Mission::updateTimer(float deltaTime){
-    if (onCooldown)
-    {
-        currentCooldown -= deltaTime;
-        if (currentCooldown <= 0)
-        {
-            onCooldown = false;
-            currentCooldown = 0;
-        }
-    }
-}
 
 void Mission::updateTimer(){
 	float dt = 1/(float)FPS;
@@ -116,30 +99,20 @@ bool Mission::IsClicked()
 }
 
 
-
 // Need to fill out player class to integrate
 // COMPLETE MISSION: ADD REWARD AND TAKE TIME FROM PLAYER
 
 void Mission:: CompleteMission(Player& player)
 {
-<<<<<<< Updated upstream
-    if (!onCooldown)
+    if (IsClicked())
     {
         player.addMoney(reward);
         player.loseTime(timeCost);
-        startCooldown();
-    }
-=======
-    if (IsClicked() && currentCooldown == 0)
-    {
-        player.addMoney(reward);
-        player.loseTime(timeCost);
-		currentCooldown = cooldownTime;
-		onCooldown = true;
+		    currentCooldown = cooldownTime;
+		    onCooldown = true;
     }
 	
 	if (onCooldown) {
-		updateTimer();
+		    updateTimer();
 	}
->>>>>>> Stashed changes
 }

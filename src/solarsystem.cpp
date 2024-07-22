@@ -164,15 +164,10 @@ void Planet::RegisterClick() {
 	}
 }
 
-void Planet::MissionHandler() {
+void Planet::MissionHandler(Player &pilot) {
 	for (int i=0; i<GetNumMissions(); i++) {
-		if (missionsAvail[i].IsClicked() && missionsAvail[i].getCurrentCooldown() == 0) {
-			missionsAvail[i].startCooldown();
-		}
-		
-		if (missionsAvail[i].getCurrentCooldown() > 0) {
-			missionsAvail[i].updateTimer(0.001);
-		}
+	    missionsAvail[i].CompleteMission(pilot);
+
 		missionsAvail[i].DrawButton();
 	}
 }

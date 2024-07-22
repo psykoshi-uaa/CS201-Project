@@ -257,12 +257,7 @@ class Mission
     //      Methods
     //      =======
 
-<<<<<<< Updated upstream
-    void startCooldown();
-    void updateTimer(float deltaTime);
-=======
     void updateTimer();
->>>>>>> Stashed changes
     void DrawButton();
     bool IsClicked();
     void CompleteMission(Player& player);
@@ -314,7 +309,7 @@ class Planet : private Sun {
 	void DrawPlanet(bool);
 	void UpdatePlanet();
 	void RegisterClick();
-	void MissionHandler();
+	void MissionHandler(Player&);
 	Vector2 GetPos();
 	float GetRadius();
 	int GetNumMissions();

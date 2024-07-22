@@ -59,7 +59,7 @@ Buttons btnHovered = NOBTN;
 int main(){
 	InitGame();
 
-	//ToggleFullscreen();
+	ToggleFullscreen();
 
 	while (!WindowShouldClose()) {
 		UpdateAndDrawCurrentScreen();
@@ -257,7 +257,7 @@ static void UpdateAndDrawCurrentScreen(){
 
 			//mission update and draw
 				if (rightSideMenu.GetActive() && ship.IsAtDestination(planet[shipDest].GetRadius()) ) {
-					planet[shipDest].MissionHandler();
+					planet[shipDest].MissionHandler(pilot);
 				}
 			}
 			else {
