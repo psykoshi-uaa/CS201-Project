@@ -53,8 +53,10 @@ void Mission::setButton(Rectangle rec){
 //      =======
 
 // TIMER UPDATE METHOD
-void Mission::updateTimer(float deltaTime){
-	currentCooldown -= deltaTime;
+
+void Mission::updateTimer(){
+	float dt = 1/(float)FPS;
+	currentCooldown = currentCooldown - dt;
 	if (currentCooldown <= 0)
 	{
 		onCooldown = false;
@@ -102,15 +104,15 @@ bool Mission::IsClicked()
 
 void Mission:: CompleteMission(Player& player)
 {
-    if (IsClicked() && cooldownTime == 0)
+    if (IsClicked())
     {
         player.addMoney(reward);
         player.loseTime(timeCost);
-		onCooldown = true;
+		    currentCooldown = cooldownTime;
+		    onCooldown = true;
     }
 	
 	if (onCooldown) {
-		int dt = 1/FPS;
-		updateTimer(dt);
+		    updateTimer();
 	}
 }

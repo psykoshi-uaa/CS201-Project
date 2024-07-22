@@ -72,6 +72,87 @@ bool Ship::IsAtDestination(float radius) {
 }
 
 /*
+//getters
+int Ship::getHP()
+{
+    return HP;
+}
+int Ship::getMaxHP()
+{
+    return maxHP;
+}
+int Ship::getShield()
+{
+    return shield;
+}
+int Ship::getmaxShield()
+{
+    return maxShield;
+}
+int Ship::getCargo()
+{
+    return cargo;
+}
+int Ship::getCargoCapacity()
+{
+    return cargoCapacity;
+}
+int Ship::getSpeed()
+{
+    return speed;
+}
+
+//setters
+void Ship::setHP(int newHP)
+{
+    HP = newHP;
+}
+void Ship::setMaxHP(int newMaxHP)
+{
+    maxHP = newMaxHP;
+}
+void Ship::setShield(int newShield)
+{
+    shield = newShield;
+}
+void Ship::setmaxShield(int newMaxShield)
+{
+    maxShield = newMaxShield;
+}
+void Ship::setCargo(int newCargo)
+{
+    cargo = newCargo;
+}
+void Ship::setCargoCapacity(int newCargoCapacity)
+{
+    cargoCapacity = newCargoCapacity;
+}
+void Ship::setSpeed(int newSpeed)
+{
+    speed = newSpeed;
+}
+
+//Combat Methods
+void Ship::TakeDamage(int amount)
+{
+    shield -= amount;
+    HP -= amount;
+}
+void Ship::Repair(int amount)
+{
+    HP += amount;
+}
+void Ship::AddCargo(int amount)
+{
+    cargo += amount;
+}
+void Ship::RemoveCargo(int amount)
+{
+    cargo -= amount;
+}
+*/
+
+/*
 int main() {
     
     const int screenWidth = 800;

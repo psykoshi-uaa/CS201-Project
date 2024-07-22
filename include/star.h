@@ -121,6 +121,15 @@ class Player {
 	void addMoney(int);
 	void payDebt(int);
 	void loseTime(int);
+	/*
+	void payMarket(int);
+	void loseSP(int);
+	void loseHP(int);
+	void lvlupHP();
+	
+	void ApplyUpgrade(int);
+	void ShowUpgrades() const;
+	*/
 
 
 	Player() 
@@ -133,6 +142,22 @@ class Ship {
 	    position,
 	    velocity;
     float distance;
+
+	/*
+	private:
+	std::string name;
+	int HP;
+	int maxHP;
+	bool hasShield;
+	int shield;
+	int maxShield;
+	int cargo;
+	int cargoCapacity;
+	int speed;
+	
+	std::vector<Weapon> weapons;
+	std::vector<Upgrade> upgrades;
+	*/
 	
     public:
     Ship(Vector2);
@@ -140,6 +165,53 @@ class Ship {
     void UpdateDestination(Vector2);
     void SetPosition(Vector2);
     bool IsAtDestination(float);
+
+	/*
+	Ship() 
+	: name("Unknown"), HP(0), maxHP(25), hasShield(false), shield(0), maxShield(25), cargo(0), cargoCapacity(25), speed(25) {
+    }
+
+	//getters
+	int getHP();
+	int getMaxHP();
+	int getShield();
+	int getmaxShield();
+	int getCargo();
+	int getCargoCapacity();
+	int getSpeed();
+	
+	getWeapons();
+	getUpgrades();
+	
+
+	//setters
+	void setHP(int);
+	void setMaxHP(int);
+	void setShield(int);
+	void setmaxShield(int);
+	void setCargo(int);
+	void setCargoCapacity(int);
+	void setSpeed(int);
+	
+	void setWeapons();
+	void setUpgrades();
+	
+
+	//Upgrade 
+	void ApplyUpgrade(int);
+	void ShowUpgrades() const;
+
+	//Combat Methods
+	void TakeDamage(int);
+	void Repair(int);
+
+	void Refuel(int);
+
+	void AddCargo(int);
+	void RemoveCargo(int);
+
+	void FireWeapons();
+	*/
 };
 
 
@@ -185,7 +257,7 @@ class Mission
     //      Methods
     //      =======
 
-    void updateTimer(float deltaTime);
+    void updateTimer();
     void DrawButton();
     bool IsClicked();
     void CompleteMission(Player& player);
