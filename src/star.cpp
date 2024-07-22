@@ -88,7 +88,31 @@ void Player::loseTime(int time_lost)
 {
 	timeRemaining -= time_lost;
 }
+/*
+void Player::payMarket(int purchase)
+{
+	money -= purchase;
+}
 
+void Player::loseSP(int damage)
+{
+	SP -= damage;
+	if(SP <= 0)
+		hasShield = false;
+}
+
+void Player::loseHP(int damage)
+{
+	HP -= damage;
+	if(HP <= 0)
+		;
+}
+
+void Player::lvlupHP()
+{
+	maxHP += 25;
+}
+*/
 
 //-------------------------------------------------------------------------------
 //			draw functions
