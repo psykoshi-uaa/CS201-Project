@@ -6,7 +6,7 @@
 
     // Constructor FIXME
 Mission::Mission(std::string name, int reward, int timeCost, float cooldownTime, Rectangle rect)
-    : name(name), reward(reward), currentCooldown(0), button(rect), onCooldown(false) {}
+    : name(name), reward(reward), cooldownTime(cooldownTime), currentCooldown(0), button(rect), onCooldown(false) {}
 
 // Getters
 std::string Mission::getName(){
@@ -56,7 +56,12 @@ void Mission::setButton(Rectangle rec){
 //COOLDOWN START METHOD
 void Mission::startCooldown(){
     onCooldown = true;
-    currentCooldown = cooldownTime;
+    //currentCooldown = cooldownTime;
+    int dt = 1/FPS;
+    while(onCooldown){
+        updateTimer(dt);
+    }
+        
 }
 // TIMER UPDATE METHOD
 void Mission::updateTimer(float deltaTime){
@@ -112,7 +117,7 @@ bool Mission::IsClicked()
 
 void Mission:: CompleteMission(Player& player)
 {
-    if (!onCooldown)
+    if ((!onCooldown) && IsClicked())
     {
         player.addMoney(reward);
         player.loseTime(timeCost);
