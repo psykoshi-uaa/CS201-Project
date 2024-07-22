@@ -257,8 +257,12 @@ class Mission
     //      Methods
     //      =======
 
+<<<<<<< Updated upstream
     void startCooldown();
     void updateTimer(float deltaTime);
+=======
+    void updateTimer();
+>>>>>>> Stashed changes
     void DrawButton();
     bool IsClicked();
     void CompleteMission(Player& player);

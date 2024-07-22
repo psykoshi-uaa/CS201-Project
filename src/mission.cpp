@@ -69,7 +69,17 @@ void Mission::updateTimer(float deltaTime){
             currentCooldown = 0;
         }
     }
-} // Deltatime?
+}
+
+void Mission::updateTimer(){
+	float dt = 1/(float)FPS;
+	currentCooldown = currentCooldown - dt;
+	if (currentCooldown <= 0)
+	{
+		onCooldown = false;
+		currentCooldown = 0;
+	}
+}
 
 // BUTTON METHODS : WORK IN PROGRESS
 void Mission::DrawButton(){
@@ -112,10 +122,24 @@ bool Mission::IsClicked()
 
 void Mission:: CompleteMission(Player& player)
 {
+<<<<<<< Updated upstream
     if (!onCooldown)
     {
         player.addMoney(reward);
         player.loseTime(timeCost);
         startCooldown();
     }
+=======
+    if (IsClicked() && currentCooldown == 0)
+    {
+        player.addMoney(reward);
+        player.loseTime(timeCost);
+		currentCooldown = cooldownTime;
+		onCooldown = true;
+    }
+	
+	if (onCooldown) {
+		updateTimer();
+	}
+>>>>>>> Stashed changes
 }
