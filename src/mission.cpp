@@ -76,16 +76,22 @@ void Mission::resetCooldown() {
 
 // BUTTON METHODS : WORK IN PROGRESS
 void Mission::DrawButton(){
-    DrawRectangleRec(button, WHITE);
- 
-    std::string yeild_text =  "Yeild: " + std::to_string(reward); // adaptable text for yeild
+    if (onCooldown)
+    {
+        DrawRectangleRec(button, DARKGREEN);
+    } else 
+    {
+        DrawRectangleRec(button, GRAY);
+    }
+   
+    std::string yield_text =  "Yield: " + std::to_string(reward); // adaptable text for yeild
     std::string time_cost_text = "Time Cost: " + std::to_string(timeCost); // text for timecost
     std::string cooldown_text = "Cooldown: " + std::to_string(currentCooldown); // text for cooldown timer
 
     //draw mission name
     DrawText(name.c_str(), button.x + 10, button.y + 10, 20, BLACK);
     //draw mission yeild
-    DrawText(yeild_text.c_str(), button.x + 10, button.y + 40, 20, GREEN);
+    DrawText(yield_text.c_str(), button.x + 10, button.y + 40, 20, GREEN);
     //draw time cost
     DrawText(time_cost_text.c_str(), button.x + 10, button.y + 60, 20, RED);
     //draw cooldown timer

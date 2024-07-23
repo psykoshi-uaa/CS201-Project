@@ -33,6 +33,13 @@
 #define ORBITALPOINTSFULL 50
 #define PLANETBOUNDS 100
 #define NUMALPHACHANNELS 10
+
+//Market defines
+#define TIER1 = 0.05
+#define TIER2 = 0.10
+#define TIER3 = 0.25
+#define TIER4 = 0.50
+#define TIER5 = 1.00
 	  
 const int SCREENWIDTH = 1920,
           SCREENHEIGHT = 1080;
@@ -264,6 +271,34 @@ class Mission
     void DrawButton();
     bool IsClicked();
     void CompleteMission(Player& player);
+};
+
+//====================================
+//     MarketUpgrade Class Header 
+//====================================
+class MarketUpgrade
+{
+	private:
+	std::string name; // in universe name
+	float tier; // Initialize with TIERnum
+	std::string type; // flight speed, yield, reward, timeCost
+	int cost;
+	bool isBought; // when BuyUpgrade(), flag true. may not be necessary
+	bool isMax; // when TIER5 is reached, isMax = true and button changes to display
+	Rectangle button;
+	public:
+	//constructor
+	MarketUpgrade(std::string name, float tier, std::string type, int cost);
+
+	//methods
+	void DrawButton(int tier_num); // tier_num is just for display purposes
+	bool IsClicked();
+	void BuyUpgrade(Player& player); //reference Player addMoney and others to update multiplier
+		// may flag isBought, but also may just initialize 
+
+
+
+
 };
 
 
