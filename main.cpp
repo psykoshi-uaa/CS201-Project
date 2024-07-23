@@ -3,6 +3,7 @@
 #include "raymath.h"
 #include <ctime>
 #include <cmath>
+#include <string>
 
 //declaring structs and other init stuff
 Texture2D titleCard = { 0 };
@@ -127,7 +128,7 @@ static void InitGame() {
 	}
 
 	for (int i=0; i<NUMMISSIONS; i++) {
-		missionBtn[i].origin = (Vector2) { SCREENWIDTH - (SCREENWIDTH / 7), (float)(SCREENWIDTH / 7 + (i * 125)) };
+		missionBtn[i].origin = (Vector2) { SCREENWIDTH - (SCREENWIDTH / 6.5 ), (float)(SCREENHEIGHT / 4 + (i * 125)) };
 		missionBtn[i].border = (Rectangle) { missionBtn[i].origin.x - 20, missionBtn[i].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
 	}
 	
@@ -141,7 +142,7 @@ static void InitGame() {
 //			update and draw screen
 //-------------------------------------------------------------------------------
 static void UpdateAndDrawCurrentScreen(){
-	int shootingStarChance = GetRandomValue(0, 1000);
+	int shootingStarChance = GetRandomValue(0, 5000);
 
 	BeginDrawing();
 
@@ -225,7 +226,7 @@ static void UpdateAndDrawCurrentScreen(){
 			AlphaLinearAnim(alphaChannel[0], 1.0f, 0.006f, true);
 			screenTimer.Run();
 
-			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || screenTimer.GetCounter() > 6 * FPS) {
+			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){// || screenTimer.GetCounter() > 6 * FPS) {
 				screenTimer.Reset();
 				currentScreen = HUB;
 			}
@@ -251,13 +252,18 @@ static void UpdateAndDrawCurrentScreen(){
 				}
 			}
 
+				
+			for (int i=0; i<NUMPLANETS; i++) {
+				planet[i].MissionHandler(pilot, true);
+			}
+			
 			if (shipDest >= 0) {
 				ship.UpdateDestination(planet[shipDest].GetPos());
 				ship.DrawSelf(planet[shipDest].GetRadius(), WHITE);
 
 			//mission update and draw
 				if (rightSideMenu.GetActive() && ship.IsAtDestination(planet[shipDest].GetRadius()) ) {
-					planet[shipDest].MissionHandler(pilot);
+					planet[shipDest].MissionHandler(pilot, false);
 				}
 			}
 			else {
@@ -265,6 +271,19 @@ static void UpdateAndDrawCurrentScreen(){
 				ship.DrawSelf(hubPort.GetRadius(), WHITE);
 
 				//MARKET GO HERE
+			}
+
+
+			if (leftSideMenu.GetActive()) {
+				std::string statusStr[] = { "Ship", "Weapon LVL:", "Shield LVL:", "Gathering Tool LVL: ", "Overall Speed:" };
+				std::string statusStats[] = { ship.getName(), std::to_string(ship.getWeapon()), std::to_string(ship.getShield()), std::to_string(ship.getGatheringTool()), std::to_string(ship.getSpeed()) };
+				int fontSize = 32;
+				
+				for (int i=0; i<5; i++) {
+					Vector2 len = MeasureTextEx(sagaFont, statusStr[i].c_str(), fontSize, 1);
+					DrawTextEx(sagaFont, statusStr[i].c_str(), {150 - len.x / 2, (float)(SCREENHEIGHT/4) + (i * 50)}, fontSize, 1, WHITE);
+					DrawTextEx(sagaFont, statusStats[i].c_str(), {SCREENWIDTH / 5 - 70, (float)(SCREENHEIGHT/4) + (i * 50)}, fontSize, 1, GREEN);
+				}
 			}
 			
 			DrawStatusBar(pilot, sbar);

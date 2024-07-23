@@ -164,11 +164,15 @@ void Planet::RegisterClick() {
 	}
 }
 
-void Planet::MissionHandler(Player &pilot) {
+void Planet::MissionHandler(Player &pilot, bool doUpdateTimer) {
 	for (int i=0; i<GetNumMissions(); i++) {
-	    missionsAvail[i].CompleteMission(pilot);
-
-		missionsAvail[i].DrawButton();
+		if (!doUpdateTimer) {
+			missionsAvail[i].CompleteMission(pilot);
+			missionsAvail[i].DrawButton();
+		}
+		else {
+			missionsAvail[i].updateTimer();
+		}
 	}
 }
 

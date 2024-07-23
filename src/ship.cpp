@@ -1,10 +1,12 @@
 #include "../include/star.h"
 #include "raylib.h"
 #include <cmath>
+#include <string>
 
 Ship::Ship(Vector2 startingPoint) 
 	: destination(startingPoint), position(startingPoint) {
-	velocity = (Vector2){2.0, 2.0};
+	velocity = (Vector2){1.0, 1.0};
+	speed = 1;
 }
 
 void Ship::DrawSelf(float radius, Color color) {
@@ -71,8 +73,12 @@ bool Ship::IsAtDestination(float radius) {
 	}
 }
 
-/*
+
 //getters
+std::string Ship::getName()
+{
+    return name;
+}
 int Ship::getHP()
 {
     return HP;
@@ -100,6 +106,14 @@ int Ship::getCargoCapacity()
 int Ship::getSpeed()
 {
     return speed;
+}
+int Ship::getWeapon()
+{
+	return weapon;
+}
+int Ship::getGatheringTool()
+{
+	return gatheringTool;
 }
 
 //setters
@@ -129,7 +143,17 @@ void Ship::setCargoCapacity(int newCargoCapacity)
 }
 void Ship::setSpeed(int newSpeed)
 {
+    velocity.x = newSpeed;
+    velocity.y = newSpeed;
     speed = newSpeed;
+}
+void Ship::setWeapon(int newWeapon)
+{
+	weapon = newWeapon;
+}
+void Ship::setGatheringTool(int newGatheringTool)
+{
+	gatheringTool = newGatheringTool;
 }
 
 //Combat Methods
@@ -150,7 +174,7 @@ void Ship::RemoveCargo(int amount)
 {
     cargo -= amount;
 }
-*/
+
 
 /*
 int main() {

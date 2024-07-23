@@ -131,8 +131,9 @@ void DrawStatusBar(Player pilot, Vector2* sbar) {
 	}
 
 	DrawTextEx(sagaFont, "PILOT: ", sbar[0], SBARFONTSIZE, 0, WHITE);
-//	DrawTextEx(sagaFont, pilot.getName(), (Vector2) {sbar[0].x + 50, sbar[0].y}, SBARFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, pilot.getName().c_str(), (Vector2) {sbar[0].x + 60, sbar[0].y}, SBARFONTSIZE, 0, WHITE);
 	DrawTextEx(sagaFont, "CURRENCY: ", sbar[1], SBARFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, std::to_string(pilot.getMoney()).c_str(), (Vector2) {sbar[1].x + 100, sbar[0].y}, SBARFONTSIZE, 0, WHITE);
 	DrawTextEx(sagaFont, "TIME LEFT TIL REPO: ", sbar[2], SBARFONTSIZE, 0, WHITE);
 }
 

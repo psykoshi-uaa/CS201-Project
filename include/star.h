@@ -133,18 +133,16 @@ class Player {
 
 
 	Player() 
-	: name("Unknown"), Class("Unknown"), money(0), debt(-1000000), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
+	: name("_______"), Class("Unknown"), money(0), debt(-1000000), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
     }
 };
 
 class Ship {
-    Vector2 destination,
+	private:
+    Vector2 destination,	
 	    position,
 	    velocity;
     float distance;
-
-	/*
-	private:
 	std::string name;
 	int HP;
 	int maxHP;
@@ -154,10 +152,12 @@ class Ship {
 	int cargo;
 	int cargoCapacity;
 	int speed;
+	int weapon;
+	int gatheringTool;
 	
-	std::vector<Weapon> weapons;
-	std::vector<Upgrade> upgrades;
-	*/
+	//std::vector<Weapon> weapons;
+	//std::vector<Upgrade> upgrades;
+
 	
     public:
     Ship(Vector2);
@@ -166,12 +166,13 @@ class Ship {
     void SetPosition(Vector2);
     bool IsAtDestination(float);
 
-	/*
+
 	Ship() 
 	: name("Unknown"), HP(0), maxHP(25), hasShield(false), shield(0), maxShield(25), cargo(0), cargoCapacity(25), speed(25) {
     }
 
 	//getters
+	std::string getName();
 	int getHP();
 	int getMaxHP();
 	int getShield();
@@ -179,9 +180,9 @@ class Ship {
 	int getCargo();
 	int getCargoCapacity();
 	int getSpeed();
-	
-	getWeapons();
-	getUpgrades();
+	int getWeapon();
+	int getGatheringTool();
+	//getUpgrades();
 	
 
 	//setters
@@ -192,8 +193,8 @@ class Ship {
 	void setCargo(int);
 	void setCargoCapacity(int);
 	void setSpeed(int);
-	
-	void setWeapons();
+	void setWeapon(int);
+	void setGatheringTool(int);
 	void setUpgrades();
 	
 
@@ -211,7 +212,7 @@ class Ship {
 	void RemoveCargo(int);
 
 	void FireWeapons();
-	*/
+
 };
 
 
@@ -309,7 +310,7 @@ class Planet : private Sun {
 	void DrawPlanet(bool);
 	void UpdatePlanet();
 	void RegisterClick();
-	void MissionHandler(Player&);
+	void MissionHandler(Player&, bool);
 	Vector2 GetPos();
 	float GetRadius();
 	int GetNumMissions();

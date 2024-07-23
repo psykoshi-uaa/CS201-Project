@@ -55,25 +55,22 @@ void Mission::setButton(Rectangle rec){
 // TIMER UPDATE METHOD
 
 void Mission::updateTimer(){
-	float dt = 1/(float)FPS;
-	currentCooldown = currentCooldown - dt;
-	if (currentCooldown <= 0)
-	{
-		onCooldown = false;
-		currentCooldown = 0;
+	if (onCooldown) {
+		float dt = 1/(float)FPS;
+		currentCooldown = currentCooldown - dt;
+		
+		if (currentCooldown <= 0)
+		{
+			onCooldown = false;
+			currentCooldown = 0;
+		}
 	}
 }
 
 // BUTTON METHODS : WORK IN PROGRESS
 void Mission::DrawButton(){
-    if (onCooldown)
-    {
-        DrawRectangleRec(button, DARKGREEN);
-    } else 
-    {
-        DrawRectangleRec(button, GRAY);
-    }
-   
+    DrawRectangleRec(button, WHITE);
+ 
     std::string yeild_text =  "Yeild: " + std::to_string(reward); // adaptable text for yeild
     std::string time_cost_text = "Time Cost: " + std::to_string(timeCost); // text for timecost
     std::string cooldown_text = "Cooldown: " + std::to_string(currentCooldown); // text for cooldown timer
@@ -86,6 +83,12 @@ void Mission::DrawButton(){
     DrawText(time_cost_text.c_str(), button.x + 10, button.y + 60, 20, RED);
     //draw cooldown timer
     DrawText(cooldown_text.c_str(), button.x + 10, button.y + 80, 20, GRAY);
+
+    if (onCooldown)
+    {
+        Rectangle cooldownRec = (Rectangle) { button.x, button.y, button.width * (currentCooldown / cooldownTime), button.height };
+        DrawRectangleRec(cooldownRec, ColorAlpha(BLACK, 0.55f) );
+    }
 }
 
 bool Mission::IsClicked()
@@ -111,8 +114,4 @@ void Mission:: CompleteMission(Player& player)
 		    currentCooldown = cooldownTime;
 		    onCooldown = true;
     }
-	
-	if (onCooldown) {
-		    updateTimer();
-	}
 }
