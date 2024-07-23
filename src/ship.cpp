@@ -5,7 +5,7 @@
 
 Ship::Ship(Vector2 startingPoint) 
 	: destination(startingPoint), position(startingPoint) {
-	velocity = (Vector2){1.0, 1.0};
+	velocity = (Vector2){6.0, 6.0};
 	speed = 1;
 }
 
@@ -154,6 +154,14 @@ void Ship::setWeapon(int newWeapon)
 void Ship::setGatheringTool(int newGatheringTool)
 {
 	gatheringTool = newGatheringTool;
+}
+void Ship::ResetAll(Vector2 startingPoint)
+{
+	position = startingPoint;
+	destination = startingPoint;
+	weapon = 0;
+	speed = 1;
+	gatheringTool = 0;
 }
 
 //Combat Methods

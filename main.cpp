@@ -12,6 +12,8 @@ Texture2D titleUnderline = { 0 };
 Texture2D logo = { 0 };
 Texture2D particle = { 0 };
 Texture2D hubBase = { 0 };
+Texture2D gameOver = { 0 };
+Texture2D gameOver2 = { 0 };
 Font sagaFont = { 0 };
 
 static Vector2 sbar[SBARNUMSEGS+1];
@@ -30,25 +32,26 @@ static GUIbtn exitBtn = { 0 };
 static GUIbtn backBtn = { 0 };
 static GUIbtn missionBtn[NUMMISSIONS];
 static Timer screenTimer;
-static Timer animTimer;
+static Timer animTimer[10];
 static int shipDest = -1,
 	   shootingStarStage = 0;
 static float alphaChannel[NUMALPHACHANNELS];
-static bool increasing = true;
+static float timeTilRepo = 1;
 
 //function prototypes
-void DrawStatusBar(Player, Vector2*);
+void DrawStatusBar(Player, Vector2*, float);
 void DrawStatusScreen(Font);
 void DrawBtnSelected(Rectangle, int);
 void DrawMainBtns(GUIbtn*);
 void DrawAndUpdateSolarSystem(Sun, Planet*, HubPort&, bool, Texture2D);
 void ShootingStar(float, float, int&);
-void AlphaWaveAnim(float&, float, float, float, bool&);
+float AlphaWaveAnim(float, float, float);
 void AlphaLinearAnim(float&, float, float, bool);
 
 static void InitGame();
 static void UpdateAndDrawCurrentScreen();
 static void ButtonCollisionAndClick();
+static void ResetGame();
 
 //declaring global
 GameScreen currentScreen = LOGO;
@@ -72,6 +75,8 @@ int main(){
 	UnloadTexture(titleUnderline);
 	UnloadTexture(logo);
 	UnloadTexture(hubBase);
+	UnloadTexture(gameOver);
+	UnloadTexture(gameOver2);
 	UnloadFont(sagaFont);
 
 	CloseWindow();
@@ -92,9 +97,12 @@ static void InitGame() {
 	titleUnderline	= LoadTexture("resources/title_ship.png");
 	logo 		= LoadTexture("resources/logo.png");
 	hubBase		= LoadTexture("resources/hub_base.png");
+	gameOver	= LoadTexture("resources/game_over.png");
+	gameOver2	= LoadTexture("resources/game_over2.png");
 	sagaFont	= LoadFontEx("resources/saga.ttf", 72, NULL, 0);
 
 	currentScreen = LOGO;
+
 	btnHovered = NOBTN;
 	screenTimer.Reset();
 	alphaChannel[0] = 0.0f;
@@ -164,7 +172,7 @@ static void UpdateAndDrawCurrentScreen(){
 
 			if (screenTimer.Wait(3) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				screenTimer.Reset();
-				animTimer.Reset();
+				animTimer[0].Reset();
 				currentScreen = TITLE;
 			}
 
@@ -174,13 +182,8 @@ static void UpdateAndDrawCurrentScreen(){
 		
 		case TITLE: {
 			//update
-			if (alphaChannel[1] < 1.0f) {
-				alphaChannel[0] += 0.005f;
-				alphaChannel[1] += 0.005f;
-			}
-			else {
-				AlphaWaveAnim(alphaChannel[0], 1.0f, 0.5f, 0.006f, increasing);
-			}
+			animTimer[0].Run();
+			alphaChannel[0] = AlphaWaveAnim(animTimer[0].GetCounter(), 1, 0.5);
 			
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				screenTimer.Reset();
@@ -201,7 +204,8 @@ static void UpdateAndDrawCurrentScreen(){
 
 		case MAINMENU: {
 			//update
-			AlphaWaveAnim(alphaChannel[0], 1.0f, 0.5f, 0.006f, increasing);
+			animTimer[0].Run();
+			alphaChannel[0] = AlphaWaveAnim(animTimer[0].GetCounter(), 1, 0.5);
 
 			//draw
 			DrawTexture(titleGlow, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[0]) );
@@ -252,6 +256,14 @@ static void UpdateAndDrawCurrentScreen(){
 				}
 			}
 
+			if (timeTilRepo <= 0) {
+				currentScreen = GAMEOVER;
+			}
+			else {
+				timeTilRepo -= (1 / (float)FPS);
+				animTimer[0].SetCounter(40);
+				animTimer[1].Reset();
+			}
 				
 			for (int i=0; i<NUMPLANETS; i++) {
 				planet[i].MissionHandler(pilot, true);
@@ -286,11 +298,65 @@ static void UpdateAndDrawCurrentScreen(){
 				}
 			}
 			
-			DrawStatusBar(pilot, sbar);
+			DrawStatusBar(pilot, sbar, timeTilRepo);
 			DrawMainBtns(hubBtn);
 			rightSideMenu.UpdateAndDrawSelf();
 			leftSideMenu.UpdateAndDrawSelf();
 		} break;
+
+		case GAMEOVER: {
+			animTimer[0].Run();
+			animTimer[1].Run();
+			alphaChannel[0] = AlphaWaveAnim(animTimer[0].GetCounter(), FPS * 5, 0.3f);
+			alphaChannel[1] = AlphaWaveAnim(animTimer[1].GetCounter(), FPS * 5, 0.3f);
+
+			DrawTexture(gameOver, SCREENWIDTH/2 - gameOver.width/2, SCREENHEIGHT / 3 - (5 * alphaChannel[0]) - gameOver.height/2, WHITE);
+			DrawTexture(gameOver2, SCREENWIDTH - SCREENWIDTH / 2.2, SCREENHEIGHT - SCREENHEIGHT / 1.3 - (5 * alphaChannel[1]), WHITE);
+
+			std::string loseStr = "You ran out of time. Mort Corp has reclaimed the legs they loaned you at ALL costs.";
+			Vector2 len = MeasureTextEx(sagaFont, loseStr.c_str(), MAINMENUFONTSIZE, 1);
+			DrawTextEx(sagaFont, loseStr.c_str(), (Vector2){ SCREENWIDTH/2 - len.x / 2, SCREENHEIGHT - SCREENHEIGHT / 3 }, MAINMENUFONTSIZE, 1, WHITE);
+
+			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+				currentScreen = RETRY;
+			}
+
+			ResetGame();
+
+		} break;
+
+		case RETRY: {
+			animTimer[0].Run();
+			animTimer[1].Run();
+			alphaChannel[0] = AlphaWaveAnim(animTimer[0].GetCounter(), FPS * 5, 0.3f);
+			alphaChannel[1] = AlphaWaveAnim(animTimer[1].GetCounter(), FPS * 5, 0.3f);
+
+			DrawTexture(gameOver, SCREENWIDTH/2 - gameOver.width/2, SCREENHEIGHT / 3 - (5 * alphaChannel[0]) - gameOver.height/2, WHITE);
+			DrawTexture(gameOver2, SCREENWIDTH - SCREENWIDTH / 2.2, SCREENHEIGHT - SCREENHEIGHT / 1.3 - (5 * alphaChannel[1]), WHITE);
+			
+			if (btnHovered == NEWGAMEBTN) {
+				DrawTextEx(sagaFont, "new game", newGameBtn.origin, MAINMENUFONTSIZE, 1, BLUE);
+			}
+			else {
+				DrawTextEx(sagaFont, "new game", newGameBtn.origin, MAINMENUFONTSIZE, 1, WHITE);
+			}
+			if (btnHovered == EXITBTN) {
+				DrawTextEx(sagaFont, "exit", exitBtn.origin, MAINMENUFONTSIZE, 1, BLUE);
+			}
+			else {
+				DrawTextEx(sagaFont, "exit", exitBtn.origin, MAINMENUFONTSIZE, 1, WHITE);
+			}
+
+			Vector2 creditsOrigin = (Vector2) { SCREENWIDTH - SCREENWIDTH / 4, SCREENHEIGHT - SCREENHEIGHT / 4 };
+			DrawTextEx(sagaFont, "Credits", creditsOrigin, MAINMENUFONTSIZE, 1, WHITE);
+			DrawTextEx(sagaFont, "Calvin Michele", (Vector2){creditsOrigin.x, creditsOrigin.y + MAINMENUFONTSIZE * 2}, MAINMENUFONTSIZE, 1, WHITE);
+			DrawTextEx(sagaFont, "Ethan Shalstrom", (Vector2){creditsOrigin.x, creditsOrigin.y + MAINMENUFONTSIZE * 3}, MAINMENUFONTSIZE, 1, WHITE);
+			DrawTextEx(sagaFont, "Sheng Her", (Vector2){creditsOrigin.x, creditsOrigin.y + MAINMENUFONTSIZE * 4}, MAINMENUFONTSIZE, 1, WHITE);
+		} break;
+
+		case SUCCESS: {
+			
+		}
 		
 		default:break;
 	}
@@ -304,6 +370,7 @@ static void UpdateAndDrawCurrentScreen(){
 //-------------------------------------------------------------------------------
 static void ButtonCollisionAndClick() {
 	switch (currentScreen) {
+		case RETRY:
 		case MAINMENU: {
 			if (CheckCollisionPointRec(GetMousePosition(), newGameBtn.border)) {
 				btnHovered = NEWGAMEBTN;
@@ -368,5 +435,15 @@ static void ButtonCollisionAndClick() {
 			
 			default: break;
 		}
+	}
+}
+
+void ResetGame() {
+	timeTilRepo = 45;
+	ship.ResetAll(hubPort.GetPos());
+	shipDest = -1;
+
+	for (int i=0; i<NUMPLANETS; i++) {
+		planet[i].ResetPlanet();
 	}
 }

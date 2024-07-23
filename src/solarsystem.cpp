@@ -50,6 +50,7 @@ Planet::Planet() {
 	std::uniform_int_distribution<int> rand_RGB(25, 255);
 
 	orbitAngle = rand_angle(ss_rd);
+	startingAngle = orbitAngle;
 	radius = rand_radius(ss_rd);
 	orbitDistance = rand_dist(ss_rd);
 	conicRotation = rand_conic(ss_rd);
@@ -76,6 +77,14 @@ void Planet::GenerateMissions(GUIbtn * btnSetting) {
 	missionsAvail.emplace_back("Salvage", 1200, 3, 10.0, (btnSetting + 2)->border );
 	missionsAvail.emplace_back("Bounty", 1200, 3, 10.0, (btnSetting + 3)->border );
 	missionsAvail.emplace_back("Raid", 1200, 3, 10.0, (btnSetting + 4)->border );
+}
+
+void Planet::ResetPlanet() {
+	for (int i=0; i<numMissionsAvail; i++) {
+		missionsAvail[i].resetCooldown();
+	}
+
+	orbitAngle = startingAngle;
 }
 
 void Planet::UpdatePlanet() {

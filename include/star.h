@@ -43,7 +43,7 @@ const float SBARSEG[SBARNUMSEGS] = {180, 400},
 
 
 //enums
-typedef enum GameScreen { LOGO = 0, TITLE, MAINMENU, INTRO, HUB, GAMEOVER, SUCCESS } GameScreen;
+typedef enum GameScreen { LOGO = 0, TITLE, MAINMENU, INTRO, HUB, GAMEOVER, RETRY, SUCCESS } GameScreen;
 typedef enum Buttons { NOBTN, NEWGAMEBTN, EXITBTN,
 			BOARDBTN, STATUSBTN, MARKETBTN, GIVEUPBTN,
 			ODDJOBBTN, GATHERBTN, SALVAGEBTN, BOUNTYBTN, RAIDBTN,
@@ -196,6 +196,7 @@ class Ship {
 	void setWeapon(int);
 	void setGatheringTool(int);
 	void setUpgrades();
+	void ResetAll(Vector2);
 	
 
 	//Upgrade 
@@ -259,11 +260,10 @@ class Mission
     //      =======
 
     void updateTimer();
+    void resetCooldown();
     void DrawButton();
     bool IsClicked();
     void CompleteMission(Player& player);
-
-
 };
 
 
@@ -285,6 +285,7 @@ class Planet : private Sun {
 	float mass,
 	      radius,
 	      orbitAngle,
+	      startingAngle,
 	      orbitDistance,
 	      orbitRadius,
 	      conicScale,
@@ -311,6 +312,7 @@ class Planet : private Sun {
 	void UpdatePlanet();
 	void RegisterClick();
 	void MissionHandler(Player&, bool);
+	void ResetPlanet();
 	Vector2 GetPos();
 	float GetRadius();
 	int GetNumMissions();
@@ -394,6 +396,7 @@ class Timer {
 
 	public:
 	float	GetCounter();
+	void	SetCounter(float);
 	void	Reset();
 	void	Run();
 	bool 	Wait(double);

@@ -123,7 +123,7 @@ void DrawBtnSelected(Rectangle rct, int btn) {
 	}
 }
 
-void DrawStatusBar(Player pilot, Vector2* sbar) {
+void DrawStatusBar(Player pilot, Vector2* sbar, float timeTileRepo) {
 	DrawRectangleLinesEx((Rectangle) {0, 0, SCREENWIDTH, SBARHEIGHT}, 3, WHITE);
 
 	for (int i=0; i<SBARNUMSEGS; i++) {
@@ -135,6 +135,7 @@ void DrawStatusBar(Player pilot, Vector2* sbar) {
 	DrawTextEx(sagaFont, "CURRENCY: ", sbar[1], SBARFONTSIZE, 0, WHITE);
 	DrawTextEx(sagaFont, std::to_string(pilot.getMoney()).c_str(), (Vector2) {sbar[1].x + 100, sbar[0].y}, SBARFONTSIZE, 0, WHITE);
 	DrawTextEx(sagaFont, "TIME LEFT TIL REPO: ", sbar[2], SBARFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, std::to_string(timeTileRepo).c_str(), (Vector2) {sbar[2].x + 200, sbar[0].y}, SBARFONTSIZE, 0, WHITE);
 }
 
 void DrawMainBtns(GUIbtn *hubBtn) {
@@ -257,6 +258,10 @@ float  Timer::GetCounter() {
 	return frameCounter;
 }
 
+void Timer::SetCounter(float counter) {
+	frameCounter = counter;
+}
+
 void Timer::Reset() {
 	frameCounter = 0;
 }
@@ -271,7 +276,6 @@ bool Timer::Wait(double mark){
 	}
 	return false;
 }
-
 
 Dice::Dice() {
 	static bool seeded = false;
@@ -298,20 +302,8 @@ float GetDist(Vector2 x1y1, Vector2 x2y2) {
 //-------------------------------------------------------------------------------
 //			animation scalers
 //-------------------------------------------------------------------------------
-void AlphaWaveAnim(float& counter, float max, float min, float increment, bool& increasing) {
-	if (counter < max && increasing == true) {
-		counter += increment;
-	}
-	else {
-		increasing = false;
-	}
-
-	if (counter > min && increasing == false){
-		counter -= increment;
-	}
-	else {
-		increasing = true;
-	}
+float AlphaWaveAnim(float counter, float dur, float scale) {
+	return scale * cos((2 * counter) / (dur / 3.14) ) + (1.0 - scale);
 }
 
 void AlphaLinearAnim(float& counter, float goal, float increment, bool increase) {

@@ -67,6 +67,13 @@ void Mission::updateTimer(){
 	}
 }
 
+void Mission::resetCooldown() {
+	if (onCooldown) {
+		currentCooldown = 0;
+		onCooldown = false;
+	}
+}
+
 // BUTTON METHODS : WORK IN PROGRESS
 void Mission::DrawButton(){
     DrawRectangleRec(button, WHITE);
