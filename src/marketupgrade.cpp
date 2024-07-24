@@ -60,7 +60,19 @@ bool MarketUpgrade::IsClicked(){
     return false;
 } 
 
+void MarketUpgrade::BuyUpgrade(Player& player){ // not sure if I need to include max handling
 
+                // reward upgrade
+    if (type == "reward"){ // if mission type is reward...
+        reward_upgrade_counter += 1;
+        player.reward_upgrade_tier = tierPercentage[reward_upgrade_counter];
+    } else if (type == "timeCost") { // timeCost upgrade
+        timeCost_upgrade_counter += 1;
+        player.timeCost_upgrade_tier = tierPercentage[timeCost_upgrade_counter];
+    }
+    // charge player
+    player.setMoney(player.money - cost);
+}
 
 
 

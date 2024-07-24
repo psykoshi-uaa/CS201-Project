@@ -26,29 +26,6 @@ int Player::getTimeRemaining(){
 	return timeRemaining;
 }
 
-/*
-int Player::getHP() {
-	return HP;
-}
-						//HP AND SP NOT NECESSARY AT THE MOMENT
-int Player::getSP() {
-	return SP;
-}
-*/
-/*
-int Player::getPilot(){
-	return piloting;
-}
-
-int Player::getRepair(){  // SKILLS NOT NECESSARY AT THE MOMENT
-	return repair;
-}
-
-int Player::getBarter(){
-	return bartering;
-}
-*/
-
 //+++++ Setters +++++
 
 void Player::setName(std::string new_name)
@@ -75,18 +52,18 @@ void Player::setTimeRemaining(int time)
 //++++++++ METHODS +++++++
 
 // add money to player account
-void Player::addMoney(int money_to_add)
+void Player::addMoney(int money_to_add, float reward_upgrade_tier)
 {
-	money += money_to_add;
+	money += money_to_add + (money_to_add * reward_upgrade_tier); // modifies player money stat with money + money * percent increase
 }
 // add money to negative debt total
 void Player::payDebt(int money_paid)
 {
 	debt += money_paid;
 }
-void Player::loseTime(int time_lost)
+void Player::loseTime(int time_lost, float timeCost_upgrade_tier)
 {
-	timeRemaining -= time_lost;
+	timeRemaining -= time_lost/timeCost_upgrade_tier; // reduces time lost as upgrade tier goes up
 }
 /*
 void Player::payMarket(int purchase)

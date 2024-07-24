@@ -35,11 +35,7 @@
 #define NUMALPHACHANNELS 10
 
 //Market defines
-#define TIER1 = 0.05
-#define TIER2 = 0.10
-#define TIER3 = 0.25
-#define TIER4 = 0.50
-#define TIER5 = 1.00
+
 	  
 const int SCREENWIDTH = 1920,
           SCREENHEIGHT = 1080;
@@ -90,8 +86,7 @@ class Player {
 	private: 
 	std::string	name;
 	std::string Class;
-	int money;
-	int debt;
+	
 	int HP;
 	const int maxHP;
 	bool hasShield;
@@ -101,7 +96,17 @@ class Player {
 	int bartering;
 	int timeRemaining;
 
+	
 	public:
+
+	int money;
+	int debt;
+
+	float reward_upgrade_tier; // for addMoney()
+	float timeCost_upgrade_tier; // for loseTime
+	float cooldown_upgrade_tier; // IMPLEMENT LATER
+	float movespeed_upgrade_tier; // IMPLEMENT LATER
+
 	// getters
 	std::string getName();
 	int getMoney();
@@ -125,9 +130,9 @@ class Player {
 	void setTimeRemaining(int);
 
 	// methods
-	void addMoney(int);
+	void addMoney(int, float); // int = amount, float = upgrade tier
 	void payDebt(int);
-	void loseTime(int);
+	void loseTime(int, float); // int = amount, float = upgrade tier
 	/*
 	void payMarket(int);
 	void loseSP(int);
@@ -286,7 +291,23 @@ class MarketUpgrade
 	bool isBought; // when BuyUpgrade(), flag true. may not be necessary
 	bool isMax; // when TIER5 is reached, isMax = true and button changes to display
 	Rectangle button;
+
 	public:
+
+	int reward_upgrade_counter = 0; // track how many upgrades have been bought
+	int timeCost_upgrade_counter = 0;
+
+	/*
+	float TIER0 = 0.00; 
+	float TIER1 = 0.05;
+	float TIER2 = 0.10;
+	float TIER3 = 0.25;
+	float TIER4 = 0.50;
+	float TIER5 = 1.00;
+	*/
+
+	float tierPercentage[6] = {0.00, 0.05, 0.10, 0.25, 0.50, 1.00}; // access to assign values to player upgrade tiers
+
 	//constructor
 	MarketUpgrade(std::string name, float tier, std::string type, int cost);
 
