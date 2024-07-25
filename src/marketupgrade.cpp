@@ -101,7 +101,12 @@ void MarketUpgrade::BuyUpgrade(Player& player){ // not sure if I need to include
         }   
     // charge player
     player.setMoney(player.money - cost);
+
+    if (reward_upgrade_counter >= 5 || timeCost_upgrade_counter >= 5) {
+        isMax = true;
+        }
     }
+
 }
 
 
