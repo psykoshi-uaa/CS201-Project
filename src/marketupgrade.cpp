@@ -5,10 +5,12 @@
 //======================================
 
     // Constructor
-MarketUpgrade::MarketUpgrade(std::string name, float tier, std::string type, int cost, Rectangle button) 
-    : name(name), tier(tier), type(type), cost(cost), button(button) {
-	isMax = false;
-}
+
+    MarketUpgrade::MarketUpgrade()
+    : name(""), tier(0), type(""), cost(0), button({0, 0, 0, 0}), isMax(false) {}
+
+    MarketUpgrade::MarketUpgrade(std::string name, float tier, std::string type, int cost, Rectangle button)
+    : name(name), tier(tier), type(type), cost(cost), button(button), isMax(false) {}
 
 // =============
 //    Methods
@@ -93,16 +95,16 @@ void MarketUpgrade::BuyUpgrade(Player& player){ // not sure if I need to include
         
             // reward upgrade
         if (type == "reward"){ // if mission type is reward...
-            reward_upgrade_counter += 1;
-            player.reward_upgrade_modifier = tierPercentage[reward_upgrade_counter];
+            player.reward_upgrade_counter += 1;
+            player.reward_upgrade_modifier = tierPercentage[player.reward_upgrade_counter];
         } else if (type == "timeCost") { // timeCost upgrade
-            timeCost_upgrade_counter += 1;
-            player.timeCost_upgrade_modifier = tierPercentage[timeCost_upgrade_counter];
+            player.timeCost_upgrade_counter += 1;
+            player.timeCost_upgrade_modifier = tierPercentage[player.timeCost_upgrade_counter];
         }   
     // charge player
     player.setMoney(player.money - cost);
 
-    if (reward_upgrade_counter >= 5 || timeCost_upgrade_counter >= 5) {
+    if (player.reward_upgrade_counter >= 5 || player.timeCost_upgrade_counter >= 5) {
         isMax = true;
         }
     }

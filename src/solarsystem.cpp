@@ -205,6 +205,11 @@ HubPort::HubPort(float radius, float orbitDistance)
 	conicScale = orbitDistance / mass;
 	conicRotation = 0;
 
+	for (int i = 0; i < 5; i++){
+        rewardUpgrades[i] = MarketUpgrade();
+        timeCostUpgrades[i] = MarketUpgrade();
+    }
+
 	orbitOn = false;
 
 	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
@@ -215,34 +220,7 @@ HubPort::HubPort(float radius, float orbitDistance)
 }
 
 void HubPort::GenerateMarket(GUIbtn * btnSetting) {
-	marketWeapon.emplace_back("Shootaguy MK-I", 1, "timeCost", 10000, (btnSetting)->border );
-	marketWeapon.emplace_back("Low-Impact Turret", 2, "timeCost", 50000, (btnSetting)->border );
-	marketWeapon.emplace_back("Heavy-Impact Turret", 3, "timeCost", 175000, (btnSetting)->border );
-	marketWeapon.emplace_back("One More Turret", 4, "timeCost", 175000, (btnSetting)->border );
-	marketWeapon.emplace_back("Laser", 5, "timeCost", 800000, (btnSetting)->border );
-
-	marketCargo.emplace_back("Cargo Hold Tape", 1, "reward", 100, (btnSetting + 1)->border );
-	marketCargo.emplace_back("Refrigerator Unit", 2, "reward", 1250, (btnSetting + 1)->border );
-	marketCargo.emplace_back("Live Creature Cage", 3, "reward", 10000, (btnSetting + 1)->border );
-	marketCargo.emplace_back("MortCorp Stasis Freezer", 4, "reward", 250000, (btnSetting + 1)->border );
-	marketCargo.emplace_back("MortCorp. Transpo. License", 5, "reward", 800000, (btnSetting + 1)->border );
-
-	marketGather.emplace_back("Old Iron Shovel", 1, "timeCost", 300, (btnSetting + 2)->border );
-	marketGather.emplace_back("Hand-Held Surveyor", 2, "timeCost", 2000, (btnSetting + 2)->border );
-	marketGather.emplace_back("Mining Laser", 3, "timeCost", 10000, (btnSetting + 2)->border );
-	marketGather.emplace_back("Robotic Farming Friend", 4, "timeCost", 250000, (btnSetting + 2)->border );
-	marketGather.emplace_back("Tractor Beam", 5, "timeCost", 800000, (btnSetting + 2)->border );
-
-	marketThruster.emplace_back("ROBO-t1 Lifter", 1, "timeCost", 1000, (btnSetting + 3)->border );
-	marketThruster.emplace_back("Thruster Kit", 2, "timeCost", 1899, (btnSetting + 3)->border );
-	marketThruster.emplace_back("Grav Sleds", 3, "timeCost", 20000, (btnSetting + 3)->border );
-	marketThruster.emplace_back("Kitsa Minion Egg", 4, "timeCost", 250000, (btnSetting + 3)->border );
-	marketThruster.emplace_back("Priority Bathroom Pass", 5, "timeCost", 500000, (btnSetting + 3)->border );
-
-	marketList.push_back(marketWeapon[0]);
-	marketList.push_back(marketCargo[0]);
-	marketList.push_back(marketGather[0]);
-	marketList.push_back(marketThruster[0]);
+	
 }
 
 void HubPort::UpdateHubPort() {
@@ -333,12 +311,34 @@ void HubPort::RegisterClick() {
 }
 
 void HubPort::MarketHandler(Player& player) {
-	for (int i=0; i<4; i++) {
-		marketList[i].DrawButton();
-		marketList[i].BuyUpgrade(player);
-	}
+
+//init of missions
+	MarketUpgrade rewardUpgrades[5] = {
+    MarketUpgrade("Cargo Hold Tape", 1, "reward", 250, {100, 100, 200, 50}),
+    MarketUpgrade("Refrigerator Unit", 2, "reward", 1000, {100, 160, 200, 50}),
+    MarketUpgrade("Live Creature Cage", 3, "reward", 2500, {100, 220, 200, 50}),
+    MarketUpgrade("MortCorp Stasis Freezer", 4, "reward", 10000, {100, 280, 200, 50}),
+    MarketUpgrade("MortCorp Transpo License", 5, "reward", 25000, {100, 340, 200, 50})
+	};
+
+	MarketUpgrade timeCostUpgrades[5] = {
+    MarketUpgrade("R0B0-t1 Lifter", 1, "timeCost", 500, {320, 100, 200, 50}),
+    MarketUpgrade("Thruster Kit", 2, "timeCost", 2000, {320, 160, 200, 50}),
+    MarketUpgrade("Grav Sleds", 3, "timeCost", 10000, {320, 220, 200, 50}),
+    MarketUpgrade("Kitsa Minion Egg", 4, "timeCost", 25000, {320, 280, 200, 50}),
+    MarketUpgrade("Priority Bathroom Pass", 5, "timeCost", 80000, {320, 340, 200, 50})
+	};
+
+	timeCostUpgrades[player.timeCost_upgrade_counter].DrawButton();
+	timeCostUpgrades[player.timeCost_upgrade_counter].BuyUpgrade(player);
+	
+	rewardUpgrades[player.reward_upgrade_counter].DrawButton();
+	rewardUpgrades[player.reward_upgrade_counter].BuyUpgrade(player);
+
 
 }
+
+
 
 Vector2 HubPort::GetPos() {
 	return pos;
