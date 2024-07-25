@@ -6,7 +6,9 @@
 
     // Constructor
 MarketUpgrade::MarketUpgrade(std::string name, float tier, std::string type, int cost, Rectangle button) 
-    : name(name), tier(tier), type(type), cost(cost), button(button) {}
+    : name(name), tier(tier), type(type), cost(cost), button(button) {
+	isMax = false;
+}
 
 // =============
 //    Methods
