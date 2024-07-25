@@ -54,18 +54,18 @@ void Player::setTimeRemaining(int time)
 //++++++++ METHODS +++++++
 
 // add money to player account
-void Player::addMoney(int money_to_add, float reward_upgrade_tier)
+void Player::addMoney(int money_to_add, int reward_upgrade_modifier)
 {
-	money += money_to_add + (money_to_add * reward_upgrade_tier); // modifies player money stat with money + money * percent increase
+	money += money_to_add + (money_to_add * reward_upgrade_modifier); // modifies player money stat with money + money * percent increase
 }
 // add money to negative debt total
 void Player::payDebt(int money_paid)
 {
 	debt += money_paid;
 }
-void Player::loseTime(int time_lost, float timeCost_upgrade_tier)
+void Player::loseTime(int time_lost, int timeCost_upgrade_modifier)
 {
-	timeRemaining -= time_lost/timeCost_upgrade_tier; // reduces time lost as upgrade tier goes up
+	timeRemaining -= time_lost/timeCost_upgrade_modifier; // reduces time lost as upgrade tier goes up
 }
 /*
 void Player::payMarket(int purchase)

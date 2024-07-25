@@ -122,8 +122,8 @@ void Mission:: CompleteMission(Player& player)
 {
     if (IsClicked())
     {
-        player.addMoney(reward, player.reward_upgrade_tier);
-        player.loseTime(timeCost, player.timeCost_upgrade_tier);
+        player.addMoney(reward, player.reward_upgrade_modifier);
+        player.loseTime(timeCost, player.timeCost_upgrade_modifier);
         currentCooldown = cooldownTime;
         onCooldown = true;
     }

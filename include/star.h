@@ -103,10 +103,10 @@ class Player {
 	int money;
 	int debt;
 
-	float reward_upgrade_tier; // for addMoney()
-	float timeCost_upgrade_tier; // for loseTime
-	float cooldown_upgrade_tier; // IMPLEMENT LATER
-	float movespeed_upgrade_tier; // IMPLEMENT LATER
+	float reward_upgrade_modifier; // for addMoney()
+	float timeCost_upgrade_modifier; // for loseTime
+	float cooldown_upgrade_modifier; // IMPLEMENT LATER
+	float movespeed_upgrade_modifier; // IMPLEMENT LATER
 
 	Player();
 	// getters
@@ -132,9 +132,9 @@ class Player {
 	void setTimeRemaining(int);
 
 	// methods
-	void addMoney(int, float); // int = amount, float = upgrade tier
+	void addMoney(int, int); // int = amount, int = upgrade tier
 	void payDebt(int);
-	void loseTime(int, float); // int = amount, float = upgrade tier
+	void loseTime(int, int); // int = amount, int = upgrade tier
 	/*
 	void payMarket(int);
 	void loseSP(int);
