@@ -39,8 +39,8 @@ void MarketUpgrade::DrawButton(){
     percentStream.precision(0);
     percentStream << std::fixed << (tier * 100);
 
-    std::string reward_percent_text = " + " + percentStream.str() + "%" + type_text; // const TIER * 100 should result in percent form
-    std::string time_percent_text = " - " + percentStream.str() + "%" + type_text;
+    std::string reward_percent_text = " + " + percentStream.str() + "% " + type_text; // const TIER * 100 should result in percent form
+    std::string time_percent_text = " - " + percentStream.str() + "% " + type_text;
     std::string cost_text = "$" + std::to_string(cost);
     std::string maxxed_text = "MAX TIER";
     
