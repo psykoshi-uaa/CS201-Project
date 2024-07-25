@@ -15,6 +15,13 @@ MarketUpgrade::MarketUpgrade(std::string name, float tier, std::string type, int
 // =============
 
 void MarketUpgrade::DrawButton(){
+    // Rectangle
+
+    if (isMax){
+        DrawRectangleRec(button, DARKGRAY);
+    } else { 
+        DrawRectangleRec(button, GRAY);
+    }
 
     // text display
     std::string tier_text = ("TIER " + std::to_string(tier) + "Upgrade");

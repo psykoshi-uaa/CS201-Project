@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 #include <random>
+#include "marketupgrade.cpp"
 
 
 std::random_device ss_rd;
