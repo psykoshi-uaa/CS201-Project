@@ -401,7 +401,7 @@ class HubPort : private Sun {
 	void DrawHubPort(bool, Texture2D);
 	void UpdateHubPort();
 	void RegisterClick();
-	void MarketHandler();
+	void MarketHandler(Player& pilot);
 	Vector2 GetPos();
 	float GetRadius();
 };

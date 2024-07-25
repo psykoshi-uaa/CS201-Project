@@ -15,6 +15,7 @@ Texture2D hubBase = { 0 };
 Texture2D gameOver = { 0 };
 Texture2D gameOver2 = { 0 };
 Font sagaFont = { 0 };
+Player pilot;
 
 static Vector2 sbar[SBARNUMSEGS+1];
 static PTXstarmanager ptxStar;
@@ -22,7 +23,7 @@ static Sun sun;
 static Planet planet[NUMPLANETS];
 static HubPort hubPort(10, 125);
 static Ship ship(hubPort.GetPos());
-static Player pilot;
+
 static SubMenu leftSideMenu(true);
 static SubMenu rightSideMenu(false);
 static GUIbtn hubBtn[HUBNUMBTNS];
@@ -285,7 +286,7 @@ static void UpdateAndDrawCurrentScreen(){
 				ship.DrawSelf(hubPort.GetRadius(), WHITE);
 
 				if (rightSideMenu.GetActive() && ship.IsAtDestination(hubPort.GetRadius()) ) {
-					hubPort.MarketHandler();
+					hubPort.MarketHandler(pilot);
 				}
 			}
 

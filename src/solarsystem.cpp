@@ -332,10 +332,12 @@ void HubPort::RegisterClick() {
 	}
 }
 
-void HubPort::MarketHandler() {
+void HubPort::MarketHandler(Player& player) {
 	for (int i=0; i<4; i++) {
 		marketList[i].DrawButton();
+		marketList[i].BuyUpgrade(player);
 	}
+
 }
 
 Vector2 HubPort::GetPos() {
