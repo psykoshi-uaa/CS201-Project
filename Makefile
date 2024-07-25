@@ -363,7 +363,8 @@ OBJS ?= main.cpp \
 		src/particles.cpp \
 		src/solarsystem.cpp \
 		src/ship.cpp \
-		src/mission.cpp
+		src/mission.cpp \
+		src/marketupgrade.cpp
 
 # For Android platform we call a custom Makefile.Android
 ifeq ($(PLATFORM),PLATFORM_ANDROID)

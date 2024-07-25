@@ -107,6 +107,7 @@ class Player {
 	float cooldown_upgrade_tier; // IMPLEMENT LATER
 	float movespeed_upgrade_tier; // IMPLEMENT LATER
 
+	Player();
 	// getters
 	std::string getName();
 	int getMoney();
@@ -142,11 +143,6 @@ class Player {
 	void ApplyUpgrade(int);
 	void ShowUpgrades() const;
 	*/
-
-
-	Player() 
-	: name("_______"), Class("Unknown"), money(0), debt(-1000000), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
-    }
 };
 
 class Ship {
@@ -309,10 +305,10 @@ class MarketUpgrade
 	float tierPercentage[6] = {0.00, 0.05, 0.10, 0.25, 0.50, 1.00}; // access to assign values to player upgrade tiers
 
 	//constructor
-	MarketUpgrade(std::string name, float tier, std::string type, int cost);
+	MarketUpgrade(std::string name, float tier, std::string type, int cost, Rectangle button);
 
 	//methods
-	void DrawButton(int tier_num); // tier_num is just for display purposes
+	void DrawButton(); // tier_num is just for display purposes
 	bool IsClicked();
 	void BuyUpgrade(Player& player); //reference Player addMoney and others to update multiplier
 		// may flag isBought, but also may just initialize 
@@ -392,9 +388,15 @@ class HubPort : private Sun {
 		orbitPointsBehind[ORBITALPOINTS];
 	bool orbitOn,
 	     isShipDest;
+	std::vector<MarketUpgrade> marketWeapon;
+	std::vector<MarketUpgrade> marketCargo;
+	std::vector<MarketUpgrade> marketGather;
+	std::vector<MarketUpgrade> marketThruster;
+	std::vector<MarketUpgrade> marketList;
 
 	public:
 	HubPort(float, float);
+	void GenerateMarket(GUIbtn*);
 	void DrawHubPort(bool, Texture2D);
 	void UpdateHubPort();
 	void RegisterClick();

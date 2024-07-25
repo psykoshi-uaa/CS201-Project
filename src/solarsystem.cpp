@@ -213,6 +213,37 @@ HubPort::HubPort(float radius, float orbitDistance)
 	};
 }
 
+void HubPort::GenerateMarket(GUIbtn * btnSetting) {
+	marketWeapon.emplace_back("Shootaguy MK-I", 1, "timeCost", 10000, (btnSetting)->border );
+	marketWeapon.emplace_back("Low-Impact Turret", 2, "timeCost", 50000, (btnSetting)->border );
+	marketWeapon.emplace_back("Heavy-Impact Turret", 3, "timeCost", 175000, (btnSetting)->border );
+	marketWeapon.emplace_back("One More Turret", 4, "timeCost", 175000, (btnSetting)->border );
+	marketWeapon.emplace_back("Laser", 5, "timeCost", 800000, (btnSetting)->border );
+
+	marketCargo.emplace_back("Cargo Hold Tape", 1, "reward", 100, (btnSetting + 1)->border );
+	marketCargo.emplace_back("Refrigerator Unit", 2, "reward", 1250, (btnSetting + 1)->border );
+	marketCargo.emplace_back("Live Creature Cage", 3, "reward", 10000, (btnSetting + 1)->border );
+	marketCargo.emplace_back("MortCorp Stasis Freezer", 4, "reward", 250000, (btnSetting + 1)->border );
+	marketCargo.emplace_back("MortCorp. Transpo. License", 5, "reward", 800000, (btnSetting + 1)->border );
+
+	marketGather.emplace_back("Old Iron Shovel", 1, "timeCost", 300, (btnSetting + 2)->border );
+	marketGather.emplace_back("Hand-Held Surveyor", 2, "timeCost", 2000, (btnSetting + 2)->border );
+	marketGather.emplace_back("Mining Laser", 3, "timeCost", 10000, (btnSetting + 2)->border );
+	marketGather.emplace_back("Robotic Farming Friend", 4, "timeCost", 250000, (btnSetting + 2)->border );
+	marketGather.emplace_back("Tractor Beam", 5, "timeCost", 800000, (btnSetting + 2)->border );
+
+	marketThruster.emplace_back("ROBO-t1 Lifter", 1, "timeCost", 1000, (btnSetting + 3)->border );
+	marketThruster.emplace_back("Thruster Kit", 2, "timeCost", 1899, (btnSetting + 3)->border );
+	marketThruster.emplace_back("Grav Sleds", 3, "timeCost", 20000, (btnSetting + 3)->border );
+	marketThruster.emplace_back("Kitsa Minion Egg", 4, "timeCost", 250000, (btnSetting + 3)->border );
+	marketThruster.emplace_back("Priority Bathroom Pass", 5, "timeCost", 500000, (btnSetting + 3)->border );
+
+	marketList.push_back(marketWeapon[0]);
+	marketList.push_back(marketCargo[0]);
+	marketList.push_back(marketGather[0]);
+	marketList.push_back(marketThruster[0]);
+}
+
 void HubPort::UpdateHubPort() {
 	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
 
@@ -297,6 +328,12 @@ void HubPort::RegisterClick() {
 		else {
 			orbitOn = false;
 		}
+	}
+}
+
+void HubPort::MarketHandler() {
+	for (int i=0; i<4; i++) {
+		marketList[i].DrawButton();
 	}
 }
 

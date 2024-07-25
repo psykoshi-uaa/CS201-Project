@@ -5,17 +5,17 @@
 //======================================
 
     // Constructor
-MarketUpgrade::MarketUpgrade(std::string name, float tier, std::string type, int cost)
-    : name(name), tier(tier), type(type), cost(cost) {}
+MarketUpgrade::MarketUpgrade(std::string name, float tier, std::string type, int cost, Rectangle button) 
+    : name(name), tier(tier), type(type), cost(cost), button(button) {}
 
 // =============
 //    Methods
 // =============
 
-void MarketUpgrade::DrawButton(int tier_num){
+void MarketUpgrade::DrawButton(){
 
     // text display
-    std::string tier_text = ("TIER " + std::to_string(tier_num) + "Upgrade");
+    std::string tier_text = ("TIER " + std::to_string(tier) + "Upgrade");
     std::string name_text = name;
     std::string type_text = type;
     std::string percent_text = " + " + std::to_string(tier * 100) + "%" + type_text; // const TIER * 100 should result in percent form

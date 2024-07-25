@@ -20,7 +20,7 @@ static Vector2 sbar[SBARNUMSEGS+1];
 static PTXstarmanager ptxStar;
 static Sun sun;
 static Planet planet[NUMPLANETS];
-static HubPort hubPort(15, 125);
+static HubPort hubPort(10, 125);
 static Ship ship(hubPort.GetPos());
 static Player pilot;
 static SubMenu leftSideMenu(true);
@@ -36,7 +36,7 @@ static Timer animTimer[10];
 static int shipDest = -1,
 	   shootingStarStage = 0;
 static float alphaChannel[NUMALPHACHANNELS];
-static float timeTilRepo = 1;
+static float timeTilRepo = 10000;
 
 //function prototypes
 void DrawStatusBar(Player, Vector2*, float);
@@ -139,6 +139,8 @@ static void InitGame() {
 		missionBtn[i].origin = (Vector2) { SCREENWIDTH - (SCREENWIDTH / 6.5 ), (float)(SCREENHEIGHT / 4 + (i * 125)) };
 		missionBtn[i].border = (Rectangle) { missionBtn[i].origin.x - 20, missionBtn[i].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
 	}
+
+	hubPort.GenerateMarket(missionBtn);
 	
 	for (int i=0; i<NUMPLANETS; i++) {
 		planet[i].GenerateMissions(missionBtn);
@@ -282,7 +284,9 @@ static void UpdateAndDrawCurrentScreen(){
 				ship.UpdateDestination(hubPort.GetPos());
 				ship.DrawSelf(hubPort.GetRadius(), WHITE);
 
-				//MARKET GO HERE
+				if (rightSideMenu.GetActive() && ship.IsAtDestination(hubPort.GetRadius()) ) {
+					hubPort.MarketHandler();
+				}
 			}
 
 

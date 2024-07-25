@@ -8,6 +8,8 @@
 // ================================
 //          Player Class
 // ================================
+Player::Player() 
+	: name("_______"), Class("Unknown"), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {money = 0; debt = -1000000;}
 
 //+++++ Getters +++++
 
@@ -120,7 +122,7 @@ void DrawMainBtns(GUIbtn *hubBtn) {
 		DrawBtnSelected(hubBtn[i].border, i + 3);
 		DrawRectangleLinesEx(hubBtn[i].border, 2, WHITE);
 	}
-	DrawTextEx(sagaFont, "Mission Board", hubBtn[0].origin, HUBMAINFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, "Interface", hubBtn[0].origin, HUBMAINFONTSIZE, 0, WHITE);
 	DrawTextEx(sagaFont, "Status", hubBtn[1].origin, HUBMAINFONTSIZE, 0, WHITE);
 	DrawTextEx(sagaFont, "Market", hubBtn[2].origin, HUBMAINFONTSIZE, 0, WHITE);
 	DrawTextEx(sagaFont, "Give Up", hubBtn[3].origin, HUBMAINFONTSIZE, 0, WHITE);

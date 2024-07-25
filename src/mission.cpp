@@ -122,9 +122,9 @@ void Mission:: CompleteMission(Player& player)
 {
     if (IsClicked())
     {
-        player.addMoney(reward);
-        player.loseTime(timeCost);
-		    currentCooldown = cooldownTime;
-		    onCooldown = true;
+        //player.addMoney(reward);
+        //player.loseTime(timeCost);
+        currentCooldown = cooldownTime;
+        onCooldown = true;
     }
 }
