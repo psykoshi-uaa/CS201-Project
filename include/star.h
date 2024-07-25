@@ -9,6 +9,7 @@
 #include <cmath>
 #include <string>
 #include <vector>
+#include <sstream>
 
 //defines
 #define FPS 60

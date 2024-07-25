@@ -24,7 +24,7 @@ void MarketUpgrade::DrawButton(){
     }
 
     // text display
-    std::string tier_text = ("TIER " + std::to_string(tier) + "Upgrade");
+    std::string tier_text = ("TIER " + std::to_string(tier) + " Upgrade");
     std::string name_text = name;
     std::string type_text = type;
     std::string percent_text = " + " + std::to_string(tier * 100) + "%" + type_text; // const TIER * 100 should result in percent form
