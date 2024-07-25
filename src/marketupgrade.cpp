@@ -24,10 +24,23 @@ void MarketUpgrade::DrawButton(){
     }
 
     // text display
-    std::string tier_text = ("TIER " + std::to_string(tier) + " Upgrade");
+    //tier text
+    std::ostringstream tierStream;
+    tierStream.precision(1);
+    tierStream << std::fixed << tier;
+    std::string tier_text = ("TIER " + tierStream.str() + " Upgrade");
+
+
     std::string name_text = name;
     std::string type_text = type;
-    std::string percent_text = " + " + std::to_string(tier * 100) + "%" + type_text; // const TIER * 100 should result in percent form
+
+    //percent text
+    std::ostringstream percentStream;
+    percentStream.precision(0);
+    percentStream << std::fixed << (tier * 100);
+
+    std::string reward_percent_text = " + " + percentStream.str() + "%" + type_text; // const TIER * 100 should result in percent form
+    std::string time_percent_text = " - " + percentStream.str() + "%" + type_text;
     std::string cost_text = "$" + std::to_string(cost);
     std::string maxxed_text = "MAX TIER";
     
@@ -37,7 +50,13 @@ void MarketUpgrade::DrawButton(){
             // display tier
         DrawText(tier_text.c_str(), button.x + 10, button.y + 10, 20, YELLOW);
             // display effect
-        DrawText(percent_text.c_str(), button.x + 10, button.y + 40, 20, GREEN);
+        if (type == "reward"){
+            DrawText(reward_percent_text.c_str(), button.x + 10, button.y + 40, 20, GREEN);
+        }
+        if (type == "timeCost"){
+            DrawText(time_percent_text.c_str(), button.x + 10, button.y + 40, 20, GREEN);
+        }
+        
             //display name
         DrawText(name_text.c_str(), button.x + 10, button.y + 60, 20, GRAY);
             // display cost
