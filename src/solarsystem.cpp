@@ -264,7 +264,8 @@ void HubPort::GenerateMarket(GUIbtn * btnSetting) {
     payDebt.emplace_back("Pay Debt", 0, "pay debt", 1000, (btnSetting + 4)->border);
     payDebt.emplace_back("Pay Debt", 1, "pay debt", 10000, (btnSetting + 4)->border);
     payDebt.emplace_back("Pay Debt", 2, "pay debt", 100000, (btnSetting + 4)->border);
-}
+	payDebt.emplace_back("Pay Debt", 3, "pay debt", 150000, (btnSetting + 4)->border);
+}	
 
 void HubPort::UpdateHubPort(Player pilot) {
 	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
