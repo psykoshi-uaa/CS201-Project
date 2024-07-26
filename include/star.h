@@ -87,7 +87,7 @@ float GetDist(Vector2, Vector2);
 //-------------------------------------------------------------------------------
 class Player {
 	private: 
-	std::string	name;
+	std::string	name = "Jeremy";
 	std::string Class;
 	
 	int HP;
