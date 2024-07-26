@@ -12,11 +12,11 @@
 //    Methods
 // =============
 
-void MarketUpgrade::DrawButton(Player pilot){
+void MarketUpgrade::DrawButton(){
     // Rectangle
 
-    if (pilot.getMoney() >= cost) {
-        DrawRectangleRec(button, DARKGREEN);
+    if (isMax){
+        DrawRectangleRec(button, DARKGRAY);
     } else { 
         DrawRectangleRec(button, GRAY);
     }
@@ -46,7 +46,7 @@ void MarketUpgrade::DrawButton(Player pilot){
     if (!isMax){ // if !maxxed, display text normally
 
             // display tier
-        DrawText(tier_text.c_str(), button.x + 10, button.y + 10, 20, BLACK);
+        DrawText(tier_text.c_str(), button.x + 10, button.y + 10, 20, YELLOW);
             // display effect
         if (type == "reward"){
             DrawText(reward_percent_text.c_str(), button.x + 10, button.y + 40, 20, GREEN);
@@ -92,38 +92,29 @@ bool MarketUpgrade::IsClicked(){
     return false;
 } 
 
-bool MarketUpgrade::IsRClicked(){
-    //click handling
-    if (!isMax && IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) && CheckCollisionPointRec(GetMousePosition(), button))
-        {
-            return true;
-        }
-    return false;
-} 
-
-void MarketUpgrade::BuyUpgrade(Player& pilot, Ship& ship){ // not sure if I need to include max handling
+void MarketUpgrade::BuyUpgrade(Player& player, Ship& ship){ // not sure if I need to include max handling
     if (IsClicked()){
         
             // reward upgrade
-	if (pilot.getMoney() >= cost) {
+	if (player.getMoney() >= cost) {
 		if (type == "reward"){ // if mission type is reward...
-		    pilot.reward_upgrade_counter += 1;
-		    pilot.reward_upgrade_modifier += tierPercentage[pilot.reward_upgrade_counter];
+		    player.reward_upgrade_counter += 1;
+		    player.reward_upgrade_modifier += tierPercentage[player.reward_upgrade_counter];
 		} else if (type == "timeCost") { // timeCost upgrade
-		    pilot.timeCost_upgrade_counter += 1;
-		    pilot.timeCost_upgrade_modifier = tierPercentage2[pilot.timeCost_upgrade_counter];
-		    ship.setSpeed(pilot.timeCost_upgrade_counter);
+		    player.timeCost_upgrade_counter += 1;
+		    player.timeCost_upgrade_modifier = tierPercentage[player.timeCost_upgrade_counter];
+		    ship.setSpeed(player.timeCost_upgrade_counter);
 		} else if (type == "weapon") {
-		    pilot.weapon_upgrade_counter++;
+		    player.weapon_upgrade_counter++;
 		}
 		else if (type == "pay debt") {
-		    pilot.setDebt(pilot.getDebt() + cost);
+		    player.setDebt(player.getDebt() + cost);
 		}
-		// charge pilot
-		pilot.setMoney(pilot.getMoney() - cost);
+		// charge player
+		player.setMoney(player.getMoney() - cost);
 	}
 
-	if (pilot.reward_upgrade_counter >= 5 || pilot.timeCost_upgrade_counter >= 5) {
+	if (player.reward_upgrade_counter >= 5 || player.timeCost_upgrade_counter >= 5) {
 		isMax = true;
         }
     }

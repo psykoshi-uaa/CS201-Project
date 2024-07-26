@@ -11,9 +11,12 @@
 Player::Player() 
 	: name("_______"), Class("Unknown"), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
 		money = 0;
-		debt = -1000000;
-		reward_upgrade_modifier = 1;
-		timeCost_upgrade_modifier = 1;
+		debt = -1000;
+		reward_upgrade_counter = 0;
+		timeCost_upgrade_counter = 0;
+		weapon_upgrade_counter = 0;
+		reward_upgrade_modifier = tierPercentage[0];
+		timeCost_upgrade_modifier = tierPercentage[0];
 		timeRemaining = 1000;
 	}
 
@@ -30,7 +33,7 @@ int Player::getMoney() {
 int Player::getDebt() {
 	return debt;
 }
-int Player::getTimeRemaining(){
+float Player::getTimeRemaining(){
 	return timeRemaining;
 }
 
@@ -44,9 +47,9 @@ void Player::setMoney(int newMoney)
 {
 	money = newMoney;
 }
-void Player::setDebt(int debt)
+void Player::setDebt(int newDebt)
 {
-	debt = debt;
+	debt = newDebt;
 }
 void Player::setHP(int HP)
 {
@@ -60,18 +63,25 @@ void Player::setTimeRemaining(int time)
 //++++++++ METHODS +++++++
 
 // add money to player account
-void Player::addMoney(int money_to_add, int reward_upgrade_modifier)
+void Player::addMoney(int money_to_add, float reward_upgrade_modifier)
 {
 	money += money_to_add + (money_to_add * reward_upgrade_modifier); // modifies player money stat with money + money * percent increase
 }
 // add money to negative debt total
-void Player::payDebt(int money_paid)
+void Player::loseTime(float time_lost, float timeCost_upgrade_modifier)
 {
-	debt += money_paid;
+	timeRemaining -= time_lost * timeCost_upgrade_modifier; // reduces time lost as upgrade tier goes up
 }
-void Player::loseTime(int time_lost, int timeCost_upgrade_modifier)
+void Player::loseTimeGradually()
 {
-	timeRemaining -= (time_lost)/timeCost_upgrade_modifier; // reduces time lost as upgrade tier goes up
+	timeRemaining -= 1/(float)FPS;
+}
+void Player::ResetAll()
+{
+	timeRemaining = 0;
+	money = 0;
+	reward_upgrade_modifier = 0;
+	timeCost_upgrade_modifier = 0;
 }
 /*
 void Player::payMarket(int purchase)
@@ -108,7 +118,7 @@ void DrawBtnSelected(Rectangle rct, int btn) {
 	}
 }
 
-void DrawStatusBar(Player pilot, Vector2* sbar, float timeTileRepo) {
+void DrawStatusBar(Player pilot, Vector2* sbar, float timeTilRepo) {
 	DrawRectangleLinesEx((Rectangle) {0, 0, SCREENWIDTH, SBARHEIGHT}, 3, WHITE);
 
 	for (int i=0; i<SBARNUMSEGS; i++) {
@@ -117,10 +127,15 @@ void DrawStatusBar(Player pilot, Vector2* sbar, float timeTileRepo) {
 
 	DrawTextEx(sagaFont, "PILOT: ", sbar[0], SBARFONTSIZE, 0, WHITE);
 	DrawTextEx(sagaFont, pilot.getName().c_str(), (Vector2) {sbar[0].x + 60, sbar[0].y}, SBARFONTSIZE, 0, WHITE);
+
 	DrawTextEx(sagaFont, "CURRENCY: ", sbar[1], SBARFONTSIZE, 0, WHITE);
 	DrawTextEx(sagaFont, std::to_string(pilot.getMoney()).c_str(), (Vector2) {sbar[1].x + 100, sbar[0].y}, SBARFONTSIZE, 0, WHITE);
-	DrawTextEx(sagaFont, "TIME LEFT TIL REPO: ", sbar[2], SBARFONTSIZE, 0, WHITE);
-	DrawTextEx(sagaFont, std::to_string(timeTileRepo).c_str(), (Vector2) {sbar[2].x + 200, sbar[0].y}, SBARFONTSIZE, 0, WHITE);
+
+	DrawTextEx(sagaFont, "DEBT: ", sbar[2], SBARFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, std::to_string(pilot.getDebt()).c_str(), (Vector2) {sbar[2].x + 100, sbar[0].y}, SBARFONTSIZE, 0, WHITE);
+
+	DrawTextEx(sagaFont, "TIME LEFT TIL REPO: ", sbar[3], SBARFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, std::to_string(timeTilRepo).c_str(), (Vector2) {sbar[3].x + 200, sbar[0].y}, SBARFONTSIZE, 0, WHITE);
 }
 
 void DrawMainBtns(GUIbtn *hubBtn) {

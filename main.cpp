@@ -21,7 +21,7 @@ static Vector2 sbar[SBARNUMSEGS+1];
 static PTXstarmanager ptxStar;
 static Sun sun;
 static Planet planet[NUMPLANETS];
-static HubPort hubPort(10, 125);
+static HubPort hubPort(5, 125);
 static Ship ship(hubPort.GetPos());
 
 static SubMenu leftSideMenu(true);
@@ -37,14 +37,13 @@ static Timer animTimer[10];
 static int shipDest = -1,
 	   shootingStarStage = 0;
 static float alphaChannel[NUMALPHACHANNELS];
-static float timeTilRepo = 10000;
 
 //function prototypes
 void DrawStatusBar(Player, Vector2*, float);
 void DrawStatusScreen(Font);
 void DrawBtnSelected(Rectangle, int);
 void DrawMainBtns(GUIbtn*);
-void DrawAndUpdateSolarSystem(Sun, Planet*, HubPort&, bool, Texture2D);
+void DrawAndUpdateSolarSystem(Sun, Player, Planet*, HubPort&, bool, Texture2D);
 void ShootingStar(float, float, int&);
 float AlphaWaveAnim(float, float, float);
 void AlphaLinearAnim(float&, float, float, bool);
@@ -111,8 +110,9 @@ static void InitGame() {
 
 	float sbarH = 5;
 	sbar[0] = (Vector2) {15, sbarH};
-	sbar[1] = (Vector2) {195, sbarH};
+	sbar[1] = (Vector2) {SBARSEG[0] + 15, sbarH};
 	sbar[2] = (Vector2) {SBARSEG[1] + 15, sbarH};
+	sbar[3] = (Vector2) {SBARSEG[2] + 15, sbarH};
 
 	newGameBtn.origin = (Vector2) {SCREENWIDTH/5, SCREENHEIGHT - SCREENHEIGHT/4};
 	newGameBtn.border = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 100, 25};
@@ -143,9 +143,17 @@ static void InitGame() {
 
 	hubPort.GenerateMarket(missionBtn);
 	
+	int randPlanet = GetRandomValue(0, NUMPLANETS);
 	for (int i=0; i<NUMPLANETS; i++) {
-		planet[i].GenerateMissions(missionBtn);
+		if (i == randPlanet) {
+			planet[i].GenerateMissions(missionBtn, true);
+		}
+		else {
+			planet[i].GenerateMissions(missionBtn, false);
+		}
 	}
+
+	ship.SetPosition((Vector2) { SCREENWIDTH / 2, SCREENHEIGHT / 2 });
 }
 
 
@@ -244,7 +252,7 @@ static void UpdateAndDrawCurrentScreen(){
 		} break;
 
 		case HUB: {
-			DrawAndUpdateSolarSystem(sun, planet, hubPort, true, hubBase);
+			DrawAndUpdateSolarSystem(sun, pilot, planet, hubPort, true, hubBase);
 
 			if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
 				if (CheckCollisionPointCircle(GetMousePosition(), hubPort.GetPos(), hubPort.GetRadius() + 5) ) {
@@ -259,13 +267,17 @@ static void UpdateAndDrawCurrentScreen(){
 				}
 			}
 
-			if (timeTilRepo <= 0) {
+			if (pilot.getTimeRemaining() <= 0) {
 				currentScreen = GAMEOVER;
 			}
 			else {
-				timeTilRepo -= (1 / (float)FPS);
+				pilot.loseTimeGradually();
 				animTimer[0].SetCounter(40);
 				animTimer[1].Reset();
+			}
+
+			if (pilot.getDebt() >= 0) {
+				currentScreen = SUCCESS;
 			}
 				
 			for (int i=0; i<NUMPLANETS; i++) {
@@ -293,7 +305,7 @@ static void UpdateAndDrawCurrentScreen(){
 
 			if (leftSideMenu.GetActive()) {
 				std::string statusStr[] = { "Ship", "Weapon LVL:", "Cargo LVL:", "Gathering Tool LVL: ", "Overall Speed:" };
-				std::string statusStats[] = { ship.getName(), std::to_string(ship.getWeapon()), std::to_string(pilot.reward_upgrade_counter), std::to_string(ship.getGatheringTool()), std::to_string(ship.getSpeed()) };
+				std::string statusStats[] = { ship.getName(), std::to_string(pilot.weapon_upgrade_counter), std::to_string(pilot.reward_upgrade_counter), std::to_string(ship.getGatheringTool()), std::to_string(ship.getSpeed()) };
 				int fontSize = 32;
 				
 				for (int i=0; i<5; i++) {
@@ -303,7 +315,7 @@ static void UpdateAndDrawCurrentScreen(){
 				}
 			}
 			
-			DrawStatusBar(pilot, sbar, timeTilRepo);
+			DrawStatusBar(pilot, sbar, pilot.getTimeRemaining());
 			DrawMainBtns(hubBtn);
 			rightSideMenu.UpdateAndDrawSelf();
 			leftSideMenu.UpdateAndDrawSelf();
@@ -360,7 +372,22 @@ static void UpdateAndDrawCurrentScreen(){
 		} break;
 
 		case SUCCESS: {
+			if (btnHovered == EXITBTN) {
+				DrawTextEx(sagaFont, "exit", exitBtn.origin, MAINMENUFONTSIZE, 1, BLUE);
+			}
+			else {
+				DrawTextEx(sagaFont, "exit", exitBtn.origin, MAINMENUFONTSIZE, 1, WHITE);
+			}
+
+			std::string winStr = "You have succesfully payed off your artificial legs granted by Mort Corp!\n\nGood flying pilot.";
+			Vector2 len = MeasureTextEx(sagaFont, winStr.c_str(), MAINMENUFONTSIZE, 1);
+			DrawTextEx(sagaFont, winStr.c_str(), (Vector2){ SCREENWIDTH/2 - len.x / 2, SCREENHEIGHT - SCREENHEIGHT / 3 }, MAINMENUFONTSIZE, 1, WHITE);
 			
+			Vector2 creditsOrigin = (Vector2) { SCREENWIDTH - SCREENWIDTH / 4, SCREENHEIGHT - SCREENHEIGHT / 4 };
+			DrawTextEx(sagaFont, "Credits", creditsOrigin, MAINMENUFONTSIZE, 1, WHITE);
+			DrawTextEx(sagaFont, "Calvin Michele", (Vector2){creditsOrigin.x, creditsOrigin.y + MAINMENUFONTSIZE * 2}, MAINMENUFONTSIZE, 1, WHITE);
+			DrawTextEx(sagaFont, "Ethan Shalstrom", (Vector2){creditsOrigin.x, creditsOrigin.y + MAINMENUFONTSIZE * 3}, MAINMENUFONTSIZE, 1, WHITE);
+			DrawTextEx(sagaFont, "Sheng Her", (Vector2){creditsOrigin.x, creditsOrigin.y + MAINMENUFONTSIZE * 4}, MAINMENUFONTSIZE, 1, WHITE);
 		}
 		
 		default:break;
@@ -406,6 +433,15 @@ static void ButtonCollisionAndClick() {
 			}
 		} break;
 
+		case SUCCESS: {
+			if (CheckCollisionPointRec(GetMousePosition(), exitBtn.border)) {
+				btnHovered = EXITBTN;
+			}
+			else {
+				btnHovered = NOBTN;
+			}
+		}
+
 		default: break;
 	}
 	
@@ -444,7 +480,7 @@ static void ButtonCollisionAndClick() {
 }
 
 void ResetGame() {
-	timeTilRepo = 45;
+	pilot.ResetAll();
 	ship.ResetAll(hubPort.GetPos());
 	shipDest = -1;
 

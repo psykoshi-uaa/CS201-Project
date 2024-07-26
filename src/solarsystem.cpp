@@ -11,15 +11,15 @@ std::random_device ss_rd;
 //-------------------------------------------------------------------------------
 //			Sun and Planets
 //-------------------------------------------------------------------------------
-void DrawAndUpdateSolarSystem(Sun sun, Planet *planet, HubPort &hubBase, bool doDrawOrbital, Texture2D hubBaseTX) {
+void DrawAndUpdateSolarSystem(Sun sun, Player pilot, Planet *planet, HubPort &hubBase, bool doDrawOrbital, Texture2D hubBaseTX) {
 	sun.DrawSun();
 
-	hubBase.UpdateHubPort();
+	hubBase.UpdateHubPort(pilot);
 	hubBase.RegisterClick();
 	hubBase.DrawHubPort(doDrawOrbital, hubBaseTX);
 
 	for (int i=0; i<NUMPLANETS; i++) {
-		planet[i].UpdatePlanet();
+		planet[i].UpdatePlanet(pilot);
 		planet[i].RegisterClick();
 		planet[i].DrawPlanet(doDrawOrbital);
 	}
@@ -43,14 +43,13 @@ void Sun::DrawSun() {
 
 //Planet functions
 Planet::Planet() {
-	std::uniform_int_distribution<int> rand_angle(0, 360);
 	std::uniform_int_distribution<int> rand_radius(3, 15);
 	std::uniform_int_distribution<int> rand_dist(50, 450);
 	std::uniform_int_distribution<int> rand_conic(-0.8, 0.8);
 	std::uniform_int_distribution<int> rand_RGB(25, 255);
 
-	orbitAngle = rand_angle(ss_rd);
-	startingAngle = orbitAngle;
+	orbitAngle = 0;
+	startingAngle = 0;
 	radius = rand_radius(ss_rd);
 	orbitDistance = rand_dist(ss_rd);
 	conicRotation = rand_conic(ss_rd);
@@ -67,16 +66,21 @@ Planet::Planet() {
 	orbitColor = (Color) {colors[0], colors[1], colors[2], 55};
 
 	orbitOn = false;
-
-	numMissionsAvail = ceil(orbitDistance / 100);
 }
 
-void Planet::GenerateMissions(GUIbtn * btnSetting) {
-	missionsAvail.emplace_back("OddJob", 1200, 3, 10.0, (btnSetting)->border );
-	missionsAvail.emplace_back("Gather", 1200, 3, 10.0, (btnSetting + 1)->border );
-	missionsAvail.emplace_back("Salvage", 1200, 3, 10.0, (btnSetting + 2)->border );
-	missionsAvail.emplace_back("Bounty", 1200, 3, 10.0, (btnSetting + 3)->border );
-	missionsAvail.emplace_back("Raid", 1200, 3, 10.0, (btnSetting + 4)->border );
+void Planet::GenerateMissions(GUIbtn * btnSetting, bool raidPlanet) {
+	if (raidPlanet == false) {
+		numMissionsAvail = ceil(orbitDistance / 200);
+	}
+	else {
+		numMissionsAvail = 5;
+	}
+
+	missionsAvail.emplace_back("OddJob", 200, 3, 1.0, (btnSetting)->border );
+	missionsAvail.emplace_back("Gather", 1200, 14, 10.0, (btnSetting + 1)->border );
+	missionsAvail.emplace_back("Salvage", 3000, 16, 45.0, (btnSetting + 2)->border );
+	missionsAvail.emplace_back("Bounty", 8000, 28, 10.0, (btnSetting + 3)->border );
+	missionsAvail.emplace_back("Raid", 24000, 60, 180.0, (btnSetting + 4)->border );
 }
 
 void Planet::ResetPlanet() {
@@ -87,7 +91,7 @@ void Planet::ResetPlanet() {
 	orbitAngle = startingAngle;
 }
 
-void Planet::UpdatePlanet() {
+void Planet::UpdatePlanet(Player pilot) {
 	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
 
 	pos = (Vector2) {
@@ -128,7 +132,7 @@ void Planet::UpdatePlanet() {
 	}
 
 	if (orbitAngle > 0) {
-		orbitAngle -= (0.000001 / distFromSun) * mass;
+		orbitAngle = ((pilot.getTimeRemaining() * 0.0001) / distFromSun) * mass;
 	}
 	else {
 		orbitAngle = 360;
@@ -174,12 +178,38 @@ void Planet::RegisterClick() {
 }
 
 void Planet::MissionHandler(Player &pilot, bool doUpdateTimer) {
-	for (int i=0; i<GetNumMissions(); i++) {
-		if (!doUpdateTimer) {
-			missionsAvail[i].CompleteMission(pilot);
-			missionsAvail[i].DrawButton();
+	int missionCorrection = 0;
+
+	if (!doUpdateTimer) {
+		if (GetNumMissions() >= 4) {
+			missionCorrection = 1;
+			if (pilot.weapon_upgrade_counter > 0) {
+				missionsAvail[3].CompleteMission(pilot);
+				missionsAvail[3].DrawButton(pilot, true);
+			}
+			else {
+				missionsAvail[3].DrawButton(pilot, false);
+			}
 		}
-		else {
+
+		if (GetNumMissions() == 5) {
+			missionCorrection = 2;
+			if (pilot.weapon_upgrade_counter == 3) {
+				missionsAvail[4].CompleteMission(pilot);
+				missionsAvail[4].DrawButton(pilot, true);
+			}
+			else {
+				missionsAvail[4].DrawButton(pilot, false);
+			}
+		}
+
+		for (int i=0; i<GetNumMissions() - missionCorrection; i++) {
+			missionsAvail[i].CompleteMission(pilot);
+			missionsAvail[i].DrawButton(pilot, true);
+		}
+	}
+	else {
+		for (int i=0; i<GetNumMissions(); i++) {
 			missionsAvail[i].updateTimer();
 		}
 	}
@@ -199,7 +229,7 @@ int Planet::GetNumMissions() {
 
 HubPort::HubPort(float radius, float orbitDistance) 
 	: radius(radius), orbitDistance(orbitDistance) {
-	orbitAngle = 30;
+	orbitAngle = 0;
 	mass = pow(radius, 2) * 100;
 	conicScale = orbitDistance / mass;
 	conicRotation = 0;
@@ -215,6 +245,10 @@ HubPort::HubPort(float radius, float orbitDistance)
 
 void HubPort::GenerateMarket(GUIbtn * btnSetting) {
 	//init of missions
+    weaponUpgrade.emplace_back("Slot-1 Turret", 1, "weapon", 10000, (btnSetting)->border);
+    weaponUpgrade.emplace_back("Slot-2 Turret", 2, "weapon", 10000, (btnSetting)->border);
+    weaponUpgrade.emplace_back("Slot-3 Turret", 3, "weapon", 10000, (btnSetting)->border);
+
     rewardUpgrade.emplace_back("Cargo Hold Tape", 1, "reward", 250, (btnSetting + 2)->border);
     rewardUpgrade.emplace_back("Refrigerator Unit", 2, "reward", 1000, (btnSetting + 2)->border);
     rewardUpgrade.emplace_back("Live Creature Cage", 3, "reward", 2500, (btnSetting + 2)->border);
@@ -226,9 +260,13 @@ void HubPort::GenerateMarket(GUIbtn * btnSetting) {
     timeCostUpgrade.emplace_back("Grav Sleds", 3, "timeCost", 10000, (btnSetting + 3)->border);
     timeCostUpgrade.emplace_back("Kitsa Minion Egg", 4, "timeCost", 25000, (btnSetting + 3)->border);
     timeCostUpgrade.emplace_back("Priority Bathroom Pass", 5, "timeCost", 80000, (btnSetting + 3)->border);
+
+    payDebt.emplace_back("Pay Debt", 0, "pay debt", 1000, (btnSetting + 4)->border);
+    payDebt.emplace_back("Pay Debt", 1, "pay debt", 10000, (btnSetting + 4)->border);
+    payDebt.emplace_back("Pay Debt", 2, "pay debt", 100000, (btnSetting + 4)->border);
 }
 
-void HubPort::UpdateHubPort() {
+void HubPort::UpdateHubPort(Player pilot) {
 	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
 
 	pos = (Vector2) {
@@ -269,7 +307,7 @@ void HubPort::UpdateHubPort() {
 	}
 
 	if (orbitAngle > 0) {
-		orbitAngle -= (0.000001 / distFromSun) * mass;
+		orbitAngle -= ((pilot.getTimeRemaining() * 0.00000001) / distFromSun) * mass;
 	}
 	else {
 		orbitAngle = 360;
@@ -315,16 +353,34 @@ void HubPort::RegisterClick() {
 	}
 }
 
-void HubPort::MarketHandler(Player& player, Ship& ship) {
-	if (player.timeCost_upgrade_counter < 5) {
-		timeCostUpgrade[player.timeCost_upgrade_counter].DrawButton();
-		timeCostUpgrade[player.timeCost_upgrade_counter].BuyUpgrade(player, ship);
+void HubPort::MarketHandler(Player& pilot, Ship& ship) {
+	static int payDebtCounter = 0;
+
+	if (pilot.timeCost_upgrade_counter < 5) {
+		timeCostUpgrade[pilot.timeCost_upgrade_counter].DrawButton(pilot);
+		timeCostUpgrade[pilot.timeCost_upgrade_counter].BuyUpgrade(pilot, ship);
 	}
 
-	if (player.reward_upgrade_counter < 5) {
-		rewardUpgrade[player.reward_upgrade_counter].DrawButton();
-		rewardUpgrade[player.reward_upgrade_counter].BuyUpgrade(player, ship);
+	if (pilot.reward_upgrade_counter < 5) {
+		rewardUpgrade[pilot.reward_upgrade_counter].DrawButton(pilot);
+		rewardUpgrade[pilot.reward_upgrade_counter].BuyUpgrade(pilot, ship);
 	}
+
+	if (pilot.weapon_upgrade_counter < 3) {
+		weaponUpgrade[pilot.weapon_upgrade_counter].DrawButton(pilot);
+		weaponUpgrade[pilot.weapon_upgrade_counter].BuyUpgrade(pilot, ship);
+	}
+
+	if (payDebt[0].IsRClicked() ) {
+		if (payDebtCounter < 2) {
+			payDebtCounter++;
+		}
+		else {
+			payDebtCounter = 0;
+		}
+	}
+	payDebt[payDebtCounter].DrawButton(pilot);
+	payDebt[payDebtCounter].BuyUpgrade(pilot, ship);
 }
 
 Vector2 HubPort::GetPos() {

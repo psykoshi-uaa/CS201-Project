@@ -26,7 +26,7 @@
 #define BOARDBTNHEIGHT 60
 #define SBARHEIGHT 30
 #define SBARFONTSIZE 22
-#define SBARNUMSEGS 2
+#define SBARNUMSEGS 3
 #define NUMPLANETS 7
 #define NUMMISSIONS 5
 #define MAXSTARPTX 200
@@ -41,10 +41,12 @@
 const int SCREENWIDTH = 1920,
           SCREENHEIGHT = 1080;
 
-const float SBARSEG[SBARNUMSEGS] = {180, 400},
+const float SBARSEG[SBARNUMSEGS] = {200, 400, 600},
 			MARGIN = 30,
 			BTNPADDING = 2;
 
+const float tierPercentage[6] = {0.05, 0.1, 0.25, 0.40, 0.75, 1.0}; // access to assign values to player upgrade tiers
+const float tierPercentage2[6] = {1.0, 0.9, 0.8, 0.6, 0.4, 0.2}; // access to assign values to player upgrade tiers
 
 //enums
 typedef enum GameScreen { LOGO = 0, TITLE, MAINMENU, INTRO, HUB, GAMEOVER, RETRY, SUCCESS } GameScreen;
@@ -95,7 +97,7 @@ class Player {
 	int piloting;
 	int repair;
 	int bartering;
-	int timeRemaining;
+	float timeRemaining;
 
 	
 	public:
@@ -104,12 +106,14 @@ class Player {
 	int debt;
 
 	float reward_upgrade_modifier; // for addMoney()
+	float weapon_upgrade_modifier;
 	float timeCost_upgrade_modifier; // for loseTime
 	float cooldown_upgrade_modifier; // IMPLEMENT LATER
 	float movespeed_upgrade_modifier; // IMPLEMENT LATER
 
 	int reward_upgrade_counter = 0;
 	int timeCost_upgrade_counter = 0;
+	int weapon_upgrade_counter = 0;
 
 	Player();
 	// getters
@@ -121,7 +125,7 @@ class Player {
 	int getPilot();
 	int getRepair();
 	int getBarter();
-	int getTimeRemaining();
+	float getTimeRemaining();
 
 	// setters
 	void setName(std::string);
@@ -135,9 +139,10 @@ class Player {
 	void setTimeRemaining(int);
 
 	// methods
-	void addMoney(int, int); // int = amount, int = upgrade tier
-	void payDebt(int);
-	void loseTime(int, int); // int = amount, int = upgrade tier
+	void addMoney(int, float); // int = amount, int = upgrade tier
+	void loseTime(float, float); // int = amount, int = upgrade tier
+	void loseTimeGradually();
+	void ResetAll();
 	/*
 	void payMarket(int);
 	void loseSP(int);
@@ -237,7 +242,7 @@ class Mission
     private:
     std::string name;
     int reward;
-    int timeCost;
+    float timeCost;
     float cooldownTime;
     float currentCooldown;
     Rectangle button;
@@ -247,12 +252,12 @@ class Mission
     public:
 
     // Constructor
-    Mission(std::string name, int reward, int timeCost, float cooldownTime, Rectangle rect);
+    Mission(std::string name, int reward, float timeCost, float cooldownTime, Rectangle rect);
 
     // Getters
     std::string getName();
     int getReward();
-    int getTimeCost();
+    float getTimeCost();
     float getCooldownTime();
     float getCurrentCooldown();
 
@@ -270,7 +275,7 @@ class Mission
 
     void updateTimer();
     void resetCooldown();
-    void DrawButton();
+    void DrawButton(Player, bool);
     bool IsClicked();
     void CompleteMission(Player& player);
 };
@@ -304,15 +309,14 @@ class MarketUpgrade
 	float TIER5 = 1.00;
 	*/
 
-	float tierPercentage[6] = {0.00, 0.05, 0.10, 0.25, 0.50, 1.00}; // access to assign values to player upgrade tiers
-
 	//constructor
 	//MarketUpgrade();
 
 	MarketUpgrade(std::string name, float tier, std::string type, int cost, Rectangle button);
 	//methods
-	void DrawButton(); // tier_num is just for display purposes
+	void DrawButton(Player); // tier_num is just for display purposes
 	bool IsClicked();
+	bool IsRClicked();
 	void BuyUpgrade(Player& player, Ship& ship); //reference Player addMoney and others to update multiplier
 		// may flag isBought, but also may just initialize 
 
@@ -362,9 +366,9 @@ class Planet : private Sun {
 
 	public:
 	Planet();
-	void GenerateMissions(GUIbtn*);
+	void GenerateMissions(GUIbtn*, bool);
 	void DrawPlanet(bool);
-	void UpdatePlanet();
+	void UpdatePlanet(Player);
 	void RegisterClick();
 	void MissionHandler(Player&, bool);
 	void ResetPlanet();
@@ -393,14 +397,14 @@ class HubPort : private Sun {
 	     isShipDest;
 	std::vector<MarketUpgrade> rewardUpgrade;
 	std::vector<MarketUpgrade> timeCostUpgrade;
-
+	std::vector<MarketUpgrade> weaponUpgrade;
+	std::vector<MarketUpgrade> payDebt;	
 
 	public:
 	HubPort(float, float);
-	HubPort();
 	void GenerateMarket(GUIbtn*);
 	void DrawHubPort(bool, Texture2D);
-	void UpdateHubPort();
+	void UpdateHubPort(Player);
 	void RegisterClick();
 	void MarketHandler(Player& pilot, Ship& ship);
 	Vector2 GetPos();

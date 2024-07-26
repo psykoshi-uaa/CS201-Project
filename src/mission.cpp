@@ -5,7 +5,7 @@
 //====================================
 
     // Constructor FIXME
-Mission::Mission(std::string name, int reward, int timeCost, float cooldownTime, Rectangle rect)
+Mission::Mission(std::string name, int reward, float timeCost, float cooldownTime, Rectangle rect)
     : name(name), reward(reward), cooldownTime(cooldownTime), currentCooldown(0), button(rect), timeCost(timeCost), onCooldown(false) {}
 
 // Getters
@@ -15,7 +15,7 @@ std::string Mission::getName(){
 int Mission::getReward(){
     return reward;
 }
-int Mission::getTimeCost(){
+float Mission::getTimeCost(){
     return timeCost;
 }
 float Mission::getCooldownTime(){
@@ -75,17 +75,21 @@ void Mission::resetCooldown() {
 }
 
 // BUTTON METHODS : WORK IN PROGRESS
-void Mission::DrawButton(){
-    if (onCooldown)
-    {
-        DrawRectangleRec(button, DARKGREEN);
-    } else 
-    {
-        DrawRectangleRec(button, GRAY);
+void Mission::DrawButton(Player pilot, bool active){
+    if (!active) {
+	DrawRectangleRec(button, GRAY);
     }
-   
-    std::string yield_text =  "Yield: " + std::to_string(reward); // adaptable text for yeild
-    std::string time_cost_text = "Time Cost: " + std::to_string(timeCost); // text for timecost
+    else {
+	if (!onCooldown) {
+	    DrawRectangleRec(button, DARKGREEN);
+	}
+	else {
+	    DrawRectangleRec(button, GRAY);
+	}
+    }
+    
+    std::string yield_text =  "Yield: " + std::to_string(reward + (reward * pilot.reward_upgrade_modifier)); // adaptable text for yeild
+    std::string time_cost_text = "Time Cost: " + std::to_string(timeCost * pilot.timeCost_upgrade_modifier); // text for timecost
     std::string cooldown_text = "Cooldown: " + std::to_string(currentCooldown); // text for cooldown timer
 
     //draw mission name
@@ -118,12 +122,12 @@ bool Mission::IsClicked()
 // Need to fill out player class to integrate
 // COMPLETE MISSION: ADD REWARD AND TAKE TIME FROM PLAYER
 
-void Mission:: CompleteMission(Player& player)
+void Mission:: CompleteMission(Player& pilot)
 {
     if (IsClicked())
     {
-        player.addMoney(reward, player.reward_upgrade_modifier);
-        player.loseTime(timeCost, player.timeCost_upgrade_modifier);
+        pilot.addMoney(reward, pilot.reward_upgrade_modifier);
+        pilot.loseTime(timeCost, pilot.timeCost_upgrade_modifier);
         currentCooldown = cooldownTime;
         onCooldown = true;
     }
