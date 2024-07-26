@@ -6,7 +6,7 @@
 
     // Constructor FIXME
 Mission::Mission(std::string name, int reward, int timeCost, float cooldownTime, Rectangle rect)
-    : name(name), reward(reward), cooldownTime(cooldownTime), currentCooldown(0), button(rect), onCooldown(false) {}
+    : name(name), reward(reward), cooldownTime(cooldownTime), currentCooldown(0), button(rect), timeCost(timeCost), onCooldown(false) {}
 
 // Getters
 std::string Mission::getName(){

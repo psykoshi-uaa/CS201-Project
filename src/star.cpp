@@ -14,6 +14,7 @@ Player::Player()
 		debt = -1000000;
 		reward_upgrade_modifier = 1;
 		timeCost_upgrade_modifier = 1;
+		timeRemaining = 1000;
 	}
 
 //+++++ Getters +++++
@@ -70,7 +71,7 @@ void Player::payDebt(int money_paid)
 }
 void Player::loseTime(int time_lost, int timeCost_upgrade_modifier)
 {
-	timeRemaining -= (time_lost+1)/timeCost_upgrade_modifier; // reduces time lost as upgrade tier goes up
+	timeRemaining -= (time_lost)/timeCost_upgrade_modifier; // reduces time lost as upgrade tier goes up
 }
 /*
 void Player::payMarket(int purchase)
