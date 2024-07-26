@@ -11,13 +11,13 @@
 Player::Player() 
 	: name("_______"), Class("Unknown"), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
 		money = 0;
-		debt = -50000;
+		debt = -250000;
 		reward_upgrade_counter = 0;
 		timeCost_upgrade_counter = 0;
 		weapon_upgrade_counter = 0;
 		reward_upgrade_modifier = tierPercentage[0];
 		timeCost_upgrade_modifier = tierPercentage2[0];
-		timeRemaining = 500;
+		timeRemaining = 728;
 	}
 
 //+++++ Getters +++++

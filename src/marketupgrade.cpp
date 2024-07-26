@@ -105,27 +105,22 @@ void MarketUpgrade::BuyUpgrade(Player& pilot, Ship& ship){ // not sure if I need
     if (IsClicked()){
         
             // reward upgrade
-	if (pilot.getMoney() >= cost) {
-		if (type == "reward"){ // if mission type is reward...
-		    pilot.reward_upgrade_counter++;
-		    pilot.reward_upgrade_modifier += tierPercentage[pilot.reward_upgrade_counter];
-		} else if (type == "timeCost") { // timeCost upgrade
-		    pilot.timeCost_upgrade_counter++;
-		    pilot.timeCost_upgrade_modifier = tierPercentage2[pilot.timeCost_upgrade_counter];
-		    ship.setSpeed(pilot.timeCost_upgrade_counter);
-		} else if (type == "weapon") {
-		    pilot.weapon_upgrade_counter++;
+		if (pilot.getMoney() >= cost) {
+			if (type == "reward"){ // if mission type is reward...
+				pilot.reward_upgrade_counter++;
+				pilot.reward_upgrade_modifier += tierPercentage[pilot.reward_upgrade_counter];
+			} else if (type == "timeCost") { // timeCost upgrade
+				pilot.timeCost_upgrade_counter++;
+				pilot.timeCost_upgrade_modifier = tierPercentage2[pilot.timeCost_upgrade_counter];
+				ship.setSpeed(pilot.timeCost_upgrade_counter);
+			} else if (type == "weapon") {
+				pilot.weapon_upgrade_counter++;
+			}
+			else if (type == "pay debt") {
+				pilot.setDebt(pilot.getDebt() + cost);
+			}
+			// charge pilot
+			pilot.setMoney(pilot.getMoney() - cost);
 		}
-		else if (type == "pay debt") {
-		    pilot.setDebt(pilot.getDebt() + cost);
-		}
-		// charge pilot
-		pilot.setMoney(pilot.getMoney() - cost);
-	}
-
-	if (pilot.reward_upgrade_counter >= 5 || pilot.timeCost_upgrade_counter >= 5) {
-		isMax = true;
-        }
     }
-
 }

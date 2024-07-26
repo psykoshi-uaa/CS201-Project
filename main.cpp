@@ -373,7 +373,7 @@ static void UpdateAndDrawCurrentScreen(){
 
 			std::string winStr = "You have succesfully payed off your artificial legs granted by Mort Corp!\n\nGood flying pilot.";
 			Vector2 len = MeasureTextEx(sagaFont, winStr.c_str(), MAINMENUFONTSIZE, 1);
-			DrawTextEx(sagaFont, winStr.c_str(), (Vector2){ SCREENWIDTH/2 - len.x / 2,SCREENHEIGHT }, MAINMENUFONTSIZE, 1, WHITE);
+			DrawTextEx(sagaFont, winStr.c_str(), (Vector2){ SCREENWIDTH/2 - len.x / 2,SCREENHEIGHT/2 }, MAINMENUFONTSIZE, 1, WHITE);
 			
 			Vector2 creditsOrigin = (Vector2) { SCREENWIDTH - SCREENWIDTH / 4, SCREENHEIGHT - SCREENHEIGHT / 4 };
 			DrawTextEx(sagaFont, "Credits", creditsOrigin, MAINMENUFONTSIZE, 1, WHITE);

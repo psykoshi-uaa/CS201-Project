@@ -76,7 +76,7 @@ void Planet::GenerateMissions(GUIbtn * btnSetting, bool raidPlanet) {
 		numMissionsAvail = 5;
 	}
 
-	missionsAvail.emplace_back("OddJob", 200, 7, 1.0, (btnSetting)->border );
+	missionsAvail.emplace_back("OddJob", 200, 4, 1.0, (btnSetting)->border );
 	missionsAvail.emplace_back("Gather", 1200, 20, 10.0, (btnSetting + 1)->border );
 	missionsAvail.emplace_back("Salvage", 3000, 7, 45.0, (btnSetting + 2)->border );
 	missionsAvail.emplace_back("Bounty", 8000, 45, 10.0, (btnSetting + 3)->border );
@@ -373,7 +373,7 @@ void HubPort::MarketHandler(Player& pilot, Ship& ship) {
 	}
 
 	if (payDebt[0].IsRClicked() ) {
-		if (payDebtCounter < 2) {
+		if (payDebtCounter < 3) {
 			payDebtCounter++;
 		}
 		else {
