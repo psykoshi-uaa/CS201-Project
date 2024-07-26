@@ -166,9 +166,6 @@ class Ship {
 	int speed;
 	int weapon;
 	int gatheringTool;
-	
-	//std::vector<Weapon> weapons;
-	//std::vector<Upgrade> upgrades;
 
 	
     public:
@@ -310,13 +307,13 @@ class MarketUpgrade
 	float tierPercentage[6] = {0.00, 0.05, 0.10, 0.25, 0.50, 1.00}; // access to assign values to player upgrade tiers
 
 	//constructor
-	MarketUpgrade();
+	//MarketUpgrade();
 
 	MarketUpgrade(std::string name, float tier, std::string type, int cost, Rectangle button);
 	//methods
 	void DrawButton(); // tier_num is just for display purposes
 	bool IsClicked();
-	void BuyUpgrade(Player& player); //reference Player addMoney and others to update multiplier
+	void BuyUpgrade(Player& player, Ship& ship); //reference Player addMoney and others to update multiplier
 		// may flag isBought, but also may just initialize 
 
 
@@ -394,8 +391,8 @@ class HubPort : private Sun {
 		orbitPointsBehind[ORBITALPOINTS];
 	bool orbitOn,
 	     isShipDest;
-	MarketUpgrade rewardUpgrades[5]; // two arrays for MarketUpgrade type upgrades
-	MarketUpgrade timeCostUpgrades[5];
+	std::vector<MarketUpgrade> rewardUpgrade;
+	std::vector<MarketUpgrade> timeCostUpgrade;
 
 
 	public:
@@ -405,7 +402,7 @@ class HubPort : private Sun {
 	void DrawHubPort(bool, Texture2D);
 	void UpdateHubPort();
 	void RegisterClick();
-	void MarketHandler(Player& pilot);
+	void MarketHandler(Player& pilot, Ship& ship);
 	Vector2 GetPos();
 	float GetRadius();
 };

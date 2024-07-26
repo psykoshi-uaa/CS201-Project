@@ -5,7 +5,7 @@
 
 Ship::Ship(Vector2 startingPoint) 
 	: destination(startingPoint), position(startingPoint) {
-	velocity = (Vector2){6.0, 6.0};
+	velocity = (Vector2){1.0, 1.0};
 	speed = 1;
 }
 

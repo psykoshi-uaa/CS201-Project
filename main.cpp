@@ -286,14 +286,14 @@ static void UpdateAndDrawCurrentScreen(){
 				ship.DrawSelf(hubPort.GetRadius(), WHITE);
 
 				if (rightSideMenu.GetActive() && ship.IsAtDestination(hubPort.GetRadius()) ) {
-					hubPort.MarketHandler(pilot);
+					hubPort.MarketHandler(pilot, ship);
 				}
 			}
 
 
 			if (leftSideMenu.GetActive()) {
-				std::string statusStr[] = { "Ship", "Weapon LVL:", "Shield LVL:", "Gathering Tool LVL: ", "Overall Speed:" };
-				std::string statusStats[] = { ship.getName(), std::to_string(ship.getWeapon()), std::to_string(ship.getShield()), std::to_string(ship.getGatheringTool()), std::to_string(ship.getSpeed()) };
+				std::string statusStr[] = { "Ship", "Weapon LVL:", "Cargo LVL:", "Gathering Tool LVL: ", "Overall Speed:" };
+				std::string statusStats[] = { ship.getName(), std::to_string(ship.getWeapon()), std::to_string(pilot.reward_upgrade_counter), std::to_string(ship.getGatheringTool()), std::to_string(ship.getSpeed()) };
 				int fontSize = 32;
 				
 				for (int i=0; i<5; i++) {

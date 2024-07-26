@@ -4,7 +4,6 @@
 #include <cmath>
 #include <vector>
 #include <random>
-#include "marketupgrade.cpp"
 
 
 std::random_device ss_rd;
@@ -205,11 +204,6 @@ HubPort::HubPort(float radius, float orbitDistance)
 	conicScale = orbitDistance / mass;
 	conicRotation = 0;
 
-	for (int i = 0; i < 5; i++){
-        rewardUpgrades[i] = MarketUpgrade();
-        timeCostUpgrades[i] = MarketUpgrade();
-    }
-
 	orbitOn = false;
 
 	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
@@ -220,7 +214,18 @@ HubPort::HubPort(float radius, float orbitDistance)
 }
 
 void HubPort::GenerateMarket(GUIbtn * btnSetting) {
-	
+	//init of missions
+    rewardUpgrade.emplace_back("Cargo Hold Tape", 1, "reward", 250, (btnSetting + 2)->border);
+    rewardUpgrade.emplace_back("Refrigerator Unit", 2, "reward", 1000, (btnSetting + 2)->border);
+    rewardUpgrade.emplace_back("Live Creature Cage", 3, "reward", 2500, (btnSetting + 2)->border);
+    rewardUpgrade.emplace_back("MortCorp Stasis Freezer", 4, "reward", 10000, (btnSetting + 2)->border);
+    rewardUpgrade.emplace_back("MortCorp Transpo License", 5, "reward", 25000, (btnSetting + 2)->border);
+
+    timeCostUpgrade.emplace_back("R0B0-t1 Lifter", 1, "timeCost", 500, (btnSetting + 3)->border);
+    timeCostUpgrade.emplace_back("Thruster Kit", 2, "timeCost", 2000, (btnSetting + 3)->border);
+    timeCostUpgrade.emplace_back("Grav Sleds", 3, "timeCost", 10000, (btnSetting + 3)->border);
+    timeCostUpgrade.emplace_back("Kitsa Minion Egg", 4, "timeCost", 25000, (btnSetting + 3)->border);
+    timeCostUpgrade.emplace_back("Priority Bathroom Pass", 5, "timeCost", 80000, (btnSetting + 3)->border);
 }
 
 void HubPort::UpdateHubPort() {
@@ -310,35 +315,17 @@ void HubPort::RegisterClick() {
 	}
 }
 
-void HubPort::MarketHandler(Player& player) {
+void HubPort::MarketHandler(Player& player, Ship& ship) {
+	if (player.timeCost_upgrade_counter < 5) {
+		timeCostUpgrade[player.timeCost_upgrade_counter].DrawButton();
+		timeCostUpgrade[player.timeCost_upgrade_counter].BuyUpgrade(player, ship);
+	}
 
-//init of missions
-	MarketUpgrade rewardUpgrades[5] = {
-    MarketUpgrade("Cargo Hold Tape", 1, "reward", 250, {100, 100, 200, 50}),
-    MarketUpgrade("Refrigerator Unit", 2, "reward", 1000, {100, 160, 200, 50}),
-    MarketUpgrade("Live Creature Cage", 3, "reward", 2500, {100, 220, 200, 50}),
-    MarketUpgrade("MortCorp Stasis Freezer", 4, "reward", 10000, {100, 280, 200, 50}),
-    MarketUpgrade("MortCorp Transpo License", 5, "reward", 25000, {100, 340, 200, 50})
-	};
-
-	MarketUpgrade timeCostUpgrades[5] = {
-    MarketUpgrade("R0B0-t1 Lifter", 1, "timeCost", 500, {320, 100, 200, 50}),
-    MarketUpgrade("Thruster Kit", 2, "timeCost", 2000, {320, 160, 200, 50}),
-    MarketUpgrade("Grav Sleds", 3, "timeCost", 10000, {320, 220, 200, 50}),
-    MarketUpgrade("Kitsa Minion Egg", 4, "timeCost", 25000, {320, 280, 200, 50}),
-    MarketUpgrade("Priority Bathroom Pass", 5, "timeCost", 80000, {320, 340, 200, 50})
-	};
-
-	timeCostUpgrades[player.timeCost_upgrade_counter].DrawButton();
-	timeCostUpgrades[player.timeCost_upgrade_counter].BuyUpgrade(player);
-	
-	rewardUpgrades[player.reward_upgrade_counter].DrawButton();
-	rewardUpgrades[player.reward_upgrade_counter].BuyUpgrade(player);
-
-
+	if (player.reward_upgrade_counter < 5) {
+		rewardUpgrade[player.reward_upgrade_counter].DrawButton();
+		rewardUpgrade[player.reward_upgrade_counter].BuyUpgrade(player, ship);
+	}
 }
-
-
 
 Vector2 HubPort::GetPos() {
 	return pos;

@@ -9,7 +9,12 @@
 //          Player Class
 // ================================
 Player::Player() 
-	: name("_______"), Class("Unknown"), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {money = 0; debt = -1000000;}
+	: name("_______"), Class("Unknown"), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
+		money = 0;
+		debt = -1000000;
+		reward_upgrade_modifier = 1;
+		timeCost_upgrade_modifier = 1;
+	}
 
 //+++++ Getters +++++
 
@@ -34,9 +39,9 @@ void Player::setName(std::string new_name)
 {
 	name = new_name;
 }
-void Player::setMoney(int money)
+void Player::setMoney(int newMoney)
 {
-	money = money;
+	money = newMoney;
 }
 void Player::setDebt(int debt)
 {
@@ -65,7 +70,7 @@ void Player::payDebt(int money_paid)
 }
 void Player::loseTime(int time_lost, int timeCost_upgrade_modifier)
 {
-	timeRemaining -= time_lost/timeCost_upgrade_modifier; // reduces time lost as upgrade tier goes up
+	timeRemaining -= (time_lost+1)/timeCost_upgrade_modifier; // reduces time lost as upgrade tier goes up
 }
 /*
 void Player::payMarket(int purchase)
