@@ -70,7 +70,7 @@ Planet::Planet() {
 
 void Planet::GenerateMissions(GUIbtn * btnSetting, bool raidPlanet) {
 	if (raidPlanet == false) {
-		numMissionsAvail = ceil(orbitDistance / 150);
+		numMissionsAvail = ceil(orbitDistance / 101);
 	}
 	else {
 		numMissionsAvail = 5;
