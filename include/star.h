@@ -277,7 +277,7 @@ class Mission
     void resetCooldown();
     void DrawButton(Player, bool);
     bool IsClicked();
-    void CompleteMission(Player& player);
+    void CompleteMission(Player& player, Ship ship);
 };
 
 //====================================
@@ -370,7 +370,7 @@ class Planet : private Sun {
 	void DrawPlanet(bool);
 	void UpdatePlanet(Player);
 	void RegisterClick();
-	void MissionHandler(Player&, bool);
+	void MissionHandler(Player&, Ship, bool);
 	void ResetPlanet();
 	Vector2 GetPos();
 	float GetRadius();

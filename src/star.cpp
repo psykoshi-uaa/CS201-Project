@@ -11,13 +11,13 @@
 Player::Player() 
 	: name("_______"), Class("Unknown"), HP(0), maxHP(25), hasShield(false), SP(0), piloting(0), repair(0), bartering(0) {
 		money = 0;
-		debt = -1000;
+		debt = -250000;
 		reward_upgrade_counter = 0;
 		timeCost_upgrade_counter = 0;
 		weapon_upgrade_counter = 0;
 		reward_upgrade_modifier = tierPercentage[0];
-		timeCost_upgrade_modifier = tierPercentage[0];
-		timeRemaining = 1000;
+		timeCost_upgrade_modifier = tierPercentage2[0];
+		timeRemaining = 1092;
 	}
 
 //+++++ Getters +++++
@@ -145,8 +145,7 @@ void DrawMainBtns(GUIbtn *hubBtn) {
 	}
 	DrawTextEx(sagaFont, "Interface", hubBtn[0].origin, HUBMAINFONTSIZE, 0, WHITE);
 	DrawTextEx(sagaFont, "Status", hubBtn[1].origin, HUBMAINFONTSIZE, 0, WHITE);
-	DrawTextEx(sagaFont, "Market", hubBtn[2].origin, HUBMAINFONTSIZE, 0, WHITE);
-	DrawTextEx(sagaFont, "Give Up", hubBtn[3].origin, HUBMAINFONTSIZE, 0, WHITE);
+	DrawTextEx(sagaFont, "Give Up", hubBtn[2].origin, HUBMAINFONTSIZE, 0, WHITE);
 }
 
 void DrawStatusScreen(Font sagaFont) {

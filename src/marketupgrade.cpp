@@ -107,10 +107,10 @@ void MarketUpgrade::BuyUpgrade(Player& pilot, Ship& ship){ // not sure if I need
             // reward upgrade
 	if (pilot.getMoney() >= cost) {
 		if (type == "reward"){ // if mission type is reward...
-		    pilot.reward_upgrade_counter += 1;
+		    pilot.reward_upgrade_counter++;
 		    pilot.reward_upgrade_modifier += tierPercentage[pilot.reward_upgrade_counter];
 		} else if (type == "timeCost") { // timeCost upgrade
-		    pilot.timeCost_upgrade_counter += 1;
+		    pilot.timeCost_upgrade_counter++;
 		    pilot.timeCost_upgrade_modifier = tierPercentage2[pilot.timeCost_upgrade_counter];
 		    ship.setSpeed(pilot.timeCost_upgrade_counter);
 		} else if (type == "weapon") {

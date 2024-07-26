@@ -70,17 +70,17 @@ Planet::Planet() {
 
 void Planet::GenerateMissions(GUIbtn * btnSetting, bool raidPlanet) {
 	if (raidPlanet == false) {
-		numMissionsAvail = ceil(orbitDistance / 200);
+		numMissionsAvail = ceil(orbitDistance / 150);
 	}
 	else {
 		numMissionsAvail = 5;
 	}
 
-	missionsAvail.emplace_back("OddJob", 200, 3, 1.0, (btnSetting)->border );
-	missionsAvail.emplace_back("Gather", 1200, 14, 10.0, (btnSetting + 1)->border );
-	missionsAvail.emplace_back("Salvage", 3000, 16, 45.0, (btnSetting + 2)->border );
-	missionsAvail.emplace_back("Bounty", 8000, 28, 10.0, (btnSetting + 3)->border );
-	missionsAvail.emplace_back("Raid", 24000, 60, 180.0, (btnSetting + 4)->border );
+	missionsAvail.emplace_back("OddJob", 200, 7, 1.0, (btnSetting)->border );
+	missionsAvail.emplace_back("Gather", 1200, 20, 10.0, (btnSetting + 1)->border );
+	missionsAvail.emplace_back("Salvage", 3000, 7, 45.0, (btnSetting + 2)->border );
+	missionsAvail.emplace_back("Bounty", 8000, 45, 10.0, (btnSetting + 3)->border );
+	missionsAvail.emplace_back("Raid", 24000, 90, 180.0, (btnSetting + 4)->border );
 }
 
 void Planet::ResetPlanet() {
@@ -177,14 +177,14 @@ void Planet::RegisterClick() {
 	}
 }
 
-void Planet::MissionHandler(Player &pilot, bool doUpdateTimer) {
+void Planet::MissionHandler(Player &pilot, Ship ship, bool doUpdateTimer) {
 	int missionCorrection = 0;
 
 	if (!doUpdateTimer) {
 		if (GetNumMissions() >= 4) {
 			missionCorrection = 1;
 			if (pilot.weapon_upgrade_counter > 0) {
-				missionsAvail[3].CompleteMission(pilot);
+				missionsAvail[3].CompleteMission(pilot, ship);
 				missionsAvail[3].DrawButton(pilot, true);
 			}
 			else {
@@ -195,7 +195,7 @@ void Planet::MissionHandler(Player &pilot, bool doUpdateTimer) {
 		if (GetNumMissions() == 5) {
 			missionCorrection = 2;
 			if (pilot.weapon_upgrade_counter == 3) {
-				missionsAvail[4].CompleteMission(pilot);
+				missionsAvail[4].CompleteMission(pilot, ship);
 				missionsAvail[4].DrawButton(pilot, true);
 			}
 			else {
@@ -204,7 +204,7 @@ void Planet::MissionHandler(Player &pilot, bool doUpdateTimer) {
 		}
 
 		for (int i=0; i<GetNumMissions() - missionCorrection; i++) {
-			missionsAvail[i].CompleteMission(pilot);
+			missionsAvail[i].CompleteMission(pilot, ship);
 			missionsAvail[i].DrawButton(pilot, true);
 		}
 	}

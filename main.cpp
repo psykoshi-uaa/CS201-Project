@@ -125,12 +125,10 @@ static void InitGame() {
 	
 	hubBtn[0].origin = (Vector2) { SCREENWIDTH - HUBBTNWIDTH + 20, MARGIN + SBARHEIGHT + 80};
 	hubBtn[0].border = (Rectangle) { hubBtn[0].origin.x - 20, hubBtn[0].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
-	hubBtn[1].origin = (Vector2) { 0, MARGIN + SBARHEIGHT + 80};
+	hubBtn[1].origin = (Vector2) { MARGIN * 2, MARGIN + SBARHEIGHT + 80};
 	hubBtn[1].border = (Rectangle) { hubBtn[1].origin.x - 20, hubBtn[1].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
-	hubBtn[2].origin = (Vector2) { 0, MARGIN + SBARHEIGHT + 40};
+	hubBtn[2].origin = (Vector2) { MARGIN * 2, SCREENHEIGHT - MARGIN * 2};
 	hubBtn[2].border = (Rectangle) { hubBtn[2].origin.x - 20, hubBtn[2].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
-	hubBtn[3].origin = (Vector2) { MARGIN, SCREENHEIGHT - MARGIN * 2};
-	hubBtn[3].border = (Rectangle) { hubBtn[3].origin.x - 20, hubBtn[3].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
 
 	for (int i=0; i<BOARDNUMBTNS; i++) {
 		boardBtn[i].origin = (Vector2) { MARGIN, MARGIN};
@@ -281,7 +279,7 @@ static void UpdateAndDrawCurrentScreen(){
 			}
 				
 			for (int i=0; i<NUMPLANETS; i++) {
-				planet[i].MissionHandler(pilot, true);
+				planet[i].MissionHandler(pilot, ship, true);
 			}
 			
 			if (shipDest >= 0) {
@@ -290,7 +288,7 @@ static void UpdateAndDrawCurrentScreen(){
 
 			//mission update and draw
 				if (rightSideMenu.GetActive() && ship.IsAtDestination(planet[shipDest].GetRadius()) ) {
-					planet[shipDest].MissionHandler(pilot, false);
+					planet[shipDest].MissionHandler(pilot, ship, false);
 				}
 			}
 			else {
@@ -351,12 +349,6 @@ static void UpdateAndDrawCurrentScreen(){
 			DrawTexture(gameOver, SCREENWIDTH/2 - gameOver.width/2, SCREENHEIGHT / 3 - (5 * alphaChannel[0]) - gameOver.height/2, WHITE);
 			DrawTexture(gameOver2, SCREENWIDTH - SCREENWIDTH / 2.2, SCREENHEIGHT - SCREENHEIGHT / 1.3 - (5 * alphaChannel[1]), WHITE);
 			
-			if (btnHovered == NEWGAMEBTN) {
-				DrawTextEx(sagaFont, "new game", newGameBtn.origin, MAINMENUFONTSIZE, 1, BLUE);
-			}
-			else {
-				DrawTextEx(sagaFont, "new game", newGameBtn.origin, MAINMENUFONTSIZE, 1, WHITE);
-			}
 			if (btnHovered == EXITBTN) {
 				DrawTextEx(sagaFont, "exit", exitBtn.origin, MAINMENUFONTSIZE, 1, BLUE);
 			}
@@ -381,7 +373,7 @@ static void UpdateAndDrawCurrentScreen(){
 
 			std::string winStr = "You have succesfully payed off your artificial legs granted by Mort Corp!\n\nGood flying pilot.";
 			Vector2 len = MeasureTextEx(sagaFont, winStr.c_str(), MAINMENUFONTSIZE, 1);
-			DrawTextEx(sagaFont, winStr.c_str(), (Vector2){ SCREENWIDTH/2 - len.x / 2, SCREENHEIGHT - SCREENHEIGHT / 3 }, MAINMENUFONTSIZE, 1, WHITE);
+			DrawTextEx(sagaFont, winStr.c_str(), (Vector2){ SCREENWIDTH/2 - len.x / 2,SCREENHEIGHT }, MAINMENUFONTSIZE, 1, WHITE);
 			
 			Vector2 creditsOrigin = (Vector2) { SCREENWIDTH - SCREENWIDTH / 4, SCREENHEIGHT - SCREENHEIGHT / 4 };
 			DrawTextEx(sagaFont, "Credits", creditsOrigin, MAINMENUFONTSIZE, 1, WHITE);
@@ -402,7 +394,6 @@ static void UpdateAndDrawCurrentScreen(){
 //-------------------------------------------------------------------------------
 static void ButtonCollisionAndClick() {
 	switch (currentScreen) {
-		case RETRY:
 		case MAINMENU: {
 			if (CheckCollisionPointRec(GetMousePosition(), newGameBtn.border)) {
 				btnHovered = NEWGAMEBTN;
@@ -423,9 +414,6 @@ static void ButtonCollisionAndClick() {
 				btnHovered = STATUSBTN;
 			}
 			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[2].border)) {
-				btnHovered = MARKETBTN;
-			}
-			else if (CheckCollisionPointRec(GetMousePosition(), hubBtn[3].border)) {
 				btnHovered = GIVEUPBTN;
 			}
 			else {
@@ -433,6 +421,7 @@ static void ButtonCollisionAndClick() {
 			}
 		} break;
 
+		case RETRY:
 		case SUCCESS: {
 			if (CheckCollisionPointRec(GetMousePosition(), exitBtn.border)) {
 				btnHovered = EXITBTN;

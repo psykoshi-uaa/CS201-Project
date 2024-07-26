@@ -122,7 +122,7 @@ bool Mission::IsClicked()
 // Need to fill out player class to integrate
 // COMPLETE MISSION: ADD REWARD AND TAKE TIME FROM PLAYER
 
-void Mission:: CompleteMission(Player& pilot)
+void Mission:: CompleteMission(Player& pilot, Ship ship)
 {
     if (IsClicked())
     {
