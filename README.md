@@ -5,51 +5,47 @@
 ___
 
 ### CS201-Project
-  This project is a creative assignment from Computer Science 201 at University of Alaska Anchorage. We will be creating an incremental space-faring game. The goal of our game is to build resources that generate idly, allowing you to build more advanced resoure generation tools for your ship and allow you to take on more dangerous missions. 
+  This project is a creative assignment from Computer Science 201 at University of Alaska Anchorage. Starcaller is an incremental space-faring game. You fly to planets and click buttons that represent missions. Those missions will consume time until the repo men get you and increase your currency based on upgrades bought at the market. Make sure to pay off your debt before it's game over!
 
-### GUI
-  We will be using RAYLIB in order to incorporate a Graphical User Interface for our game. This is a minimalist GUI library that will require us to have an understanding of what is going on with the windows and graphics behind the scenes, unlike with QT.
+### Controls
+[Left Click] - display planet orbits and select missions and markets buys
 
-### Player Choice
-  The player should have agency in making the best decision as a space pilot. They will choose which mission they should take in order to maximize their mission rewards based on ship equipment, currency, and other stats that will affect the outcome of the varied missions.
+[Right Click] - move to planets and change payment increment for 'pay debt'
 
-# GAME LOOP
-Title screen appears. Player presses key to begin. Through text interaction player names character. Welcome message appears, introducing the game (this could also come before title screen). Land on home/hub screen.
-
-### 1. Home
+### Game Loop
+#### 1. Hub Port
 - Upgrades, ship and character.
 - Money, debt and income (especially if the player acquires a constant income upgrade).
 - Market, buy and sell.
-- Jobs[^1], Missions/increment grind.
+- Jobs, Missions/increment grind.
 
-The display of Home depends on graphical capability. Functionally it represents the main part of the player’s journey. It should say how much money the player has, and present a of couple option trees. (GUI or text). Player should be able to look at their stats here, and current inventory/equipment. Player chooses how to proceed. To begin with, player should do 1-3 incremental “jobs” or clicks to just increase money (small chance for big salvage win as well). Player then buys a weapon[^2], peripheral, or tool.
+The port that circles the sun is where you can find all of the market upgrades and pay off your debt. The debt button has the extra funcionality of changing payment increment based on if you right click.
 
-### 2. Mission
- - Player takes mission.
- - Mission plays out by giving a text blurb that varies depending on mission type.
- - Last paragraph may vary depending on fail/success.
 
-In the background the game compares player stats with mission requirements, and adds the modifier +number depending on weapon/ship bonuses or other stats. (For example, an upgraded laser would provide +3 to the player ‘dice roll’ against an enemy. An upgraded engine would allow the cargo to be transported +2 parsecs faster.) Further interactivity could be brought by making mid-combat choices in a turn based system. (Use different weapons, flee, etc.)
+#### 2. Missions
+ - Oddjob
+ - Gather
+ - Salvage
+ - Bounty
+ - Raid
+
+Each planet has a number of mission depending on it's distance from the sun as well as one catch all planet in case no planets are generated far enough from the sun. The missions have varying degrees of time cost and rewards that are calculated against the players upgrades. Bounty missions require 1 weapon and Raids require 2 weapons.
 	
-### 2.5 Display results - 
- - Display money earned
- - Damage taken (-money to repair)
- - If money falls below debt threshold, GAME OVER. 
 
-Mission design may take 2 forms: combat and industry/mining/transport. More types can be created for more complexity. Upgrades that give new abilities (cargo hold, anti-gravity, etc.) allow access to these missions. Combat is the high-risk, high reward scenario, whereas the others are lower risk, less reward. Combat carries risk of death, and the increase of your debt. Other options allow you to increase money with very small chance of pirate attack.
-
-### 3. Back Home
-Player is now back Home, but with more money. They can now buy a new upgrade, stat increase, etc. They may be able to access a new tier of missions with harder difficulty, pay toward their debt, etc.
-
-### 3.5 Market
-The market supplies upgrades for ship (thrusters, lasers, etc.) that either unlock new mission types or increase damage stat, money yield, etc. A reliably available upgrade is extra money per “odd job” click. Expensive upgrades may include automation options (money flow per minute from minions?). The market can either be a text menu, a screen of its own, or a popup when money threshold is reached. (Like in incremental games when new things pop up.)
-
-This loop continues until player pays off debt or GAME OVER.
+#### 3. Market
+The market supplies upgrades for ship (thrusters, lasers, etc.) that either unlock new mission types, money yield, ship speed, and reduce time taken from doing a mission. A reliably available upgrade is extra money per “odd job” click. This loop continues until player pays off debt or GAME OVER.
 
 ### Outro
-The game will terminate when the player pays off their debt or the debt increases too much. Different text will display depending on outcome. May display stats, money, etc. Upon player input the window will close.
+The game will terminate when the player pays off their debt or the debt increases too much. Different text will display depending on outcome.
 
 
-[^1]: All equipment could be designed as flat stat increases or new capabilities, eliminating the need for a gear-swapping system. 
-[^2]: Missions can be randomized to a degree but to start they can also just be set “levels” that can be cleared for big payouts.
+# HOW TO BUILD
+In order to build you will need to install the raylib library following the raylib installation following the build and installation in the [raylib github](https://github.com/raysan5/raylib).
+If you are on windows and using a minGW toolchain run this commandline while your directory is set inside the same directory as main.cpp:
 
+```g++ -o starcaller main.cpp src/star.cpp src/particles.cpp src/solarsystem.cpp src/mission.cpp src/marketupgrade.cpp src/ship.cpp -lraylib -lgdi32 -lwinmm```
+
+
+If you are on MacOS use this commandline:
+
+```CS201-Project % clang++ -std=c++17 -I/opt/homebrew/opt/raylib/include -L/opt/homebrew/opt/raylib/lib -lraylib src/marketupgrade.cpp src/particles.cpp src/ship.cpp src/solarsystem.cpp src/mission.cpp src/star.cpp main.cpp -o starcaller```
