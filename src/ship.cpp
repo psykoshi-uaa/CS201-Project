@@ -10,16 +10,19 @@ Ship::Ship(Vector2 startingPoint)
 }
 
 void Ship::DrawSelf(float radius, Color color) {
+		//calculate direction faced and distance
     Vector2 direction = {destination.x - position.x, destination.y - position.y};
     distance = sqrt(direction.x * direction.x + direction.y * direction.y);
     float rotation = 0;
 
+		//if the distance of the ship is > radius + 1 then set the position closer to the destination based on velocity
     if (distance > radius + 1)
     {
         position.x += direction.x * (velocity.x / distance);
         position.y += direction.y * (velocity.x / distance);
         rotation = atan2f(direction.y, direction.x) + acos(0.0);
     }
+		//otherwise draw the ship circling it's destination
     else
     {
         float time = GetTime();
@@ -42,6 +45,7 @@ void Ship::DrawSelf(float radius, Color color) {
     };
 
     for (int i = 0; i < 3; ++i) {
+			//the ship is drawn as a triangle given three points, here the points are calculated based on rotation
         float cosA = cosf(rotation);
         float sinA = sinf(rotation);
         float rotatedX = cosA * (points[i].x - position.x) - sinA * (points[i].y - position.y) + position.x;
@@ -52,6 +56,7 @@ void Ship::DrawSelf(float radius, Color color) {
         outlinepoints[i] = { outlinerotatedX, outlinerotatedY };
     }
 
+		//draw the ship
     DrawTriangle(outlinepoints[0], outlinepoints[1], outlinepoints[2], BLACK);
     DrawTriangle(points[0], points[1], points[2], color);
 }
@@ -73,6 +78,7 @@ bool Ship::IsAtDestination(float radius) {
 	}
 }
 
+	//THE REST IS LARGELY UNUSED EXCEPT FOR A SET SPEED AND GET SPEED
 
 //getters
 std::string Ship::getName()
@@ -154,14 +160,6 @@ void Ship::setWeapon(int newWeapon)
 void Ship::setGatheringTool(int newGatheringTool)
 {
 	gatheringTool = newGatheringTool;
-}
-void Ship::ResetAll(Vector2 startingPoint)
-{
-	position = startingPoint;
-	destination = startingPoint;
-	weapon = 0;
-	speed = 1;
-	gatheringTool = 0;
 }
 
 //Combat Methods

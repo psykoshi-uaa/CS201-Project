@@ -76,13 +76,7 @@ void Player::loseTimeGradually()
 {
 	timeRemaining -= 1/(float)FPS;
 }
-void Player::ResetAll()
-{
-	timeRemaining = 0;
-	money = 0;
-	reward_upgrade_modifier = 0;
-	timeCost_upgrade_modifier = 0;
-}
+
 /*
 void Player::payMarket(int purchase)
 {
@@ -148,52 +142,9 @@ void DrawMainBtns(GUIbtn *hubBtn) {
 	DrawTextEx(sagaFont, "Give Up", hubBtn[2].origin, HUBMAINFONTSIZE, 0, WHITE);
 }
 
-void DrawStatusScreen(Font sagaFont) {
-		Vector2 menuPos[] = {
-			(Vector2) { SCREENWIDTH / 5, SCREENHEIGHT / 9 },
-			(Vector2) { SCREENWIDTH / 2 + SCREENWIDTH / 10, SCREENHEIGHT / 9 },
-			(Vector2) { SCREENWIDTH / 2 + SCREENWIDTH / 10, SCREENHEIGHT / 2 }
-		};
-		
-		Rectangle menuBor[] = {
-			(Rectangle) { menuPos[0].x, menuPos[0].y, SCREENWIDTH/3, SCREENHEIGHT/1.2 },	
-			(Rectangle) { menuPos[1].x, menuPos[1].y, SCREENWIDTH/3, SCREENHEIGHT/3   },	
-			(Rectangle) { menuPos[2].x, menuPos[2].y, SCREENWIDTH/3, SCREENHEIGHT/2.5 }
-		};
- 
-        //Ship
-	DrawRectangleLinesEx(menuBor[0], 2, WHITE);
-
-        DrawTextEx(sagaFont, "Ship", {menuPos[0].x + MARGIN, menuPos[0].y + 50}, HUBMAINFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "Weapon LVL:", {menuPos[0].x + MARGIN, menuPos[0].y + 100}, HUBMAINFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "Shield LVL:", {menuPos[0].x + MARGIN, menuPos[0].y + 150}, HUBMAINFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "Gathering Tool LVL:", {menuPos[0].x + MARGIN, menuPos[0].y + 200}, HUBMAINFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "Overall Speed:", {menuPos[0].x + MARGIN, menuPos[0].y + 250}, HUBMAINFONTSIZE, 1, WHITE);
-   	    
-	//Pilot
-	DrawRectangleLinesEx(menuBor[1], 2, WHITE);
-
-        DrawTextEx(sagaFont, "Pilot: XYZ", {menuPos[1].x + MARGIN, menuPos[1].y + 50}, HUBMAINFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "Registered Pilot Under", {menuPos[1].x + MARGIN, menuPos[1].y + 100}, HUBSUBFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "the SSE Administration", {menuPos[1].x + MARGIN, menuPos[1].y + 150}, HUBSUBFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "License Valid Until: 04/14/2248", {menuPos[1].x + MARGIN, menuPos[1].y + 200}, HUBSUBFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "Birthdate:           09/12/2223", {menuPos[1].x + MARGIN, menuPos[1].y + 250}, HUBSUBFONTSIZE, 1, WHITE);
-
-        //Debt
-	DrawRectangleLinesEx(menuBor[2], 2, WHITE);
-
-        DrawTextEx(sagaFont, "This pilot is to pay of their debt to MORT CORP by", {menuPos[2].x + MARGIN, menuPos[2].y + 50}, HUBSUBFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "08/28/2242", {menuPos[2].x + MARGIN, menuPos[2].y + 100}, HUBSUBFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "for the loan of borrowed limbs or shall forfeit their life", {menuPos[2].x + MARGIN, menuPos[2].y + 150}, HUBSUBFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "and body for scientific and good purposes.", {menuPos[2].x + MARGIN, menuPos[2].y + 200}, HUBSUBFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "MORT CORP is protected under the Right to", {menuPos[2].x + MARGIN, menuPos[2].y + 250}, HUBSUBFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "Dismemberment Act and the Right to Slay Act.", {menuPos[2].x + MARGIN, menuPos[2].y + 300}, HUBSUBFONTSIZE, 1, WHITE);
-        DrawTextEx(sagaFont, "Debt owed to MORT CORP: Debt", {menuPos[2].x + MARGIN, menuPos[2].y + 350}, HUBSUBFONTSIZE, 1, WHITE);
-}
-
 
 //-------------------------------------------------------------------------------
-//			menu
+//			menu functions - pop menu in and out based on activation
 //-------------------------------------------------------------------------------
 SubMenu::SubMenu(bool leftSide) {
 	float menuWidth = SCREENWIDTH / 5,
@@ -227,6 +178,7 @@ void SubMenu::HandleActivation() {
 }
 
 void SubMenu::UpdateAndDrawSelf() {
+		//draw the menu in certain positions based on activation
 	if (isActive && isLeftSide) {
 		pos.x = max_x;
 		DrawRectangleLinesEx(border, 2, WHITE);
@@ -276,6 +228,80 @@ bool Timer::Wait(double mark){
 	return false;
 }
 
+	//hypotenuse to find distance
+float GetDist(Vector2 x1y1, Vector2 x2y2) {
+	return sqrt(pow(x2y2.x - x1y1.x, 2) + pow(x2y2.y - x1y1.y, 2) );
+}
+
+
+//-------------------------------------------------------------------------------
+//			animation scalers
+//-------------------------------------------------------------------------------
+float AlphaWaveAnim(float counter, float dur, float scale) {
+		//cosine equation for ease in and ease out effects
+	return scale * cos((2 * counter) / (dur / 3.14) ) + (1.0 - scale);
+}
+
+void AlphaLinearAnim(float& counter, float goal, float increment, bool increase) {
+	if (increase == false && counter > goal) {
+		counter -= increment;
+	}
+	else if (increase == true && counter < goal) {
+		counter += increment;
+	}
+}
+
+
+
+
+
+//DEPRECATED
+/*
+void DrawStatusScreen(Font sagaFont) {
+		Vector2 menuPos[] = {
+			(Vector2) { SCREENWIDTH / 5, SCREENHEIGHT / 9 },
+			(Vector2) { SCREENWIDTH / 2 + SCREENWIDTH / 10, SCREENHEIGHT / 9 },
+			(Vector2) { SCREENWIDTH / 2 + SCREENWIDTH / 10, SCREENHEIGHT / 2 }
+		};
+		
+		Rectangle menuBor[] = {
+			(Rectangle) { menuPos[0].x, menuPos[0].y, SCREENWIDTH/3, SCREENHEIGHT/1.2 },	
+			(Rectangle) { menuPos[1].x, menuPos[1].y, SCREENWIDTH/3, SCREENHEIGHT/3   },	
+			(Rectangle) { menuPos[2].x, menuPos[2].y, SCREENWIDTH/3, SCREENHEIGHT/2.5 }
+		};
+ 
+        //Ship
+	DrawRectangleLinesEx(menuBor[0], 2, WHITE);
+
+        DrawTextEx(sagaFont, "Ship", {menuPos[0].x + MARGIN, menuPos[0].y + 50}, HUBMAINFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "Weapon LVL:", {menuPos[0].x + MARGIN, menuPos[0].y + 100}, HUBMAINFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "Shield LVL:", {menuPos[0].x + MARGIN, menuPos[0].y + 150}, HUBMAINFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "Gathering Tool LVL:", {menuPos[0].x + MARGIN, menuPos[0].y + 200}, HUBMAINFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "Overall Speed:", {menuPos[0].x + MARGIN, menuPos[0].y + 250}, HUBMAINFONTSIZE, 1, WHITE);
+   	    
+	//Pilot
+	DrawRectangleLinesEx(menuBor[1], 2, WHITE);
+
+        DrawTextEx(sagaFont, "Pilot: XYZ", {menuPos[1].x + MARGIN, menuPos[1].y + 50}, HUBMAINFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "Registered Pilot Under", {menuPos[1].x + MARGIN, menuPos[1].y + 100}, HUBSUBFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "the SSE Administration", {menuPos[1].x + MARGIN, menuPos[1].y + 150}, HUBSUBFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "License Valid Until: 04/14/2248", {menuPos[1].x + MARGIN, menuPos[1].y + 200}, HUBSUBFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "Birthdate:           09/12/2223", {menuPos[1].x + MARGIN, menuPos[1].y + 250}, HUBSUBFONTSIZE, 1, WHITE);
+
+        //Debt
+	DrawRectangleLinesEx(menuBor[2], 2, WHITE);
+
+        DrawTextEx(sagaFont, "This pilot is to pay of their debt to MORT CORP by", {menuPos[2].x + MARGIN, menuPos[2].y + 50}, HUBSUBFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "08/28/2242", {menuPos[2].x + MARGIN, menuPos[2].y + 100}, HUBSUBFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "for the loan of borrowed limbs or shall forfeit their life", {menuPos[2].x + MARGIN, menuPos[2].y + 150}, HUBSUBFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "and body for scientific and good purposes.", {menuPos[2].x + MARGIN, menuPos[2].y + 200}, HUBSUBFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "MORT CORP is protected under the Right to", {menuPos[2].x + MARGIN, menuPos[2].y + 250}, HUBSUBFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "Dismemberment Act and the Right to Slay Act.", {menuPos[2].x + MARGIN, menuPos[2].y + 300}, HUBSUBFONTSIZE, 1, WHITE);
+        DrawTextEx(sagaFont, "Debt owed to MORT CORP: Debt", {menuPos[2].x + MARGIN, menuPos[2].y + 350}, HUBSUBFONTSIZE, 1, WHITE);
+}
+*/
+
+/*
 Dice::Dice() {
 	static bool seeded = false;
 	if (!seeded) {
@@ -291,26 +317,4 @@ int Dice::rollD6(int numRolls = 0) {
 	}
 	return total;
 }
-
-
-float GetDist(Vector2 x1y1, Vector2 x2y2) {
-	return sqrt(pow(x2y2.x - x1y1.x, 2) + pow(x2y2.y - x1y1.y, 2) );
-}
-
-
-//-------------------------------------------------------------------------------
-//			animation scalers
-//-------------------------------------------------------------------------------
-float AlphaWaveAnim(float counter, float dur, float scale) {
-	return scale * cos((2 * counter) / (dur / 3.14) ) + (1.0 - scale);
-}
-
-void AlphaLinearAnim(float& counter, float goal, float increment, bool increase) {
-	if (increase == false && counter > goal) {
-		counter -= increment;
-	}
-	else if (increase == true && counter < goal) {
-		counter += increment;
-	}
-}
-
+*/

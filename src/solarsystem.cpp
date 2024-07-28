@@ -11,6 +11,7 @@ std::random_device ss_rd;
 //-------------------------------------------------------------------------------
 //			Sun and Planets
 //-------------------------------------------------------------------------------
+	//This is the function that handles all of the solar system functions
 void DrawAndUpdateSolarSystem(Sun sun, Player pilot, Planet *planet, HubPort &hubBase, bool doDrawOrbital, Texture2D hubBaseTX) {
 	sun.DrawSun();
 
@@ -43,11 +44,13 @@ void Sun::DrawSun() {
 
 //Planet functions
 Planet::Planet() {
+		//GetRand was not working correctly so I opted for the <random> include
 	std::uniform_int_distribution<int> rand_radius(3, 15);
 	std::uniform_int_distribution<int> rand_dist(50, 450);
 	std::uniform_int_distribution<int> rand_conic(-0.8, 0.8);
 	std::uniform_int_distribution<int> rand_RGB(25, 255);
 
+		//init the planet variables
 	orbitAngle = 0;
 	startingAngle = 0;
 	radius = rand_radius(ss_rd);
@@ -57,6 +60,7 @@ Planet::Planet() {
 	conicScale = orbitDistance / mass;
 	alpha = 0.0f;
 
+		//assign the color randomly
 	unsigned char colors[3] = {
 		(unsigned char)(rand_RGB(ss_rd) ),
 		(unsigned char)(rand_RGB(ss_rd) ),
@@ -69,6 +73,8 @@ Planet::Planet() {
 }
 
 void Planet::GenerateMissions(GUIbtn * btnSetting, bool raidPlanet) {
+		//sometimes there are no planets that are far enough away to generate every mission type
+		//so I included this as a surefire way to make sure atleast one planet has all 5 mission types
 	if (raidPlanet == false) {
 		numMissionsAvail = ceil(orbitDistance / 101);
 	}
@@ -76,6 +82,7 @@ void Planet::GenerateMissions(GUIbtn * btnSetting, bool raidPlanet) {
 		numMissionsAvail = 5;
 	}
 
+		//fill the mission vector
 	missionsAvail.emplace_back("OddJob", 200, 4, 1.0, (btnSetting)->border );
 	missionsAvail.emplace_back("Gather", 1200, 20, 10.0, (btnSetting + 1)->border );
 	missionsAvail.emplace_back("Salvage", 3000, 7, 45.0, (btnSetting + 2)->border );
@@ -83,15 +90,9 @@ void Planet::GenerateMissions(GUIbtn * btnSetting, bool raidPlanet) {
 	missionsAvail.emplace_back("Raid", 24000, 90, 180.0, (btnSetting + 4)->border );
 }
 
-void Planet::ResetPlanet() {
-	for (int i=0; i<numMissionsAvail; i++) {
-		missionsAvail[i].resetCooldown();
-	}
-
-	orbitAngle = startingAngle;
-}
 
 void Planet::UpdatePlanet(Player pilot) {
+		//adjust the orbit based on an orbital equation
 	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
 
 	pos = (Vector2) {
@@ -99,11 +100,13 @@ void Planet::UpdatePlanet(Player pilot) {
 		sunPos.y + sin(orbitAngle) * orbitRadius 
 	};
 	
+		//there are two orbital point arrays for the gradually increasing and decreasing orbit lines based on mouse distance
 	for(int p=0; p<ORBITALPOINTS; p++) {
 		float distScaler = 1 / distFromMouse;
 		float splineAngleA = orbitAngle - (p * distScaler);
 		float splineAngleB = orbitAngle + (p * distScaler);
 
+			//these two arrays change the position of each point based on mouse distance along the same orbital equation that the planet follows
 		orbitPointsAhead[p] = {
 			sunPos.x + cos(splineAngleA) * (orbitDistance / (1 - conicScale * cos(splineAngleA - conicRotation)) ),
 			sunPos.y + sin(splineAngleA) * (orbitDistance / (1 - conicScale * cos(splineAngleA - conicRotation)) )
@@ -115,6 +118,7 @@ void Planet::UpdatePlanet(Player pilot) {
 		};
 	}
 
+		//this is a third array for the full orbital line based on the same orbital equation that the planet follows
 	for(int p=0; p<ORBITALPOINTSFULL; p++) {
 		float splineAngleF = ((M_PI / ORBITALPOINTSFULL) * p * 2.041);
 
@@ -124,13 +128,16 @@ void Planet::UpdatePlanet(Player pilot) {
 		};
 	}
 
+		//important distance calculations
 	distFromMouse = GetDist(pos, GetMousePosition() );
 	distFromSun = GetDist(pos, sunPos);
 
+		//if the mouse dist is less than 10 than set to 10 otherwise the lines do some crazy things
 	if (distFromMouse < 10) {
 		distFromMouse = 10;
 	}
 
+		//adust the orbit of the planet based on time, distance from sun, and mass of planet
 	if (orbitAngle > 0) {
 		orbitAngle = ((pilot.getTimeRemaining() * 0.0001) / distFromSun) * mass;
 	}
@@ -140,6 +147,7 @@ void Planet::UpdatePlanet(Player pilot) {
 }
 
 void Planet::DrawPlanet(bool doDrawOrbital) {
+		//if the mouse is colliding with the planet, the orbit is on, or the sun is on then draw the full orbital line
 	if (((CheckCollisionPointCircle(GetMousePosition(), pos, radius)
 	|| CheckCollisionPointCircle(GetMousePosition(), sunPos, 30) )
 	|| orbitOn == true
@@ -147,15 +155,18 @@ void Planet::DrawPlanet(bool doDrawOrbital) {
 	&& doDrawOrbital == true) {
 		DrawSplineLinear(orbitPointsFull, ORBITALPOINTSFULL, 2, orbitColor );
 	}
+		//otherwise if the planet is within a certain range then draw the gradually increasing and decreasing orbital lines
 	else if (CheckCollisionPointCircle(GetMousePosition(), pos, PLANETBOUNDS) ) {
 		DrawSplineLinear(orbitPointsAhead, ORBITALPOINTS, 2, orbitColor );
 		DrawSplineLinear(orbitPointsBehind, ORBITALPOINTS, 2, orbitColor );
 	}
 	
+		//draw the planet
 	DrawCircleV(pos, radius, color);
 }
 
 void Planet::RegisterClick() {
+		//if the sun is clicked turn sunclicked on
 	if (CheckCollisionPointCircle(GetMousePosition(), sunPos, sunRadius)
 	&& IsMouseButtonPressed(MOUSE_LEFT_BUTTON) ) {
 		if (sunClicked == false) {
@@ -165,7 +176,7 @@ void Planet::RegisterClick() {
 			sunClicked = false;
 		}
 	}
-
+		//if the planet is clicked turn orbit on
 	if (CheckCollisionPointCircle(GetMousePosition(), pos, radius)
 	&& IsMouseButtonPressed(MOUSE_LEFT_BUTTON) ) {
 		if (orbitOn == false) {
@@ -178,8 +189,10 @@ void Planet::RegisterClick() {
 }
 
 void Planet::MissionHandler(Player &pilot, Ship ship, bool doUpdateTimer) {
+		//mission correction is needed for the planets with bounty or raid
 	int missionCorrection = 0;
 
+		//for each mission, draw and handle mission based on if it can be clicked or not
 	if (!doUpdateTimer) {
 		if (GetNumMissions() >= 4) {
 			missionCorrection = 1;
@@ -203,6 +216,8 @@ void Planet::MissionHandler(Player &pilot, Ship ship, bool doUpdateTimer) {
 			}
 		}
 
+			//draw each mission except for the bounty or raid missions because they draw themselves already
+			//this was a workaround fix that needs a rework with the mission class but we did not have time
 		for (int i=0; i<GetNumMissions() - missionCorrection; i++) {
 			missionsAvail[i].CompleteMission(pilot, ship);
 			missionsAvail[i].DrawButton(pilot, true);
@@ -210,11 +225,13 @@ void Planet::MissionHandler(Player &pilot, Ship ship, bool doUpdateTimer) {
 	}
 	else {
 		for (int i=0; i<GetNumMissions(); i++) {
+				//update the cooldown for each mission regardless of anything
 			missionsAvail[i].updateTimer();
 		}
 	}
 }
 
+// getters
 Vector2 Planet::GetPos() {
 	return pos;
 }
@@ -227,8 +244,10 @@ int Planet::GetNumMissions() {
 	return numMissionsAvail;
 }
 
-HubPort::HubPort(float radius, float orbitDistance) 
+//Hubport class that operates similarily to the planet class
+HubPort::HubPort(float radius, float orbitDistance)
 	: radius(radius), orbitDistance(orbitDistance) {
+		//see planet class for constructor info
 	orbitAngle = 0;
 	mass = pow(radius, 2) * 100;
 	conicScale = orbitDistance / mass;
@@ -244,7 +263,7 @@ HubPort::HubPort(float radius, float orbitDistance)
 }
 
 void HubPort::GenerateMarket(GUIbtn * btnSetting) {
-	//init of missions
+	//init of market upgrades and their different tier levels
     weaponUpgrade.emplace_back("Slot-1 Turret", 1, "weapon", 10000, (btnSetting)->border);
     weaponUpgrade.emplace_back("Slot-2 Turret", 2, "weapon", 10000, (btnSetting)->border);
     weaponUpgrade.emplace_back("Slot-3 Turret", 3, "weapon", 10000, (btnSetting)->border);
@@ -268,6 +287,7 @@ void HubPort::GenerateMarket(GUIbtn * btnSetting) {
 }	
 
 void HubPort::UpdateHubPort(Player pilot) {
+		//see planet update function for info -----------
 	orbitRadius = orbitDistance / (1 - conicScale * cos(orbitAngle - conicRotation));
 
 	pos = (Vector2) {
@@ -316,6 +336,7 @@ void HubPort::UpdateHubPort(Player pilot) {
 }
 
 void HubPort::DrawHubPort(bool doDrawOrbital, Texture2D hubBaseTX) {
+		//see planet draw for info (except that this one draws a texture instead of a filled circle)
 	if (((CheckCollisionPointCircle(GetMousePosition(), pos, radius)
 	|| CheckCollisionPointCircle(GetMousePosition(), sunPos, 30) )
 	|| orbitOn == true
@@ -333,6 +354,7 @@ void HubPort::DrawHubPort(bool doDrawOrbital, Texture2D hubBaseTX) {
 }
 
 void HubPort::RegisterClick() {
+		//see planet registerclick for info
 	if (CheckCollisionPointCircle(GetMousePosition(), sunPos, sunRadius)
 	&& IsMouseButtonPressed(MOUSE_LEFT_BUTTON) ) {
 		if (sunClicked == false) {
@@ -355,6 +377,7 @@ void HubPort::RegisterClick() {
 }
 
 void HubPort::MarketHandler(Player& pilot, Ship& ship) {
+		//handle each market button based on player upgrade levels
 	static int payDebtCounter = 0;
 
 	if (pilot.timeCost_upgrade_counter < 5) {
@@ -372,6 +395,7 @@ void HubPort::MarketHandler(Player& pilot, Ship& ship) {
 		weaponUpgrade[pilot.weapon_upgrade_counter].BuyUpgrade(pilot, ship);
 	}
 
+		//if the pay debt button is right clicked change it's tier level
 	if (payDebt[0].IsRClicked() ) {
 		if (payDebtCounter < 3) {
 			payDebtCounter++;

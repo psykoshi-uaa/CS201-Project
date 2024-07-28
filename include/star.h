@@ -19,11 +19,6 @@
 #define HUBSUBFONTSIZE 24
 #define HUBBTNWIDTH 250
 #define HUBBTNHEIGHT 40 
-#define BOARDNUMBTNS 5
-#define BOARDMAINFONTSIZE 50
-#define BOARDSUBFONTSIZE 24
-#define BOARDBTNWIDTH 300
-#define BOARDBTNHEIGHT 60
 #define SBARHEIGHT 30
 #define SBARFONTSIZE 22
 #define SBARNUMSEGS 3
@@ -35,9 +30,7 @@
 #define PLANETBOUNDS 100
 #define NUMALPHACHANNELS 10
 
-//Market defines
-
-	  
+//screen dimensions
 const int SCREENWIDTH = 1920,
           SCREENHEIGHT = 1080;
 
@@ -45,6 +38,7 @@ const float SBARSEG[SBARNUMSEGS] = {200, 400, 600},
 			MARGIN = 30,
 			BTNPADDING = 2;
 
+//upgrade tier modifers
 const float tierPercentage[6] = {0.05, 0.1, 0.25, 0.40, 0.75, 1.0}; // access to assign values to player upgrade tiers
 const float tierPercentage2[6] = {1.0, 0.9, 0.8, 0.6, 0.4, 0.2}; // access to assign values to player upgrade tiers
 
@@ -142,7 +136,6 @@ class Player {
 	void addMoney(int, float); // int = amount, int = upgrade tier
 	void loseTime(float, float); // int = amount, int = upgrade tier
 	void loseTimeGradually();
-	void ResetAll();
 	/*
 	void payMarket(int);
 	void loseSP(int);
@@ -210,7 +203,6 @@ class Ship {
 	void setWeapon(int);
 	void setGatheringTool(int);
 	void setUpgrades();
-	void ResetAll(Vector2);
 	
 
 	//Upgrade 
@@ -371,7 +363,6 @@ class Planet : private Sun {
 	void UpdatePlanet(Player);
 	void RegisterClick();
 	void MissionHandler(Player&, Ship, bool);
-	void ResetPlanet();
 	Vector2 GetPos();
 	float GetRadius();
 	int GetNumMissions();

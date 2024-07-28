@@ -8,6 +8,7 @@
 //			particle animations (PTX = particles)
 //-------------------------------------------------------------------------------
 PTXstarmanager::PTXstarmanager() {
+		//set the ASCII characters for the particles
 	starFX[0] = '+';
 	starFX[1] = '*';
 	starFX[2] = 'x';
@@ -17,22 +18,27 @@ PTXstarmanager::PTXstarmanager() {
 
 void PTXstarmanager::LifeCycle() {
 	for (int i=0; i<MAXSTARPTX; i++) {
+			//if the particle is at 0 life then run generate star for that star
 		if (ptxstar[i].life == 0) {
 			GenerateStar(ptxstar[i]);
 		}
+			//else if the life is less than a designated time then update and draw that star
 		else if (ptxstar[i].life > 0 && ptxstar[i].life < FPS) {
 			UpdateSelf(ptxstar[i]);
 			DrawSelf(ptxstar[i]);
 		}
+			//else if the animation is still visible then gradually fade it out
 		else if (ptxstar[i].alpha > 0) {
 			ptxstar[i].alpha -= 0.001f;
 			DrawSelf(ptxstar[i]);
 		}
+			//else set the life of that star back to 0
 		else {
 			ptxstar[i].life = 0;
 		}
 	}
 
+		//this variable is used so that each star updates only every three frames instead of every frame
 	if (counter > updateTime) {
 		counter = 0;
 	}
@@ -43,47 +49,48 @@ void PTXstarmanager::LifeCycle() {
 }
 
 void PTXstarmanager::GenerateStar(PTXstar &ptx) {
-	if (ptx.life == 0) {
-		int chance = GetRandomValue(0, 400);
-		
-		if (chance == 1) {
-			ptx.dist = GetRandomValue(3, 20) * 0.01f;
+		//generate a random number
+	int chance = GetRandomValue(0, 400);
+		//if the random number is equal to 1 then initialize the star struct with a distance, a color of the 4 selected, a random position on the screen, and a life of 1
+	if (chance == 1) {
+		ptx.dist = GetRandomValue(3, 20) * 0.01f;
 
-			int colorChance = GetRandomValue(0, 3);
+		int colorChance = GetRandomValue(0, 3);
 
-			switch (colorChance) {
-				case 0: ptx.color = {70, 200, 255, 255};
-						break;
-				
-				case 1: ptx.color = {70, 70, 255, 255};
-						break;
-						
-				case 2: ptx.color = {70, 150, 255, 255};
-						break;
-				
-				case 3: ptx.color = {255, 250, 230, 255};
-						break;
-				
-				default: break;
-			}
-
-			ptx.life = 1;
-			ptx.pos = { (float)GetRandomValue(0, SCREENWIDTH), (float)GetRandomValue(0, SCREENHEIGHT) };
+		switch (colorChance) {
+			case 0: ptx.color = {70, 200, 255, 255};
+					break;
+			
+			case 1: ptx.color = {70, 70, 255, 255};
+					break;
+					
+			case 2: ptx.color = {70, 150, 255, 255};
+					break;
+			
+			case 3: ptx.color = {255, 250, 230, 255};
+					break;
+			
+			default: break;
 		}
+
+		ptx.life = 1;
+		ptx.pos = { (float)GetRandomValue(0, SCREENWIDTH), (float)GetRandomValue(0, SCREENHEIGHT) };
 	}
 }
 
 void PTXstarmanager::UpdateSelf(PTXstar &ptx) {
+		//gradually increase life
 	if (counter == updateTime) {
 		ptx.life++;
 	}
-
+		//gradually fade the star in until it is equal to distance (anywhere from 0.03 ~ 0.2)
 	if (ptx.alpha < ptx.dist) {
 		ptx.alpha += 0.001f;
 	}
 }
 
 void PTXstarmanager::DrawSelf(PTXstar &ptx) {
+		//draw an ASCII character based on life modulo 3
 	if (ptx.life > 0) {
 		if ((ptx.life + 1) % 3 == 0) {
 			DrawTextCodepoint(GetFontDefault(), starFX[0], ptx.pos, 10, ColorAlpha(ptx.color, ptx.alpha) );

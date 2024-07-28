@@ -27,7 +27,6 @@ static Ship ship(hubPort.GetPos());
 static SubMenu leftSideMenu(true);
 static SubMenu rightSideMenu(false);
 static GUIbtn hubBtn[HUBNUMBTNS];
-static GUIbtn boardBtn[BOARDNUMBTNS];
 static GUIbtn newGameBtn = { 0 };
 static GUIbtn exitBtn = { 0 };
 static GUIbtn backBtn = { 0 };
@@ -40,7 +39,6 @@ static float alphaChannel[NUMALPHACHANNELS];
 
 //function prototypes
 void DrawStatusBar(Player, Vector2*, float);
-void DrawStatusScreen(Font);
 void DrawBtnSelected(Rectangle, int);
 void DrawMainBtns(GUIbtn*);
 void DrawAndUpdateSolarSystem(Sun, Player, Planet*, HubPort&, bool, Texture2D);
@@ -51,7 +49,6 @@ void AlphaLinearAnim(float&, float, float, bool);
 static void InitGame();
 static void UpdateAndDrawCurrentScreen();
 static void ButtonCollisionAndClick();
-static void ResetGame();
 
 //declaring global
 GameScreen currentScreen = LOGO;
@@ -65,11 +62,13 @@ int main(){
 
 	ToggleFullscreen();
 
+	//Until the window is closed, draw and update the game
 	while (!WindowShouldClose()) {
 		UpdateAndDrawCurrentScreen();
 		ButtonCollisionAndClick();
 	}
 
+	//Unlaod all images and fonts used.
 	UnloadTexture(titleCard);
 	UnloadTexture(titleGlow);
 	UnloadTexture(titleUnderline);
@@ -91,6 +90,7 @@ int main(){
 static void InitGame() {
 	SetTargetFPS(FPS);
 
+	//Load all images and fonts
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "Starcaller");
 	titleCard	= LoadTexture("resources/title.png");
 	titleGlow	= LoadTexture("resources/title_glow.png");
@@ -101,6 +101,7 @@ static void InitGame() {
 	gameOver2	= LoadTexture("resources/game_over2.png");
 	sagaFont	= LoadFontEx("resources/saga.ttf", 72, NULL, 0);
 
+	//initializations of variables
 	currentScreen = LOGO;
 
 	btnHovered = NOBTN;
@@ -108,21 +109,21 @@ static void InitGame() {
 	alphaChannel[0] = 0.0f;
 	alphaChannel[1] = -0.5f;
 
+		//prepare statusbar dimensions
 	float sbarH = 5;
 	sbar[0] = (Vector2) {15, sbarH};
 	sbar[1] = (Vector2) {SBARSEG[0] + 15, sbarH};
 	sbar[2] = (Vector2) {SBARSEG[1] + 15, sbarH};
 	sbar[3] = (Vector2) {SBARSEG[2] + 15, sbarH};
 
+		//prepare new game button dimensions
 	newGameBtn.origin = (Vector2) {SCREENWIDTH/5, SCREENHEIGHT - SCREENHEIGHT/4};
 	newGameBtn.border = (Rectangle) {newGameBtn.origin.x, newGameBtn.origin.y, 100, 25};
-
+		//prepare exit game button dimensions
 	exitBtn.origin = (Vector2) {SCREENWIDTH/5, newGameBtn.origin.y + 25};
 	exitBtn.border = (Rectangle) {exitBtn.origin.x, exitBtn.origin.y, 40, 25};
-
-	backBtn.origin = (Vector2) {(Vector2){SCREENWIDTH - MARGIN * 3, SCREENHEIGHT - MARGIN * 3}};
-	backBtn.border = (Rectangle) {backBtn.origin.x - 20, backBtn.origin.y - BTNPADDING, 100, 40 + BTNPADDING * 2};
 	
+		//prepare Status, Interface, and Giveup button dimensions and origins
 	hubBtn[0].origin = (Vector2) { SCREENWIDTH - HUBBTNWIDTH + 20, MARGIN + SBARHEIGHT + 80};
 	hubBtn[0].border = (Rectangle) { hubBtn[0].origin.x - 20, hubBtn[0].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
 	hubBtn[1].origin = (Vector2) { MARGIN * 2, MARGIN + SBARHEIGHT + 80};
@@ -130,17 +131,16 @@ static void InitGame() {
 	hubBtn[2].origin = (Vector2) { MARGIN * 2, SCREENHEIGHT - MARGIN * 2};
 	hubBtn[2].border = (Rectangle) { hubBtn[2].origin.x - 20, hubBtn[2].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
 
-	for (int i=0; i<BOARDNUMBTNS; i++) {
-		boardBtn[i].origin = (Vector2) { MARGIN, MARGIN};
-	}
-
+		//prepare interface button origins and dimensions
 	for (int i=0; i<NUMMISSIONS; i++) {
 		missionBtn[i].origin = (Vector2) { SCREENWIDTH - (SCREENWIDTH / 6.5 ), (float)(SCREENHEIGHT / 4 + (i * 125)) };
 		missionBtn[i].border = (Rectangle) { missionBtn[i].origin.x - 20, missionBtn[i].origin.y - BTNPADDING, HUBBTNWIDTH - 20, HUBBTNHEIGHT - 2 };
 	}
 
+		//create market buttons for hub port
 	hubPort.GenerateMarket(missionBtn);
 	
+		//create mission buttons per planet
 	int randPlanet = GetRandomValue(0, NUMPLANETS);
 	for (int i=0; i<NUMPLANETS; i++) {
 		if (i == randPlanet) {
@@ -151,6 +151,7 @@ static void InitGame() {
 		}
 	}
 
+		//set ship to the sun - wanted to make origin set to the hub port but position of each planet updates after the timer starts running in update and draw, aka after this function.
 	ship.SetPosition((Vector2) { SCREENWIDTH / 2, SCREENHEIGHT / 2 });
 }
 
@@ -159,38 +160,42 @@ static void InitGame() {
 //			update and draw screen
 //-------------------------------------------------------------------------------
 static void UpdateAndDrawCurrentScreen(){
+		//shooting stars
 	int shootingStarChance = GetRandomValue(0, 5000);
 
+		//raylib begin drawing screen
 	BeginDrawing();
-
+		//set background to black
 	ClearBackground(BLACK);
 
+		//run the star particle system
 	ptxStar.LifeCycle();
 
+		//run the shooting star function based on shootingStarChance and if the shooting star is not currently running.
 	if (shootingStarChance == 1 && shootingStarStage == -1) {
 		shootingStarStage = 0; 
 	}
-
 	ShootingStar(SCREENWIDTH, SCREENHEIGHT, shootingStarStage);
-
+	
+		//Switch what happens based on the current screen________________
 	switch (currentScreen)
 	{
 		case LOGO: {
-			//update
+			//Mort Corp display on exe startup
 			screenTimer.Run();
-
+				//if 3 seconds pass or the mouse left button is pressed - continue to TITLE screen
 			if (screenTimer.Wait(3) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				screenTimer.Reset();
 				animTimer[0].Reset();
 				currentScreen = TITLE;
 			}
 
-			//draw
+			//draw the image
 			DrawTexture(logo, SCREENWIDTH/2 - logo.width/2, SCREENHEIGHT/2 - logo.height/2, WHITE);
 		} break;
 		
 		case TITLE: {
-			//update
+			//Title card display and "click anywhere" and run an animation timer that is necessary for the pulsing galaxy to fade in and out
 			animTimer[0].Run();
 			alphaChannel[0] = AlphaWaveAnim(animTimer[0].GetCounter(), 1, 0.5);
 			
@@ -199,12 +204,13 @@ static void UpdateAndDrawCurrentScreen(){
 				currentScreen = MAINMENU;
 			}
 
-			//draw
+			//draw the title card image and the glowing galaxy behind title, as well as the click anywhere text
 			if (alphaChannel[1] < 1.0f) {
 				DrawTexture(titleGlow, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[0]) );
 				DrawTexture(titleCard, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[1]) );
 			}
 			else {	
+					//once the title is fully faded in , queue click anywhere
 				DrawTexture(titleGlow, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[0]) );
 				DrawTexture(titleCard, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, WHITE);
 				DrawTextEx(sagaFont, "<click anywhere>", (Vector2){SCREENWIDTH/2 - 80, SCREENHEIGHT/2}, 30, 0, ColorAlpha(WHITE, alphaChannel[0]));
@@ -212,14 +218,15 @@ static void UpdateAndDrawCurrentScreen(){
 		} break;
 
 		case MAINMENU: {
-			//update
+			//same animation and title as TITLE but this time new game and exit game are drawn and handled
 			animTimer[0].Run();
 			alphaChannel[0] = AlphaWaveAnim(animTimer[0].GetCounter(), 1, 0.5);
 
-			//draw
+				//draw the title
 			DrawTexture(titleGlow, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[0]) );
 			DrawTexture(titleCard, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, WHITE);
 					
+				//based on which button btnHovered is equal to - draw them as white or blue
 			if (btnHovered == NEWGAMEBTN) {
 				DrawTextEx(sagaFont, "new game", newGameBtn.origin, MAINMENUFONTSIZE, 0, BLUE);
 			}
@@ -235,27 +242,30 @@ static void UpdateAndDrawCurrentScreen(){
 		} break;
 
 		case INTRO: {
-			//update
+			//fade in intro text
 			AlphaLinearAnim(alphaChannel[0], 1.0f, 0.006f, true);
 			screenTimer.Run();
-
-			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){// || screenTimer.GetCounter() > 6 * FPS) {
-				screenTimer.Reset();
+				//if mouse is pressed after 1 second or 6 seconds pass - switch to HUB screen
+			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && alphaChannel[0] > 0.5f ) {
 				currentScreen = HUB;
 			}
 
-			//draw
-			DrawTextEx(sagaFont, "Intro text block blah dee blah dee blah\nhello how are you woohoo you are pilot John Doe",
+			//draw the text
+			DrawTextEx(sagaFont, "Welcome back to life, pilot. We (Mort Corp) were generous enough to bring you back from the dead.\n\nYour last legs were destroyed beyond repair so we changed them out for you, generous, we know!\n\nNow prove to us that you are grateful by paying them off. What? You didn't ask for them? Too bad!\n\nYou have until the next planetary allignment to do so or we will - Take. Them. Back...",
 					(Vector2){MARGIN * 3, SCREENHEIGHT/2 - 50}, MAINMENUFONTSIZE, 0, ColorAlpha(WHITE, alphaChannel[0]) );	
 		} break;
 
 		case HUB: {
+			//this is the primary screen where all of the  magic happens
 			DrawAndUpdateSolarSystem(sun, pilot, planet, hubPort, true, hubBase);
 
+				//if the mouse is right clicked over a planet set that planet as the ships destination
 			if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+					//if the planet hubPort is clicked set ship destination to -1
 				if (CheckCollisionPointCircle(GetMousePosition(), hubPort.GetPos(), hubPort.GetRadius() + 5) ) {
 					shipDest = -1;
 				}
+					// otherwise set shipDest to the planets index number
 				else {
 					for (int i=0; i<NUMPLANETS; i++) {
 						if (CheckCollisionPointCircle(GetMousePosition(), planet[i].GetPos(), planet[i].GetRadius()) ) {
@@ -265,54 +275,63 @@ static void UpdateAndDrawCurrentScreen(){
 				}
 			}
 
+				//if the player time remaining variable runs out switch to gameover screen
 			if (pilot.getTimeRemaining() <= 0) {
 				currentScreen = GAMEOVER;
-			}
-			else {
-				pilot.loseTimeGradually();
 				animTimer[0].SetCounter(40);
 				animTimer[1].Reset();
 			}
+				//otherwise decrease the timer gradually
+			else {
+				pilot.loseTimeGradually();
+			}
 
+				//if the player pays off all of their debt then switch to the success screen
 			if (pilot.getDebt() >= 0) {
 				currentScreen = SUCCESS;
 			}
 				
+				//run the mission handler for only the planet at the index of shipDest 
 			for (int i=0; i<NUMPLANETS; i++) {
 				planet[i].MissionHandler(pilot, ship, true);
 			}
 			
+				//update and draw the players ship.
 			if (shipDest >= 0) {
 				ship.UpdateDestination(planet[shipDest].GetPos());
 				ship.DrawSelf(planet[shipDest].GetRadius(), WHITE);
 
-			//mission update and draw
+			//mission update and draw if the right side menu is activated and the ship is at it's destination
 				if (rightSideMenu.GetActive() && ship.IsAtDestination(planet[shipDest].GetRadius()) ) {
 					planet[shipDest].MissionHandler(pilot, ship, false);
 				}
 			}
 			else {
+					//update and draw the players ship if hubPort is the dest (it is not part of the planet array, so if shipDest is < 0, then do this)
 				ship.UpdateDestination(hubPort.GetPos());
 				ship.DrawSelf(hubPort.GetRadius(), WHITE);
 
+					//run the hubports market handler function if the right side menu is activated and the ship is at it's destination
 				if (rightSideMenu.GetActive() && ship.IsAtDestination(hubPort.GetRadius()) ) {
 					hubPort.MarketHandler(pilot, ship);
 				}
 			}
 
-
+				//Draw the status screen on the left hand side of the screen as long as the left menu is activated
 			if (leftSideMenu.GetActive()) {
 				std::string statusStr[] = { "Ship", "Weapon LVL:", "Cargo LVL:", "Gathering Tool LVL: ", "Overall Speed:" };
 				std::string statusStats[] = { ship.getName(), std::to_string(pilot.weapon_upgrade_counter), std::to_string(pilot.reward_upgrade_counter), std::to_string(ship.getGatheringTool()), std::to_string(ship.getSpeed()) };
 				int fontSize = 32;
 				
 				for (int i=0; i<5; i++) {
+						//The length of the string needed to be measure first in order for a nicer looking centered look
 					Vector2 len = MeasureTextEx(sagaFont, statusStr[i].c_str(), fontSize, 1);
 					DrawTextEx(sagaFont, statusStr[i].c_str(), {150 - len.x / 2, (float)(SCREENHEIGHT/4) + (i * 50)}, fontSize, 1, WHITE);
 					DrawTextEx(sagaFont, statusStats[i].c_str(), {SCREENWIDTH / 5 - 70, (float)(SCREENHEIGHT/4) + (i * 50)}, fontSize, 1, GREEN);
 				}
 			}
 			
+				//Draw the status bar, main buttons, and left and right submenus if they are active
 			DrawStatusBar(pilot, sbar, pilot.getTimeRemaining());
 			DrawMainBtns(hubBtn);
 			rightSideMenu.UpdateAndDrawSelf();
@@ -320,27 +339,29 @@ static void UpdateAndDrawCurrentScreen(){
 		} break;
 
 		case GAMEOVER: {
+			//Run timers that determine the position of the images drawn as they bob up and down
 			animTimer[0].Run();
 			animTimer[1].Run();
 			alphaChannel[0] = AlphaWaveAnim(animTimer[0].GetCounter(), FPS * 5, 0.3f);
 			alphaChannel[1] = AlphaWaveAnim(animTimer[1].GetCounter(), FPS * 5, 0.3f);
-
+			
+				//draw a guy floating and his torn off arm
 			DrawTexture(gameOver, SCREENWIDTH/2 - gameOver.width/2, SCREENHEIGHT / 3 - (5 * alphaChannel[0]) - gameOver.height/2, WHITE);
 			DrawTexture(gameOver2, SCREENWIDTH - SCREENWIDTH / 2.2, SCREENHEIGHT - SCREENHEIGHT / 1.3 - (5 * alphaChannel[1]), WHITE);
-
+			
+				//draw the text based on it's length in order to center the text
 			std::string loseStr = "You ran out of time. Mort Corp has reclaimed the legs they loaned you at ALL costs.";
 			Vector2 len = MeasureTextEx(sagaFont, loseStr.c_str(), MAINMENUFONTSIZE, 1);
 			DrawTextEx(sagaFont, loseStr.c_str(), (Vector2){ SCREENWIDTH/2 - len.x / 2, SCREENHEIGHT - SCREENHEIGHT / 3 }, MAINMENUFONTSIZE, 1, WHITE);
 
+				//if the mouse is pressed switch screen to retry
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				currentScreen = RETRY;
 			}
-
-			ResetGame();
-
 		} break;
 
 		case RETRY: {
+			//same anim and picture as GAMEOVER
 			animTimer[0].Run();
 			animTimer[1].Run();
 			alphaChannel[0] = AlphaWaveAnim(animTimer[0].GetCounter(), FPS * 5, 0.3f);
@@ -349,6 +370,7 @@ static void UpdateAndDrawCurrentScreen(){
 			DrawTexture(gameOver, SCREENWIDTH/2 - gameOver.width/2, SCREENHEIGHT / 3 - (5 * alphaChannel[0]) - gameOver.height/2, WHITE);
 			DrawTexture(gameOver2, SCREENWIDTH - SCREENWIDTH / 2.2, SCREENHEIGHT - SCREENHEIGHT / 1.3 - (5 * alphaChannel[1]), WHITE);
 			
+				//draw the exit button
 			if (btnHovered == EXITBTN) {
 				DrawTextEx(sagaFont, "exit", exitBtn.origin, MAINMENUFONTSIZE, 1, BLUE);
 			}
@@ -356,6 +378,7 @@ static void UpdateAndDrawCurrentScreen(){
 				DrawTextEx(sagaFont, "exit", exitBtn.origin, MAINMENUFONTSIZE, 1, WHITE);
 			}
 
+				//draw the credits
 			Vector2 creditsOrigin = (Vector2) { SCREENWIDTH - SCREENWIDTH / 4, SCREENHEIGHT - SCREENHEIGHT / 4 };
 			DrawTextEx(sagaFont, "Credits", creditsOrigin, MAINMENUFONTSIZE, 1, WHITE);
 			DrawTextEx(sagaFont, "Calvin Michele", (Vector2){creditsOrigin.x, creditsOrigin.y + MAINMENUFONTSIZE * 2}, MAINMENUFONTSIZE, 1, WHITE);
@@ -364,27 +387,31 @@ static void UpdateAndDrawCurrentScreen(){
 		} break;
 
 		case SUCCESS: {
+			//draw the exit button
 			if (btnHovered == EXITBTN) {
 				DrawTextEx(sagaFont, "exit", exitBtn.origin, MAINMENUFONTSIZE, 1, BLUE);
 			}
 			else {
 				DrawTextEx(sagaFont, "exit", exitBtn.origin, MAINMENUFONTSIZE, 1, WHITE);
 			}
-
+				
+				//draw victory text
 			std::string winStr = "You have succesfully payed off your artificial legs granted by Mort Corp!\n\nGood flying pilot.";
 			Vector2 len = MeasureTextEx(sagaFont, winStr.c_str(), MAINMENUFONTSIZE, 1);
 			DrawTextEx(sagaFont, winStr.c_str(), (Vector2){ SCREENWIDTH/2 - len.x / 2,SCREENHEIGHT/2 }, MAINMENUFONTSIZE, 1, WHITE);
 			
+				//draw credits
 			Vector2 creditsOrigin = (Vector2) { SCREENWIDTH - SCREENWIDTH / 4, SCREENHEIGHT - SCREENHEIGHT / 4 };
 			DrawTextEx(sagaFont, "Credits", creditsOrigin, MAINMENUFONTSIZE, 1, WHITE);
 			DrawTextEx(sagaFont, "Calvin Michele", (Vector2){creditsOrigin.x, creditsOrigin.y + MAINMENUFONTSIZE * 2}, MAINMENUFONTSIZE, 1, WHITE);
 			DrawTextEx(sagaFont, "Ethan Shalstrom", (Vector2){creditsOrigin.x, creditsOrigin.y + MAINMENUFONTSIZE * 3}, MAINMENUFONTSIZE, 1, WHITE);
 			DrawTextEx(sagaFont, "Sheng Her", (Vector2){creditsOrigin.x, creditsOrigin.y + MAINMENUFONTSIZE * 4}, MAINMENUFONTSIZE, 1, WHITE);
-		}
+		} break;
 		
 		default:break;
 	}
 
+	//raylib function to stop drawing to the screen
 	EndDrawing();
 }
 
@@ -393,6 +420,7 @@ static void UpdateAndDrawCurrentScreen(){
 //			button handling
 //-------------------------------------------------------------------------------
 static void ButtonCollisionAndClick() {
+	//based on which screen currentScreen is set to check to see if any buttons are being collided with
 	switch (currentScreen) {
 		case MAINMENU: {
 			if (CheckCollisionPointRec(GetMousePosition(), newGameBtn.border)) {
@@ -441,6 +469,8 @@ static void ButtonCollisionAndClick() {
 				for (int i=0; i<NUMALPHACHANNELS; i++) {
 					alphaChannel[i] = 0.0f;
 				}
+				screenTimer.Reset();
+				btnHovered = NOBTN;
 				currentScreen = INTRO;
 			} break;
 
@@ -465,15 +495,5 @@ static void ButtonCollisionAndClick() {
 			
 			default: break;
 		}
-	}
-}
-
-void ResetGame() {
-	pilot.ResetAll();
-	ship.ResetAll(hubPort.GetPos());
-	shipDest = -1;
-
-	for (int i=0; i<NUMPLANETS; i++) {
-		planet[i].ResetPlanet();
 	}
 }
