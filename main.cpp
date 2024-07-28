@@ -186,7 +186,8 @@ static void UpdateAndDrawCurrentScreen(){
 				//if 3 seconds pass or the mouse left button is pressed - continue to TITLE screen
 			if (screenTimer.Wait(3) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				screenTimer.Reset();
-				animTimer[0].Reset();
+				animTimer[0].SetCounter((FPS*8)/2);
+				animTimer[1].SetCounter((FPS*8)/2);
 				currentScreen = TITLE;
 			}
 
@@ -199,32 +200,37 @@ static void UpdateAndDrawCurrentScreen(){
 		} break;
 		
 		case TITLE: {
-			//Title card display and "click anywhere" and run an animation timer that is necessary for the pulsing galaxy to fade in and out
+			//This is a really sloppy last minute fix for the fading in intro
 			animTimer[0].Run();
-			alphaChannel[0] = AlphaWaveAnim(animTimer[0].GetCounter(), 1, 0.5);
+			if (alphaChannel[0] < 0.99f) {
+				alphaChannel[0] = AlphaWaveAnim(animTimer[0].GetCounter(), FPS * 8, 0.5f);
+			}
+			else {
+				animTimer[1].Run();
+				if (alphaChannel[1] < 0.99f) {
+					alphaChannel[0] = 1.0f;
+					alphaChannel[1] = AlphaWaveAnim(animTimer[1].GetCounter(), FPS * 8, 0.5f);
+				}
+				else {
+					alphaChannel[1] = 1.0f;
+				}
+			}
 			
-			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || alphaChannel[1] == 1.0f) {
 				screenTimer.Reset();
 				currentScreen = MAINMENU;
 			}
 
 			//draw the title card image and the glowing galaxy behind title, as well as the click anywhere text
-			if (alphaChannel[1] < 1.0f) {
-				DrawTexture(titleGlow, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[0]) );
-				DrawTexture(titleCard, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[1]) );
-			}
-			else {	
-					//once the title is fully faded in , queue click anywhere
-				DrawTexture(titleGlow, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[0]) );
-				DrawTexture(titleCard, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, WHITE);
-				DrawTextEx(sagaFont, "<click anywhere>", (Vector2){SCREENWIDTH/2 - 80, SCREENHEIGHT/2}, 30, 0, ColorAlpha(WHITE, alphaChannel[0]));
-			}
+			DrawTexture(titleGlow, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[0]) );
+			DrawTexture(titleCard, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[1]) );
+			
 		} break;
 
 		case MAINMENU: {
 			//same animation and title as TITLE but this time new game and exit game are drawn and handled
 			animTimer[0].Run();
-			alphaChannel[0] = AlphaWaveAnim(animTimer[0].GetCounter(), 1, 0.5);
+			alphaChannel[0] = AlphaWaveAnim(animTimer[0].GetCounter(), FPS * 5, 0.2f);
 
 				//draw the title
 			DrawTexture(titleGlow, SCREENWIDTH/2 - titleCard.width/2, SCREENHEIGHT/5, ColorAlpha(WHITE, alphaChannel[0]) );
