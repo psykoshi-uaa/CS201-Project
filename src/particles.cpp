@@ -119,6 +119,7 @@ void ShootingStar(float screenWidth, float screenHeight, int& count)
     static Vector2 position;
     static float total_distance = sqrt(pow((destination_2.x - position.x), 2) + pow((destination_2.y - position.x), 2));
 
+    //initialize/keep constant starting position, position, and destination
     if (count == 0) {
         position = { (float)GetRandomValue(0, screenWidth - total_distance), (float)GetRandomValue(0, screenHeight - total_distance)};
         start = position;
@@ -132,9 +133,11 @@ void ShootingStar(float screenWidth, float screenHeight, int& count)
 
     switch (count) {
         case 0:
+        //used to initialize
             count++;
             break;
         case 1:
+        //move star from start to destiation 1 and draw a line following star
             if (position.x < destination_1.x) {
                 direction = { destination_1.x - position.x, destination_1.y - position.y };
                 distance = sqrt(direction.x * direction.x + direction.y * direction.y);
@@ -143,10 +146,12 @@ void ShootingStar(float screenWidth, float screenHeight, int& count)
                 if(distance > 800 / 200)
                 DrawLine(start.x, start.y, position.x - (screenWidth / 400), position.y - (screenHeight / 225), ColorAlpha(WHITE, alpha));
             } else {
+                //move onto next destination
                 count++;
             }
             break;
         case 2:
+        //move star to destination 2 and draw line following star
             if (position.x < destination_2.x) {
                 DrawLine(start.x, start.y, destination_1.x, destination_1.y, ColorAlpha(ColorAlpha(WHITE, alpha), alpha));
                 direction = { destination_2.x - position.x, destination_2.y - position.y };
@@ -158,11 +163,13 @@ void ShootingStar(float screenWidth, float screenHeight, int& count)
                     DrawLine(destination_1.x, destination_1.y, position.x - (screenWidth / 400), position.y - (screenHeight / 225), ColorAlpha(WHITE, alpha));
                 }
             } else {
+                //restart variable position for next case and move onto next case
                 position = start;
                 count++;
             }
             break;
         case 3:
+        // draw line dissappearing from start to destination 1
             DrawLine(destination_1.x, destination_1.y, destination_2.x, destination_2.y, ColorAlpha(WHITE, alpha));
             direction = { destination_1.x - position.x, destination_1.y - position.y };
             distance = sqrt(direction.x * direction.x + direction.y * direction.y);
@@ -173,10 +180,12 @@ void ShootingStar(float screenWidth, float screenHeight, int& count)
                 DrawLine(position.x, position.y, destination_1.x, destination_1.y, ColorAlpha(WHITE, alpha));
             }
             else{
+                //move onto to next case
                 count++;
             }
             break;
         case 4:
+        //draw line dissappearing from destination 1 to destination 2
             direction = { destination_2.x - position.x, destination_2.y - position.y};
             distance = sqrt(direction.x * direction.x + direction.y * direction.y);
             position.x += direction.x * (velocity / distance);
@@ -186,6 +195,7 @@ void ShootingStar(float screenWidth, float screenHeight, int& count)
                 DrawLine(position.x, position.y, destination_2.x, destination_2.y, ColorAlpha(WHITE, alpha));
             }
             else{
+                // restart count
                 count = -1;
             }
             break;
@@ -195,6 +205,7 @@ void ShootingStar(float screenWidth, float screenHeight, int& count)
     
     if (count >= 0 && count < 3)
     {
+        //draw star as *
         DrawText("*", position.x, position.y, 14, WHITE);
     }
 };
