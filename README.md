@@ -12,13 +12,8 @@ ___
 
 [Right Click] - move to planets and change payment increment for 'pay debt'
 
-### GUI
-  We will be using RAYLIB in order to incorporate a Graphical User Interface for our game. This is a minimalist GUI library that will require us to have an understanding of what is going on with the windows and graphics behind the scenes, unlike with QT.
-
-### Player Choice
-  The player has agency in making the best decision as a space pilot. They will choose which mission they should take in order to maximize their mission rewards based on ship market upgrades that will affect the outcome of the varied missions.
-
-### 1. Home
+### Game Loop
+#### 1. Hub Port
 - Upgrades, ship and character.
 - Money, debt and income (especially if the player acquires a constant income upgrade).
 - Market, buy and sell.
@@ -26,7 +21,8 @@ ___
 
 The port that circles the sun is where you can find all of the market upgrades and pay off your debt. The debt button has the extra funcionality of changing payment increment based on if you right click.
 
-### 2. Mission
+
+#### 2. Missions
  - Oddjob
  - Gather
  - Salvage
@@ -36,7 +32,7 @@ The port that circles the sun is where you can find all of the market upgrades a
 Each planet has a number of mission depending on it's distance from the sun as well as one catch all planet in case no planets are generated far enough from the sun. The missions have varying degrees of time cost and rewards that are calculated against the players upgrades. Bounty missions require 1 weapon and Raids require 2 weapons.
 	
 
-### 3 Market
+#### 3. Market
 The market supplies upgrades for ship (thrusters, lasers, etc.) that either unlock new mission types, money yield, ship speed, and reduce time taken from doing a mission. A reliably available upgrade is extra money per “odd job” click. This loop continues until player pays off debt or GAME OVER.
 
 ### Outro
@@ -45,9 +41,10 @@ The game will terminate when the player pays off their debt or the debt increase
 
 # HOW TO BUILD
 In order to build you will need to install the raylib library following the raylib installation following the build and installation in the [raylib github](https://github.com/raysan5/raylib).
-If you are on windows and using a minGW toolchain run this commandline:
+If you are on windows and using a minGW toolchain run this commandline while your directory is set inside the same directory as main.cpp:
 
 ```g++ -o starcaller main.cpp src/star.cpp src/particles.cpp src/solarsystem.cpp src/mission.cpp src/marketupgrade.cpp src/ship.cpp -lraylib -lgdi32 -lwinmm```
+
 
 If you are on MacOS use this commandline:
 
