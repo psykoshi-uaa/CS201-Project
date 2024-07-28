@@ -192,6 +192,10 @@ static void UpdateAndDrawCurrentScreen(){
 
 			//draw the image
 			DrawTexture(logo, SCREENWIDTH/2 - logo.width/2, SCREENHEIGHT/2 - logo.height/2, WHITE);
+			
+			std::string rayStr = "made with raylib";
+			Vector2 len = MeasureTextEx(sagaFont, rayStr.c_str(), MAINMENUFONTSIZE, 1);
+			DrawTextEx(sagaFont, rayStr.c_str(), (Vector2){ SCREENWIDTH/2 - len.x / 2, SCREENHEIGHT - SCREENHEIGHT / 5 }, MAINMENUFONTSIZE, 1, WHITE);
 		} break;
 		
 		case TITLE: {
